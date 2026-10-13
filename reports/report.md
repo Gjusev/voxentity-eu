@@ -6,23 +6,23 @@ Synthetic speech, simulated telephone channel. All numbers come from frozen pred
 
 | system | track | N | slot accuracy | 95% CI | coverage | macro12 clean | macro12 tel | stale-rate |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gold-extractor | asr_slots | 240 | 100.0 | [100.0, 100.0] | 100.0 | 100.0 | 100.0 | 0.0 |
+| gold-extractor | asr_slots | 240 | 99.2 | [97.5, 100.0] | 100.0 | 99.2 | 99.2 | 0.0 |
 | reference-agent | asr_slots | 240 | 20.8 | [15.4, 26.2] | 100.0 | 21.7 | 20.0 | 0.0 |
-| whisper-turbo-slots | asr_slots | 240 | 20.8 | [15.4, 26.3] | 100.0 | 21.7 | 20.0 | 0.0 |
+| whisper-turbo-slots | asr_slots | 240 | 20.8 | [15.4, 26.2] | 100.0 | 21.7 | 20.0 | 0.0 |
 
 ## Paired degradation — gold-extractor
 
 - N pairs: 120
-- accuracy clean: 100.0
-- accuracy telephone: 100.0
+- accuracy clean: 99.2
+- accuracy telephone: 99.2
 - delta: +0.0 percentage points
-- transitions: {"fail->pass": 0, "pass->fail": 0, "pass->pass": 120, "fail->fail": 0}
+- transitions: {"fail->pass": 0, "pass->fail": 0, "pass->pass": 119, "fail->fail": 1}
 
 ### 12-cell matrix (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
-| de-DE|calendar_value | 20 | 100 | 100 |
+| de-DE|calendar_value | 20 | 90 | 90 |
 | de-DE|email | 20 | 100 | 100 |
 | de-DE|person_name | 20 | 100 | 100 |
 | de-DE|phone | 20 | 100 | 100 |
@@ -87,9 +87,9 @@ Synthetic speech, simulated telephone channel. All numbers come from frozen pred
 
 ## Error taxonomy (heuristic, revisable)
 
-- **gold-extractor**: {"correct": 240}
-- **reference-agent**: {"correct": 240}
-- **whisper-turbo-slots**: {"correct": 240}
+- **gold-extractor**: {"correct": 238, "omission": 2}
+- **reference-agent**: {"omission": 101, "correct": 50, "digit_error": 26, "name_error": 22, "address_component_loss": 14, "digit_swap": 11, "missing_prefix": 5, "calendar_component_loss": 4, "domain_error": 3, "local_part_error": 3, "code_error": 1}
+- **whisper-turbo-slots**: {"omission": 101, "correct": 50, "digit_error": 26, "name_error": 22, "address_component_loss": 14, "digit_swap": 11, "missing_prefix": 5, "calendar_component_loss": 4, "domain_error": 3, "local_part_error": 3, "code_error": 1}
 
 ## Human control (FLEURS, known corpus)
 

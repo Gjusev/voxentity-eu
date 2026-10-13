@@ -27,7 +27,7 @@ from ..corpus.verbalize import (
     SPELL_FR,
 )
 
-EXTRACTOR_VERSION = "rex-1"
+EXTRACTOR_VERSION = "rex-2"
 
 # --- correction markers (design list, not a linguistic census) -------------------
 
@@ -394,12 +394,28 @@ def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
     return f"{day:02d}.{month:02d}" + (f".{year}" if year else "")
 
 
+_DE_ORDINAL_STEMS = {"erst": 1, "dritt": 3, "sieb": 7, "ach": 8}
+
+
 def _parse_day(tokens: list[str], maps: LocaleMaps) -> int | None:
     if not tokens:
         return None
     tok = tokens[-1]
-    tok = re.sub(r"ten$", "", tok) if maps.locale == "de-DE" else tok  # ordinal
-    tok = re.sub(r"er$", "", tok) if maps.locale == "fr-FR" else tok
+    if maps.locale == "de-DE":
+        for suffix in ("ten", "en", "te"):
+            if tok.endswith(suffix):
+                stem = tok[: -len(suffix)]
+                if stem in maps.numbers:
+                    return maps.numbers[stem]
+                if stem in maps.digits:
+                    return int(maps.digits[stem])
+                if stem in _DE_ORDINAL_STEMS:
+                    return _DE_ORDINAL_STEMS[stem]
+    else:
+        if tok.endswith("er"):
+            tok = tok[:-2]
+        if tok.startswith("1er"):
+            tok = "premier"
     if tok in maps.numbers:
         return maps.numbers[tok]
     if tok in maps.digits:
