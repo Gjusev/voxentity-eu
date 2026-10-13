@@ -104,7 +104,7 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
             lines.append(f"- delta: {pd['delta_percentage_points']:+.1f} percentage points")
         lines.append(f"- transitions: {json.dumps(pd['transition_matrix'])}")
         lines.append("")
-        lines.append("### 12-cell matrix (accuracy clean / telephone)")
+        lines.append("### Cell matrix: locale × entity (accuracy clean / telephone)")
         lines.append("")
         matrix = cell_matrix(scored)
         lines.append("| cell | N | clean % | telephone % |")

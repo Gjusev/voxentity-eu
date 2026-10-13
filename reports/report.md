@@ -36,7 +36,7 @@ Bars: exact slot accuracy per locale × entity cell (values in the 12-cell table
 - delta: +0.0 percentage points
 - transitions: {"fail->pass": 0, "pass->fail": 0, "pass->pass": 120, "fail->fail": 0}
 
-### 12-cell matrix (accuracy clean / telephone)
+### Cell matrix: locale × entity (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
@@ -61,7 +61,7 @@ Bars: exact slot accuracy per locale × entity cell (values in the 12-cell table
 - delta: +0.0 percentage points
 - transitions: {"fail->pass": 0, "pass->fail": 0, "pass->pass": 109, "fail->fail": 11}
 
-### 12-cell matrix (accuracy clean / telephone)
+### Cell matrix: locale × entity (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
@@ -86,7 +86,7 @@ Bars: exact slot accuracy per locale × entity cell (values in the 12-cell table
 - delta: +5.0 percentage points
 - transitions: {"fail->pass": 2, "pass->fail": 8, "pass->pass": 36, "fail->fail": 74}
 
-### 12-cell matrix (accuracy clean / telephone)
+### Cell matrix: locale × entity (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
@@ -111,7 +111,7 @@ Bars: exact slot accuracy per locale × entity cell (values in the 12-cell table
 - delta: +4.2 percentage points
 - transitions: {"fail->pass": 3, "pass->fail": 8, "pass->pass": 39, "fail->fail": 70}
 
-### 12-cell matrix (accuracy clean / telephone)
+### Cell matrix: locale × entity (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
@@ -136,7 +136,7 @@ Bars: exact slot accuracy per locale × entity cell (values in the 12-cell table
 - delta: +5.0 percentage points
 - transitions: {"fail->pass": 2, "pass->fail": 8, "pass->pass": 36, "fail->fail": 74}
 
-### 12-cell matrix (accuracy clean / telephone)
+### Cell matrix: locale × entity (accuracy clean / telephone)
 
 | cell | N | clean % | telephone % |
 | --- | --- | --- | --- |
