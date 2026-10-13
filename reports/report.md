@@ -14,6 +14,20 @@ Ceiling controls: `gold-extractor` feeds the extractor the spoken gold text the 
 | voxtral-mini-slots | asr_slots | 240 | 37.1 | [30.0, 43.8] | 100.0 | 39.2 | 35.0 | 0.0 |
 | whisper-turbo-slots | asr_slots | 240 | 34.2 | [28.3, 40.4] | 100.0 | 36.7 | 31.7 | 0.0 |
 
+## Figures
+
+![Slot accuracy by cell](figures/cell_accuracy.svg)
+
+Bars: exact slot accuracy per locale × entity cell (values in the 12-cell tables below). Gray tick: extractor fed the written gold text; where bars sit far below it the loss is ASR, where the tick itself is low the extractor is the limit.
+
+![Paired differences](figures/paired_deltas.svg)
+
+| comparison | Δ pp | 95% CI | n |
+| --- | --- | --- | --- |
+| Whisper turbo − Voxtral Mini (both conditions) | -2.9 | [-7.1, +1.3] | 240 |
+| Whisper turbo: clean − telephone | +5.0 | [+0.8, +10.0] | 120 |
+| Voxtral Mini: clean − telephone | +4.2 | [-0.8, +9.2] | 120 |
+
 ## Paired degradation — gold-extractor
 
 - N pairs: 120

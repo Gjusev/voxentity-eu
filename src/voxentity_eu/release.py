@@ -135,6 +135,7 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
         ("THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"),
         ("dataset_card/DATASET_CARD.md", "dataset_card/DATASET_CARD.md"),
         ("reports/report.md", "reports/report.md"),
+        ("reports/figures", "reports/figures"),
         ("uv-core.lock", "uv-core.lock"),
     ]:
         copy_if_exists(rel, dest)

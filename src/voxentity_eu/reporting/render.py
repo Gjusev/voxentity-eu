@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from ..provenance import write_text_atomic
+from .charts import write_figures
 from .errors import enrich_with_taxonomy
 from .tables import cell_matrix, system_table
 
@@ -88,6 +89,7 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
             f"{fmt(r['stale_value_rate'])} |"
         )
     lines.append("")
+    lines.extend(write_figures(scored_runs, Path(out_path).parent / "figures"))
 
     for name, scored in scored_runs.items():
         if scored.get("incomplete") or "summary" not in scored:

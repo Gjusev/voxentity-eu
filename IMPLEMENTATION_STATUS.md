@@ -114,6 +114,17 @@ Comparación pareada whisper − voxtral (n=240, bootstrap estratificado, 2000
 réplicas): −2.9 pp, IC 95% [−7.1, +1.3]; voxtral mejor en 17 pares, whisper
 en 10 — **sin diferencia concluyente**; resultado nulo publicado como tal.
 
+Canal telefónico pareado por escenario (clean − telephone, bootstrap 95%):
+whisper +5.0 pp [+0.8, +10.0] (degradación detectable), voxtral +4.2 pp
+[−0.8, +9.2] (no concluyente). Figuras SVG en reports/figures/ (precisión
+por celda con techo escrito; diferencias pareadas con IC).
+
+Space (space/app.py) verificado en navegador con gradio 6.17: se corrigieron
+4 fallos que impedían su uso (audio limpio sobrescrito por el telefónico,
+rutas de audio inexistentes, case_id duplicados entre condiciones,
+transcripciones ausentes) y se cablearon los botones de ejemplo
+determinista de docs/08. No desplegado.
+
 Lectura: con el techo escrito en ~91%, ambas familias ASR quedan en ~34–37%;
 el hueco restante sí es mayoritariamente ASR (emails dictados/deletreados,
 teléfonos, nombres, códigos). Celdas más débiles: email (0–20%), teléfono
