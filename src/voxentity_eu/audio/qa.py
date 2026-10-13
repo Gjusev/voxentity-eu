@@ -127,7 +127,18 @@ def cli_qa(manifest_path: str, out_path: str) -> dict[str, Any]:
         )
 
     write_text_atomic(out_path, "\n".join(json.dumps(v, ensure_ascii=False) for v in verdicts) + "\n")
+    # write statuses back into the manifest (eligibility freezes before inference)
+    status_by_id = {v["audio_id"]: v["qa_status"] for v in verdicts}
+    updated = []
+    for a in audio:
+        if a.audio_id in status_by_id and a.qa_status == "pending_review":
+            data = a.model_dump()
+            data["qa_status"] = status_by_id[a.audio_id]
+            updated.append(AudioRecord.model_validate(data))
+        else:
+            updated.append(a)
+    write_text_atomic(manifest_file, "\n".join(r.model_dump_json() for r in updated) + "\n")
     counts: dict[str, int] = {}
     for v in verdicts:
         counts[v["qa_status"]] = counts.get(v["qa_status"], 0) + 1
-    return {"qa_total": len(verdicts), "counts": counts, "out": out_path}
+    return {"qa_total": len(verdicts), "counts": counts, "out": out_path, "manifest_updated": manifest_file}

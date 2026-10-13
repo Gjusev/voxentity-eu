@@ -16,7 +16,6 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 def main() -> int:
     import torch
-
     from qwen_tts import Qwen3TTSModel
 
     report: dict = {"torch": torch.__version__, "cuda": torch.cuda.is_available()}

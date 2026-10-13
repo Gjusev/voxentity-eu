@@ -236,6 +236,21 @@ def cli_score(gold_path: str, predictions_path: str, manifest_path: str, out_pat
     audio = list(read_jsonl(manifest_path, AudioRecord))
     predictions = list(read_jsonl(predictions_path, Prediction))
 
+    # Inference worked on opaque input ids; scoring translates them back via the
+    # gold-side mapping written by export-inputs (separate access paths, docs/04).
+    gold_dir = Path(gold_path).resolve().parent
+    mapping: dict[str, str] = {}
+    for map_file in sorted(gold_dir.glob("input_mapping_*.json")):
+        mapping.update(json.loads(map_file.read_text(encoding="utf-8")))
+    if mapping:
+        translated = []
+        for p in predictions:
+            data = p.model_dump()
+            if data["audio_id"] in mapping:
+                data["audio_id"] = mapping[data["audio_id"]]
+            translated.append(Prediction.model_validate(data))
+        predictions = translated
+
     state_root = Path(predictions_path).resolve().parent
     try:
         payload = score_run(scenarios, audio, predictions, state_root=state_root)

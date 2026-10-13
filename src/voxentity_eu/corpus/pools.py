@@ -134,16 +134,16 @@ def email_pool(locale: str, count: int) -> list[str]:
     while len(out) < count:
         style = next(stream) % 4
         f = firsts[next(stream) % len(firsts)].lower()
-        l = lasts[next(stream) % len(lasts)]
+        last_name = lasts[next(stream) % len(lasts)]
         domain = EMAIL_DOMAINS[next(stream) % 2]
         if style == 0:
-            local = f"{f}.{l}"
+            local = f"{f}.{last_name}"
         elif style == 1:
-            local = f"{f}{l}{next(stream) % 100:02d}"
+            local = f"{f}{last_name}{next(stream) % 100:02d}"
         elif style == 2:
-            local = f"{f}_{l}"
+            local = f"{f}_{last_name}"
         else:
-            local = f"{f}.{l}{next(stream) % 10}"
+            local = f"{f}.{last_name}{next(stream) % 10}"
         if locale == "fr-FR":
             local = (local.replace("é", "e").replace("è", "e").replace("ç", "c")
                      .replace("ï", "i").replace("ê", "e"))
