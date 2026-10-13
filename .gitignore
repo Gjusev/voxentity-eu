@@ -2,6 +2,7 @@
 .env.*
 !.env.example
 .venv/
+.venv-gpu/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -11,10 +12,16 @@ dist/
 build/
 *.egg-info/
 .cache/
-data/raw/
-data/generated/
-artifacts/
+# large artifacts stay out of git; small manifests and gold are versioned
+data/audio/
+data/inputs/
+data/human_control/
+data/smoke_tts/
+data/smoke_tts2/
+data/*.log
+data/_*.txt
 runs/
+artifacts/
 models/
 *.wav
 *.flac
@@ -24,3 +31,6 @@ models/
 kaggle.json
 token
 .ipynb_checkpoints/
+release_bundle/
+space/audio/
+space/results.json
