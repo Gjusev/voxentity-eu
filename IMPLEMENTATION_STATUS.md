@@ -38,6 +38,12 @@ reproducible con los comandos listados.
   regenerado); ordinales alemanes irregulares (ersten/dritten/siebten)
   corregidos (1 clip test regenerado y reevaluado).
 - Estado del corpus: automated-QA/provisional (sin escucha humana).
+- Revisión humana preparada: `python scripts/review_package.py build` genera
+  review/index.html (reproductor + texto objetivo, sin salidas ASR) y
+  review/review.csv; `apply --reviewer NOMBRE` valida veredictos
+  (accepted/wrong_synthesis/ambiguous/truncated, motivo obligatorio si no
+  accepted), escribe data/generated/human_review.jsonl y excluye del scoring
+  el clip limpio y su versión telefónica. «verified» sólo con 180/180.
 
 ## P3 — Síntesis y QA: COMPLETADO
 

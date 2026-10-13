@@ -7,7 +7,7 @@ Orden por dependencias, sin calendario. Una casilla marcada cita su evidencia; e
 - [x] Crear pyproject, paquete, CLI y extras separados; escoger lock tool y registrar decisión. — evidencia: pyproject + CLI `voxentity`, extras tts/asr-*/space; lock `uv-core.lock`.
 - [x] Implementar schemas y validar ejemplos. — evidencia: contracts.py; tests/unit/test_contracts.py.
 - [x] Crear tests de IDs, rutas, tipos, duplicados y aislamiento de gold. — evidencia: tests/unit/test_contracts.py, test_corpus.py.
-- [ ] Añadir CI CPU offline, lint y validación de links internos. — parcial: `.github/workflows/ci.yml` (ruff + pytest sobre uv-core.lock); falta validación de links internos.
+- [x] Añadir CI CPU offline, lint y validación de links internos. — evidencia: `.github/workflows/ci.yml` (ruff, scripts/check_links.py, pytest sobre uv-core.lock).
 Aceptación: instalación limpia, import sin torch/GPU/red; CLI help y ejemplos parseables; tests adversariales pasan.
 
 ## P1 — Scorer
@@ -33,8 +33,8 @@ Aceptación: counts exactos, equilibrio de dificultad y voz, validación semánt
 Depende P2.
 - [x] Resolver Qwen y speaker IDs; smoke test por idioma/voz. — evidencia: scripts/smoke_tts.py; data/smoke_tts/report*.json.
 - [x] Generador reanudable, provenance, hashes y registros de intentos. — evidencia: synthesis.jsonl + synthesis_prev_attempts.jsonl.
-- [ ] QA automática, revisión de audio disponible y flujo de exclusiones.
-- [ ] Paquete de revisión para casos pending.
+- [ ] QA automática, revisión de audio disponible y flujo de exclusiones. — QA automática y flujo de exclusiones listos (`review_package.py apply`: veredicto con motivo, clip limpio + telefónico excluidos del scoring, gold intacto); falta la escucha humana en sí.
+- [x] Paquete de revisión para casos pending. — evidencia: `scripts/review_package.py build` (review/index.html + review.csv, 180 clips limpios, sin transcripciones ASR).
 Aceptación: 180 clean accepted para verified o estado provisional explícito; errores TTS no etiquetados como errores ASR; ningún filtro basado en resultados del modelo evaluado.
 
 ## P4 — Canal

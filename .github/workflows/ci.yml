@@ -13,4 +13,5 @@ jobs:
           python-version: "3.11"
       - run: pip install -r uv-core.lock && pip install --no-deps -e . && pip install pytest ruff
       - run: ruff check .
+      - run: python scripts/check_links.py
       - run: pytest

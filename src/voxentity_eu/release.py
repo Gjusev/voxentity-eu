@@ -127,6 +127,7 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
         ("data/generated/transforms.jsonl", "transforms.jsonl"),
         ("data/generated/audio_manifest.jsonl", "audio_manifest.jsonl"),
         ("data/generated/qa.jsonl", "qa.jsonl"),
+        ("data/generated/human_review.jsonl", "human_review.jsonl"),  # present once listened
         ("data/human_control/human_control_manifest.jsonl", "human_control_manifest.jsonl"),
         ("data/human_control/attribution.json", "attribution.json"),
         ("LICENSE", "LICENSE"),
