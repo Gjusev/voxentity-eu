@@ -5,8 +5,19 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
+from dataclasses import fields as _dc_fields
+
 from ..scoring.aggregate import summarize
 from ..scoring.bootstrap import bootstrap_ci
+
+
+def _g(row: Any, key: str) -> Any:
+    """Attribute access for dataclasses, item access for dicts."""
+    if isinstance(row, dict):
+        return row.get(key)
+    if hasattr(row, key):
+        return getattr(row, key)
+    return None
 
 
 def system_table(scored_runs: dict[str, dict[str, Any]], *, replicates: int = 2000, seed: int = 20260101) -> list[dict[str, Any]]:
@@ -40,7 +51,7 @@ def error_taxonomy_table(scored_runs: dict[str, dict[str, Any]]) -> dict[str, di
     out: dict[str, dict[str, int]] = {}
     for name, scored in scored_runs.items():
         counts = Counter(
-            r.get("error_taxonomy") or "correct" for r in scored.get("results", [])
+            (_g(r, "error_taxonomy") or "correct") for r in scored.get("results", [])
         )
         out[name] = dict(sorted(counts.items(), key=lambda kv: -kv[1]))
     return out
@@ -53,9 +64,9 @@ def cell_matrix(scored: dict[str, Any]) -> list[list[Any]]:
     rows: list[list[Any]] = [header]
     by_cell: dict[str, dict[str, Any]] = {}
     for r in scored["results"]:
-        key = f"{r['locale']}|{r['entity_type']}"
+        key = f"{_g(r, 'locale')}|{_g(r, 'entity_type')}"
         by_cell.setdefault(key, {"clean": [], "telephone": []})
-        by_cell[key][r["condition"]].append(r["correct"])
+        by_cell[key][_g(r, "condition")].append(_g(r, "correct"))
     for key in sorted(by_cell):
         c = by_cell[key]["clean"]
         t = by_cell[key]["telephone"]

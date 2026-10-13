@@ -68,13 +68,19 @@ class IncompleteRun(Exception):
 def _load_agent_state(path: str, state_root: Path | None) -> list[dict[str, Any]]:
     """Read the observed final agent state; the only evidence for agent_slots."""
 
-    p = Path(path)
-    if not p.is_absolute() and state_root is not None:
-        p = state_root / p
-    try:
-        raw = json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        raise RunIntegrityError(f"unreadable observed final state {path}: {exc}") from exc
+    candidates = [Path(path)]
+    if not Path(path).is_absolute() and state_root is not None:
+        candidates.append(state_root / path)
+    raw = None
+    last_exc: Exception | None = None
+    for p in candidates:
+        try:
+            raw = json.loads(p.read_text(encoding="utf-8"))
+            break
+        except (OSError, ValueError) as exc:
+            last_exc = exc
+    if raw is None:
+        raise RunIntegrityError(f"unreadable observed final state {path}: {last_exc}") from last_exc
     slots = raw.get("final_slots")
     if slots is None:
         raise RunIntegrityError(f"observed final state {path} lacks final_slots")

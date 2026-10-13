@@ -10,9 +10,11 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
-SRC = Path("/kaggle/input/voxentity-eu-src/src")
+SRC_ZIP = Path("/kaggle/input/voxentity-eu-src/src.zip")
+SRC = Path("/kaggle/working/pkg")
 INPUTS = Path("/kaggle/input/voxentity-eu-inputs")
 
 
@@ -25,7 +27,10 @@ def main() -> int:
         ],
         check=False,
     )
-    sys.path.insert(0, str(SRC))
+    SRC.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(SRC_ZIP) as z:
+        z.extractall(SRC)
+    sys.path.insert(0, str(SRC / "src"))
     import torch  # noqa: F401  (verifies CUDA torch availability)
 
     from voxentity_eu.runner import run_asr

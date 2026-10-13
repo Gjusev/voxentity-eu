@@ -77,10 +77,10 @@ def build_gold_extractor_run(
     audio = read_jsonl(audio_manifest_path, AudioRecord)
     inputs = _load_inputs(inputs_dir)
     id_to_scenario: dict[str, str] = {}
-    mapping_path = inputs_dir.parent / "gold" / "input_mapping.json"
-    if mapping_path.exists():
-        id_to_scenario = json.loads(mapping_path.read_text(encoding="utf-8"))
-    else:
+    for gold_dir in (inputs_dir.parent / "gold", inputs_dir.parent / "generated" / "gold", Path("data/generated/gold")):
+        for mapping_path in sorted(gold_dir.glob("input_mapping_*.json")):
+            id_to_scenario.update(json.loads(mapping_path.read_text(encoding="utf-8")))
+    if not id_to_scenario:
         # fall back: manifest audio_id == scenario_id pre-export
         id_to_scenario = {a.audio_id: a.scenario_id for a in audio if a.scenario_id}
 
@@ -88,7 +88,7 @@ def build_gold_extractor_run(
     for input_id, meta in inputs.items():
         if meta["corpus"] != "synthetic":
             continue
-        sid = id_to_scenario.get(input_id, input_id)
+        sid = id_to_scenario.get(input_id, input_id).removesuffix("-tel")
         sc = scenarios.get(sid)
         if sc is None:
             continue
@@ -210,7 +210,7 @@ def human_control_wer_cer(
         else:
             # jiwer returns a dict with aggregated counts in recent versions
             out = jiwer.process_words(reference=refs, hypothesis=hyps)
-            denom = out.words
+            denom = out.hits + out.deletions + out.substitutions
             measure = out.wer
         return {
             "error_rate": measure if isinstance(measure, float) else float(measure),

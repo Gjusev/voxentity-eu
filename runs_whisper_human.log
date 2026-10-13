@@ -1,0 +1,17 @@
+`torch_dtype` is deprecated! Use `dtype` instead!
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+[run whisper-turbo] 20/200
+[run whisper-turbo] 40/200
+[run whisper-turbo] 60/200
+[run whisper-turbo] 80/200
+[run whisper-turbo] 100/200
+[run whisper-turbo] 120/200
+[run whisper-turbo] 140/200
+[run whisper-turbo] 160/200
+[run whisper-turbo] 180/200
+[run whisper-turbo] 200/200
+system: whisper-turbo
+rows: 200
+completed: 200
+failed: 0
+out: runs\whisper-human

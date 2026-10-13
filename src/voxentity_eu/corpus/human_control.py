@@ -23,26 +23,41 @@ SAMPLES_PER_LOCALE = 50
 
 
 def _parquet_files(repo: str, config: str, revision: str, split: str = "test"):
-    """Explicit parquet file list from the pinned revision (no script exec)."""
+    """Explicit parquet list from HF's official auto-conversion branch.
+
+    The dataset's main branch at the pinned revision ships the legacy
+    script+tar layout; docs/03 §E forbids executing dataset scripts, so we
+    read the official parquet export (refs/convert/parquet) and pin its
+    resolved commit instead.
+    """
 
     try:
         from huggingface_hub import HfApi
     except ImportError as exc:
         raise MissingDependency(f"huggingface_hub unavailable: {exc}") from exc
     api = HfApi()
-    files = api.list_repo_files(repo, revision=revision, repo_type="dataset")
+    parquet_rev = "refs/convert/parquet"
+    info = api.dataset_info(repo, revision=parquet_rev)
+    resolved = info.sha  # pin the conversion commit, not the moving ref name
+    files = api.list_repo_files(repo, revision=resolved, repo_type="dataset")
     prefix = f"{config}/{split}/"
-    return sorted(f for f in files if f.startswith(prefix) and f.endswith(".parquet"))
+    return sorted(f for f in files if f.startswith(prefix) and f.endswith(".parquet")), resolved
+
+
+def fleurs_row_key(row: dict[str, Any]) -> str:
+    """Stable unique row key: the original audio path (the id column repeats)."""
+
+    path = row.get("path") or row.get("audio", {}).get("path") or ""
+    return str(path).rsplit("/", 1)[-1].rsplit(".", 1)[0]
 
 
 def select_rows(
     rows: list[dict[str, Any]], locale: str, count: int
 ) -> list[dict[str, Any]]:
-    """Deterministic selection by sha256 of the FLEURS id, ascending."""
+    """Deterministic selection by sha256 of the unique row key, ascending."""
 
     def key(row: dict[str, Any]) -> str:
-        rid = str(row.get("id", ""))
-        return sha256_text(f"fleurs:{locale}:{rid}")
+        return sha256_text(f"fleurs:{locale}:{fleurs_row_key(row)}")
 
     return sorted(rows, key=key)[:count]
 
@@ -66,9 +81,11 @@ def build_human_control(out_dir: Path, source_lock: Path) -> dict[str, Any]:
 
     manifest_rows: list[dict[str, Any]] = []
     per_locale_counts: dict[str, int] = {}
+    parquet_revision: str | None = None
 
     for locale, config in FLEURS_CONFIGS.items():
-        files = _parquet_files("google/fleurs", config, revision)
+        files, resolved = _parquet_files("google/fleurs", config, revision)
+        parquet_revision = resolved
         if not files:
             raise QualityGateFailed(
                 f"no parquet test files for {config} at revision {revision}; "
@@ -77,7 +94,7 @@ def build_human_control(out_dir: Path, source_lock: Path) -> dict[str, Any]:
         rows: list[dict[str, Any]] = []
         for fname in files:
             local = hf_hub_download(
-                "google/fleurs", fname, revision=revision, repo_type="dataset"
+                "google/fleurs", fname, revision=resolved, repo_type="dataset"
             )
             import pyarrow.parquet as pq
 
@@ -90,7 +107,7 @@ def build_human_control(out_dir: Path, source_lock: Path) -> dict[str, Any]:
         per_locale_counts[locale] = len(selected)
 
         for row in selected:
-            rid = str(row["id"])
+            rid = fleurs_row_key(row)
             audio_bytes = row["audio"]["bytes"]
             base = f"fleurs-{config}-{rid}"
             # original preserved untouched
@@ -126,7 +143,6 @@ def build_human_control(out_dir: Path, source_lock: Path) -> dict[str, Any]:
                 "qa_status": "accepted",
                 "encoding": "pcm_s16le",
                 "channels": 1,
-                "schema_extra": None,
             }
             manifest_rows.append(
                 {
@@ -162,6 +178,12 @@ def build_human_control(out_dir: Path, source_lock: Path) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "source": "google/fleurs",
         "revision": revision,
+        "parquet_export_revision": parquet_revision,
+        "parquet_note": (
+            "main branch ships the legacy script format; rows were read from HF's "
+            "official auto-converted parquet branch at the commit above, no dataset "
+            "scripts executed"
+        ),
         "license": fleurs["declared_license"],
         "license_url": "https://creativecommons.org/licenses/by/4.0/",
         "rights_holder": "Google (FLEURS authors)",

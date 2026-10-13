@@ -15,15 +15,32 @@ def load_scored(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _to_example_results(scored: dict[str, Any]) -> list[Any]:
+    from ..scoring.match import ExampleResult
+
+    out = []
+    for r in scored.get("results", []):
+        if isinstance(r, dict):
+            fields = {f: r.get(f) for f in ExampleResult.__dataclass_fields__}
+            fields.pop("correct", None)
+            out.append(ExampleResult(**fields))
+        else:
+            out.append(r)
+    return out
+
+
 def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> dict[str, Any]:
     from ..contracts import Scenario, read_jsonl
 
     scenarios = {s.scenario_id: s for s in read_jsonl(scenarios_path, Scenario)}
     scored_runs: dict[str, dict[str, Any]] = {}
-    for f in sorted(results_dir.glob("scored_*.json")):
+    for f in sorted(results_dir.glob("*.json")):
         scored = load_scored(f)
-        scored = enrich_with_taxonomy(scored, scenarios)
-        scored_runs[f.stem.removeprefix("scored_")] = scored
+        if "results" not in scored:
+            continue  # wer blocks and other non-run artifacts
+        scored = enrich_with_taxonomy(scored, scenarios)  # works on dicts
+        scored["results"] = _to_example_results(scored)  # aggregate needs objects
+        scored_runs[f.stem] = scored
 
     lines: list[str] = ["# VoxEntity-EU measured results", ""]
     lines.append(
