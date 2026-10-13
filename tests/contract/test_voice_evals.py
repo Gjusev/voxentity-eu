@@ -43,9 +43,6 @@ def fixture_caller_cls():
 def test_export_fixture_loads_with_real_caller(tmp_path: Path, fixture_caller_cls):
     import asyncio
 
-    import numpy as np
-    import soundfile as sf
-
     from voxentity_eu.adapters.voice_evals_export import export_voice_evals_fixture
     from voxentity_eu.contracts import AudioRecord, Scenario, read_jsonl
 
@@ -129,7 +126,7 @@ def test_duplicate_texts_rejected(tmp_path: Path):
                     "condition": "clean", "path": rel, "sha256": "a" * 64,
                     "sample_rate_hz": 16000, "num_samples": 1600,
                     "duration_seconds": 0.1, "qa_status": "accepted",
-                    "synthesis_id": f"sy-dup-1",
+                    "synthesis_id": "sy-dup-1",
                 }
             )
         )

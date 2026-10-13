@@ -140,7 +140,7 @@ def run_asr(
     if corpus_manifest.exists():
         cm = json.loads(corpus_manifest.read_text(encoding="utf-8"))
         dataset_hash = cm.get("corpus_hash", dataset_hash)
-    from .provenance import code_commit, sha256_text
+    from .provenance import code_commit
 
     lock_hash = "0" * 64
     if Path("uv-core.lock").exists():

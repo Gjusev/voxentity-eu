@@ -61,7 +61,7 @@ def translate_human_predictions() -> Path:
     mapping = {iid: by_sha[meta["sha256"]] for iid, meta in inputs.items() if meta["sha256"] in by_sha}
 
     src = Path("runs/whisper-human/predictions.jsonl")
-    rows = [json.loads(l) for l in src.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = [json.loads(line) for line in src.read_text(encoding="utf-8").splitlines() if line.strip()]
     out_rows = []
     for r in rows:
         r["audio_id"] = mapping[r["audio_id"]]
@@ -93,7 +93,6 @@ def synthetic_wer() -> None:
     import jiwer
 
     from voxentity_eu.contracts import Scenario, read_jsonl
-    from voxentity_eu.provenance import sha256_file
 
     scenarios = {s.scenario_id: s for s in read_jsonl(GOLD, Scenario)}
     mapping = {}
@@ -104,7 +103,7 @@ def synthetic_wer() -> None:
         pred_path = Path(f"runs/{system}/predictions.jsonl")
         if not pred_path.exists():
             continue
-        rows = [json.loads(l) for l in pred_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+        rows = [json.loads(line) for line in pred_path.read_text(encoding="utf-8").splitlines() if line.strip()]
         refs, hyps = [], []
         for r in rows:
             aid = mapping.get(r["audio_id"], r["audio_id"])

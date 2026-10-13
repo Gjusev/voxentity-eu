@@ -5,8 +5,6 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any
 
-from dataclasses import fields as _dc_fields
-
 from ..scoring.aggregate import summarize
 from ..scoring.bootstrap import bootstrap_ci
 
