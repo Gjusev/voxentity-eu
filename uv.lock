@@ -1,0 +1,2 @@
+# Core lock (scoring/offline profile) generated with uv 0.9.21 / Python 3.11.
+# Regenerate with: uv pip compile pyproject.toml -o uv-core.lock

@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "scenario_id": "dev-fr-reference-correction-001",
   "split": "dev",
   "locale": "fr-FR",
