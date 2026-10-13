@@ -1,0 +1,1 @@
+These are schema design examples, not measured predictions. No audio or observed agent state exists. The future release validator must reject the positive agent_slots example as measured evidence until a real state artifact is supplied. The IDs are illustrative and do not form a joined runnable dataset.

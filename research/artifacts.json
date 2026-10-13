@@ -1,0 +1,48 @@
+{
+  "status": "research_only_not_runtime_validated",
+  "models": [
+    {
+      "id": "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice",
+      "revision": "85e237c12c027371202489a0ec509ded67b5e4b5",
+      "declared_license": "apache-2.0",
+      "role": "primary_tts_candidate"
+    },
+    {
+      "id": "openai/whisper-large-v3-turbo",
+      "revision": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9",
+      "declared_license": "mit",
+      "role": "asr_candidate"
+    },
+    {
+      "id": "mistralai/Voxtral-Mini-3B-2507",
+      "revision": "3060fe34b35ba5d44202ce9ff3c097642914f8f3",
+      "declared_license": "apache-2.0",
+      "role": "asr_candidate"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "google/fleurs",
+      "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+      "declared_license": "cc-by-4.0",
+      "configs": [
+        "de_de",
+        "fr_fr"
+      ],
+      "role": "separate_human_control"
+    }
+  ],
+  "local_integration": {
+    "repository": "https://github.com/Gjusev/voice-evals",
+    "commit": "3f6f9dd6412cbbaf8842405d6444fb2d74b8790e",
+    "inspected_files": [
+      "README.md",
+      "docs/data-format.md",
+      "src/voice_evals/probe/voices/fixture.py"
+    ]
+  },
+  "notes": [
+    "Model license metadata does not independently prove all output redistribution rights.",
+    "Resolve dependency locks and compatible backends during implementation."
+  ]
+}

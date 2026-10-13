@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.1",
+  "scenario_id": "dev-fr-reference-correction-001",
+  "split": "dev",
+  "locale": "fr-FR",
+  "entity_type": "reference_code",
+  "template_family": "fr_reference_correction_dev",
+  "difficulty_tags": [
+    "correction",
+    "spelling"
+  ],
+  "written_text": "Ma référence est AB-57, pardon, AB-75.",
+  "synthesis_text": "Ma référence est A B, cinquante-sept, pardon, A B, soixante-quinze.",
+  "entities": [
+    {
+      "entity_id": "target-1",
+      "type": "reference_code",
+      "canonical_value": "AB-75",
+      "accepted_variants": [],
+      "mention_text": "AB-75",
+      "target": true
+    }
+  ],
+  "previous_mentions": [
+    {
+      "type": "reference_code",
+      "value": "AB-57"
+    }
+  ],
+  "seed": 17
+}

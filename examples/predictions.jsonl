@@ -1,0 +1,2 @@
+{"run_id":"example-not-measured","audio_id":"fixture-positive","track":"agent_slots","status":"ok","transcript":"Ma référence est AB-75.","predicted_slots":[{"type":"reference_code","value":"AB-75"}],"error_type":null,"raw_artifact_path":null,"observed_final_state_path":null}
+{"run_id":"example-not-measured","audio_id":"fixture-timeout","track":"agent_slots","status":"timeout","transcript":null,"predicted_slots":[],"error_type":"timeout","raw_artifact_path":null,"observed_final_state_path":null}
