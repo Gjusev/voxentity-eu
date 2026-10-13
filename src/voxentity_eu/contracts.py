@@ -19,7 +19,7 @@ SCHEMA_VERSION = "0.2"
 # --- enums -----------------------------------------------------------------
 
 Split = Literal["dev", "test"]
-Locale = Literal["de-DE", "fr-FR"]
+Locale = Literal["de-DE", "fr-FR", "es-ES"]
 EntityType = Literal[
     "person_name",
     "phone",

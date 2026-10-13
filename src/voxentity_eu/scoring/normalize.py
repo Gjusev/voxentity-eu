@@ -49,9 +49,20 @@ STREET_ABBREVIATIONS: dict[str, str] = {
         "ste": "sainte",
         "st": "saint",
     },
+    "es-ES": {
+        "c/": "calle",
+        "av.": "avenida",
+        "pza.": "plaza",
+        "pº": "paseo",
+    },
 }
 
-COUNTRY_CODES: dict[str, str] = {"de-DE": "49", "fr-FR": "33"}
+COUNTRY_CODES: dict[str, str] = {"de-DE": "49", "fr-FR": "33", "es-ES": "34"}
+# national phone shapes: de/FR consume one trunk zero ("0170…" → "+49 170…");
+# ES numbers are 9 digits with no trunk zero ("612 345 678" → "+34 612 345 678")
+_NATIONAL_TRUNK_ZERO = {"de-DE": True, "fr-FR": True, "es-ES": False}
+_NATIONAL_LENGTH = {"de-DE": None, "fr-FR": None, "es-ES": 9}
+_NATIONAL_HEADS = {"de-DE": None, "fr-FR": None, "es-ES": ("6", "7", "9")}
 
 _PHONE_SEPARATOR_RE = re.compile(r"[\s.\-()\u2013\u2014/\u00a0]")
 _REF_SPACE_RE = re.compile(r"[\s\u00a0]+")
@@ -86,13 +97,16 @@ def canonical_phone(value: str, locale: Locale) -> str:
     text = _PHONE_SEPARATOR_RE.sub("", text)
     if text.startswith("00"):
         text = "+" + text[2:]
-    elif text.startswith("0"):
+    elif text.startswith("0") and _NATIONAL_TRUNK_ZERO[locale]:
         # Declared locale rule: national trunk zero → +country code.
         # Only the single trunk zero is consumed; later zeros are preserved.
-        cc = COUNTRY_CODES.get(locale)
-        if cc is None:
-            raise ValueError(f"no declared phone rule for locale {locale}")
-        text = "+" + cc + text[1:]
+        text = "+" + COUNTRY_CODES[locale] + text[1:]
+    elif _NATIONAL_LENGTH[locale] is not None and len(text) == _NATIONAL_LENGTH[locale] and (
+        _NATIONAL_HEADS[locale] is None or text[0] in _NATIONAL_HEADS[locale]
+    ):
+        # ES: a bare 9-digit national number (mobile 6/7, landline 9) is the
+        # national form of the international number
+        text = "+" + COUNTRY_CODES[locale] + text
     # international form that repeats the trunk zero after the country code,
     # e.g. "+49 (0)171 2345678" → drop that single in-parens trunk zero
     for cc in COUNTRY_CODES.values():
@@ -189,6 +203,11 @@ _POSTAL_RE = {
     "de-DE": re.compile(
         r"^(?P<street>.+?)\s+(?P<number>\d+\s*(?:[a-zA-Z]{1,4}|bis|ter)?(?:\s*-\s*\d+)?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
     ),
+    # ES written order matches DE ("Calle Mayor 12, 28013 Madrid"); suffix
+    # vocabulary is bis only
+    "es-ES": re.compile(
+        r"^(?P<street>.+?)\s+(?P<number>\d+\s*(?:bis)?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
+    ),
     "fr-FR": re.compile(
         r"^(?P<number>\d+\s*[a-zA-Z]?),?\s+(?P<street>.+?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
     ),
@@ -227,15 +246,30 @@ _MONTH_WORDS: dict[str, dict[str, int]] = {
         "décembre": 12,
         "decembre": 12,
     },
+    "es-ES": {
+        "enero": 1,
+        "febrero": 2,
+        "marzo": 3,
+        "abril": 4,
+        "mayo": 5,
+        "junio": 6,
+        "julio": 7,
+        "agosto": 8,
+        "septiembre": 9,
+        "setiembre": 9,
+        "octubre": 10,
+        "noviembre": 11,
+        "diciembre": 12,
+    },
 }
 
 _DIGIT_WORD_RE = re.compile(r"\d+")
 
 
 def _parse_postal_address(text: str, locale: Locale) -> str | PostalAddressValue:
-    # locale shape first, then the other shape as fallback: both "street number"
-    # and "number street" are legitimate textual address forms.
-    for key in (locale, "fr-FR" if locale == "de-DE" else "de-DE"):
+    # locale shape first, then the other shapes as fallback: both "street
+    # number" and "number street" are legitimate textual address forms.
+    for key in dict.fromkeys((locale, "de-DE", "fr-FR", "es-ES")):
         pattern = _POSTAL_RE.get(key)
         if pattern is None:
             continue

@@ -39,6 +39,8 @@ def build_parser() -> argparse.ArgumentParser:
     cb = csub.add_parser("build")
     cb.add_argument("--config", default="configs/corpus.yaml")
     cb.add_argument("--out", default="data/generated")
+    cb.add_argument("--suite", choices=["main", "es"], default="main",
+                    help="main = de/fr core corpus; es = separate extension suite")
     cv = csub.add_parser("validate")
     cv.add_argument("--manifest", required=True)
     cv.add_argument("--gold", required=True)

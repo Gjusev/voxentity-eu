@@ -13,7 +13,7 @@ from .base import Asr, AsrResult
 
 MODEL_ID = "openai/whisper-large-v3-turbo"
 MODEL_REVISION = "41f01f3fe87f28c78e2fbf8b568835947dd65ed9"
-WHISPER_LANGUAGES = {"de-DE": "german", "fr-FR": "french"}
+WHISPER_LANGUAGES = {"de-DE": "german", "fr-FR": "french", "es-ES": "spanish"}
 
 
 class WhisperTurbo(Asr):

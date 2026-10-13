@@ -51,13 +51,28 @@ FIRST_FR = [
     "Jules", "Karine", "Léon", "Manon", "Nicolas", "Océane", "Pénélope", "Quentin", "Raphaëlle",
     "Simon", "Tatiana",
 ]
+NAMES_ES = [
+    "García", "Martínez", "Álvarez", "Fernández", "Muñoz", "Peña", "Núñez", "Jiménez-Villar",
+    "Ordoñez", "Hernández", "Gómez", "Sáez", "Castañeda", "Ibáñez", "Moreno-Luna",
+    "Belmonte", "Carrillo", "Villanueva", "Zamorano", "Alcaraz", "Escamilla", "Tejadillos",
+    "Fontaneda", "Rascacielos", "Pradoverde", "Robledillo", "Sotoserrano", "Valdecantos",
+    "Olmedillo", "Cruzada", "Arrevuelta", "Quintanilla", "Salceda", "Melgar de Arriba",
+]
+FIRST_ES = [
+    "Ana", "Bruno", "Carmen", "David", "Elena", "Fernando", "Gloria", "Hugo", "Irene", "Javier",
+    "Karen", "Lucas", "María", "Nicolás", "Olivia", "Pablo", "Raquel", "Sergio", "Tomás", "Úrsula",
+]
+
+FIRSTS = {"de-DE": FIRST_DE, "fr-FR": FIRST_FR, "es-ES": FIRST_ES}
+SURNAMES = {"de-DE": NAMES_DE, "fr-FR": NAMES_FR, "es-ES": NAMES_ES}
+GRAPHEMIC_TRAPS = {"de-DE": "ßüöä", "fr-FR": "éèëïôç", "es-ES": "ñáéíóú"}
 
 
 def person_pool(locale: str, count: int, *, tricky_only: bool = False) -> list[str]:
-    firsts = FIRST_DE if locale == "de-DE" else FIRST_FR
-    lasts = NAMES_DE if locale == "de-DE" else NAMES_FR
+    firsts = FIRSTS[locale]
+    lasts = SURNAMES[locale]
     if tricky_only:
-        traps = "ßüöä" if locale == "de-DE" else "éèëïôç"
+        traps = GRAPHEMIC_TRAPS[locale]
         lasts = [n for n in lasts if any(c in n.lower() for c in traps)]
     stream = _rng_stream(f"person-{locale}" + ("-tricky" if tricky_only else ""))
     combos: list[tuple[int, int]] = []
@@ -73,22 +88,31 @@ def person_pool(locale: str, count: int, *, tricky_only: bool = False) -> list[s
 
 # --- phones ----------------------------------------------------------------------
 
+def _national_phone(locale: str, stream) -> str:
+    if locale == "de-DE":
+        # mobile-style national form: 017x + 7 digits (11 digits incl trunk)
+        return "017" + str(next(stream) % 10) + f"{next(stream) % 10**7:07d}"
+    if locale == "fr-FR":
+        return "0" + str(6 + next(stream) % 2) + f"{next(stream) % 10**8:08d}"
+    # es-ES: 9-digit national number, mobile heads 6/7, NO trunk zero
+    return str(6 + next(stream) % 2) + f"{next(stream) % 10**8:08d}"
+
+
+# locales whose national form has no trunk zero (ES keeps all 9 digits)
+TRUNKLESS = {"de-DE": False, "fr-FR": False, "es-ES": True}
+
+
 def phone_pool(locale: str, count: int) -> list[str]:
-    cc = "49" if locale == "de-DE" else "33"
+    from .verbalize import COUNTRY_CODES
+
+    cc = COUNTRY_CODES[locale]
     stream = _rng_stream(f"phone-{locale}")
     out: list[str] = []
     seen: set[str] = set()
     while len(out) < count:
-        if locale == "de-DE":
-            # mobile-style national form: 017x + 7 digits (11 digits incl trunk)
-            head = "017" + str(next(stream) % 10)
-            rest = f"{next(stream) % 10**7:07d}"
-            national = head + rest
-        else:
-            head = "0" + str(6 + next(stream) % 2)
-            rest = f"{next(stream) % 10**8:08d}"
-            national = head + rest
-        intl = "+" + cc + national[1:]
+        national = _national_phone(locale, stream)
+        rest = national if TRUNKLESS[locale] else national[1:]
+        intl = "+" + cc + rest
         if intl in seen:
             continue
         seen.add(intl)
@@ -99,14 +123,19 @@ def phone_pool(locale: str, count: int) -> list[str]:
 def tricky_phone_pool(locale: str, count: int) -> list[str]:
     """Phonetically hard numbers: repeats, runs, confusable pairs (60/70 in FR)."""
 
-    cc = "49" if locale == "de-DE" else "33"
-    base = "17" if locale == "de-DE" else "6"
+    from .verbalize import COUNTRY_CODES
+
+    cc = COUNTRY_CODES[locale]
+    base = {"de-DE": "17", "fr-FR": "6", "es-ES": "6"}[locale]
     patterns = [
         base + "55" + "4433", base + "12" + "3456", base + "77" + "7700",
         base + "66" + "0660", base + "19" + "9911", base + "80" + "0808",
     ]
     if locale == "fr-FR":
         patterns += [base + "60" + "7060", base + "70" + "0670", base + "16" + "6161"]
+    elif locale == "es-ES":
+        # 60/70 and seis/siete confusions under a 9-digit national number
+        patterns += [base + "60" + "7060", base + "17" + "0717", base + "16" + "6161"]
     else:
         patterns += [base + "62" + "2662", base + "90" + "0909", base + "45" + "5445"]
     out: list[str] = []
@@ -122,11 +151,17 @@ def tricky_phone_pool(locale: str, count: int) -> list[str]:
 EMAIL_DOMAINS = ["example.com", "example.org"]
 
 
+# base chain for surname-derived local parts: EXACTLY the historical de/fr
+# behavior (no umlauts here — "kühn" must stay "kühn" in the de/fr corpus)
+_BASE_LOCAL = str.maketrans("ßéèëïôç", "seeeioc")
+# FR post-local strip (historical); ES strip for its own pool
+_FR_LOCAL = str.maketrans("éèçïê", "eecie")
+_ES_LOCAL = str.maketrans("áéíóúñü", "aeiounu")
+
+
 def email_pool(locale: str, count: int) -> list[str]:
-    firsts = FIRST_DE if locale == "de-DE" else FIRST_FR
-    lasts = [n.split()[0].lower().replace("ß", "ss").replace("é", "e").replace("è", "e")
-             .replace("ë", "e").replace("ï", "i").replace("ô", "o").replace("ç", "c")
-             for n in (NAMES_DE if locale == "de-DE" else NAMES_FR)]
+    firsts = FIRSTS[locale]
+    lasts = [n.split()[0].lower().translate(_BASE_LOCAL) for n in SURNAMES[locale]]
     stream = _rng_stream(f"email-{locale}")
     out: list[str] = []
     seen: set[str] = set()
@@ -144,8 +179,9 @@ def email_pool(locale: str, count: int) -> list[str]:
         else:
             local = f"{f}.{last_name}{next(stream) % 10}"
         if locale == "fr-FR":
-            local = (local.replace("é", "e").replace("è", "e").replace("ç", "c")
-                     .replace("ï", "i").replace("ê", "e"))
+            local = local.translate(_FR_LOCAL)
+        elif locale == "es-ES":
+            local = local.translate(_ES_LOCAL)
         addr = f"{local}@{domain}"
         if addr in seen:
             continue
@@ -227,13 +263,33 @@ LOCALITIES_FR = [
 ]
 
 
+# ES streets and localities are invented combinations of generic street types
+# and toponymic morphemes; no geocoding, no associated identity (same fiction
+# policy as DE/FR, docs/03 §A).
+STREETS_ES = [
+    "Calle del Aliso", "Calle de los Nogales", "Avenida de la Vega", "Camino del Cerezo",
+    "Paseo de las Acacias", "Plaza de la Fuente", "Calle del Olmedo", "Avenida de los Chopos",
+    "Camino de la Dehesa", "Calle de las Adelfas", "Paseo del Mirador", "Calle del Tejo",
+    "Avenida de la Encomienda", "Plaza del Rosal", "Calle de los Tilos", "Camino del Prado",
+    "Paseo de la Alameda", "Calle del Madroño", "Avenida de los Fresnos", "Plaza de la Cisterna",
+]
+LOCALITIES_ES = [
+    "Valdefresno", "Sotillo de la Vega", "Fuentealmendra", "Villarejo del Monte",
+    "Casas de la Pradera", "El Saz Nuevo", "Montearagón la Baja", "Robledal de Arriba",
+    "La Nava Chica", "Peñalcordero", "Torreveladiego", "Aldehuela del Campo",
+]
+STREETS = {"de-DE": STREETS_DE, "fr-FR": STREETS_FR, "es-ES": STREETS_ES}
+LOCALITIES = {"de-DE": LOCALITIES_DE, "fr-FR": LOCALITIES_FR, "es-ES": LOCALITIES_ES}
+SUFFIXES = {"de-DE": ["", "a", "b"], "fr-FR": ["", "bis", "ter"], "es-ES": ["", "bis"]}
+
+
 def address_pool(locale: str, count: int, *, variant: str = "") -> list[dict]:
-    streets = STREETS_DE if locale == "de-DE" else STREETS_FR
-    localities = LOCALITIES_DE if locale == "de-DE" else LOCALITIES_FR
+    streets = STREETS[locale]
+    localities = LOCALITIES[locale]
     stream = _rng_stream(f"addr-{locale}{variant}")
     out: list[dict] = []
     seen: set[tuple] = set()
-    suffixes = ["", "a", "b"] if locale == "de-DE" else ["", "bis", "ter"]
+    suffixes = SUFFIXES[locale]
     while len(out) < count:
         street = streets[next(stream) % len(streets)]
         num = 1 + next(stream) % 180

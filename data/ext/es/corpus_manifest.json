@@ -1,0 +1,25 @@
+{
+ "total_scenarios": 90,
+ "splits": {
+  "dev": 30,
+  "test": 60
+ },
+ "per_cell": {
+  "es-ES|calendar_value": 15,
+  "es-ES|email": 15,
+  "es-ES|person_name": 15,
+  "es-ES|phone": 15,
+  "es-ES|postal_address": 15,
+  "es-ES|reference_code": 15
+ },
+ "difficulty_mix": {
+  "correction": 18,
+  "direct": 30,
+  "orthographic": 12,
+  "phonetic": 12,
+  "segmented": 9,
+  "spelling": 9
+ },
+ "corpus_hash": "fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701",
+ "suite": "es"
+}

@@ -18,22 +18,32 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
     warnings: list[str] = []
 
     # --- counts
-    if len(scenarios) != 180:
-        errors.append(f"expected 180 scenarios, found {len(scenarios)}")
+    # suite layout: main = 180 (de+fr), es = 90; every locale contributes
+    # 6 cells x 15 cases
+    locales_present = sorted({s.locale for s in scenarios})
+    expected_total = 15 * 6 * len(locales_present)
+    if len(scenarios) != expected_total:
+        errors.append(f"expected {expected_total} scenarios for locales {locales_present}, found {len(scenarios)}")
     per_cell: Counter = Counter((s.locale, s.entity_type) for s in scenarios)
-    for locale in ("de-DE", "fr-FR"):
+    for locale in locales_present:
         for entity in (
             "person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"
         ):
             n = per_cell.get((locale, entity), 0)
             if n != 15:
                 errors.append(f"cell {locale}/{entity}: {n} scenarios, expected 15")
+    per_locale_dev = 5 * 6
     split_counts = Counter(s.split for s in scenarios)
-    if split_counts.get("dev", 0) != 60 or split_counts.get("test", 0) != 120:
-        errors.append(f"split sizes {dict(split_counts)}, expected 60 dev / 120 test")
+    if split_counts.get("dev", 0) != per_locale_dev * len(locales_present) or (
+        split_counts.get("test", 0) != 10 * 6 * len(locales_present)
+    ):
+        errors.append(
+            f"split sizes {dict(split_counts)}, expected "
+            f"{per_locale_dev * len(locales_present)} dev / {10 * 6 * len(locales_present)} test"
+        )
 
     # --- difficulty mix per cell
-    for locale in ("de-DE", "fr-FR"):
+    for locale in locales_present:
         for entity in (
             "person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"
         ):
@@ -70,7 +80,7 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
             errors.append(f"template family {fam} appears in splits {sorted(splits)}")
 
     # --- value separation across splits (canonical forms per locale × entity)
-    for locale in ("de-DE", "fr-FR"):
+    for locale in locales_present:
         for entity in (
             "person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"
         ):

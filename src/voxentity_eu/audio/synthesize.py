@@ -16,12 +16,12 @@ from typing import Any
 MODEL_ID = "Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice"
 MODEL_REVISION = "85e237c12c027371202489a0ec509ded67b5e4b5"
 VOICES = ("serena", "dylan")
-LANGUAGE_ARG = {"de-DE": "german", "fr-FR": "french"}
+LANGUAGE_ARG = {"de-DE": "german", "fr-FR": "french", "es-ES": "spanish"}
 MASTER_RATE = 24000
 
 CELL_ORDER = [
     (locale, entity)
-    for locale in ("de-DE", "fr-FR")
+    for locale in ("de-DE", "fr-FR", "es-ES")
     for entity in (
         "person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"
     )

@@ -17,6 +17,10 @@ rex-4 (from code-switching dev failures): correction markers match whole
 words only (substring matching cut "manon" at "non"); English separators
 (dot/underscore/dash) and digit words (zero..nine) are accepted; Irish "O'"
 surnames stay one token; French two-word letter names (double vé, i grec).
+es-ES suite (rex-4): ES maps/markers/carriers, national 9-digit phone with
+no trunk zero, "16 de octubre" calendars, street extraction starting at the
+street-type word, phrase substitution for "treinta y seis" numbers and
+"uve doble"/"i griega"/"guion bajo". de/fr behavior is unchanged.
 """
 
 from __future__ import annotations
@@ -25,16 +29,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
-from ..corpus.verbalize import (
-    DIGITS_DE,
-    DIGITS_FR,
-    LETTER_NAMES_DE,
-    LETTER_NAMES_FR,
-    MONTHS_DE,
-    MONTHS_FR,
-    SPELL_DE,
-    SPELL_FR,
-)
+from ..corpus.verbalize import COUNTRY_CODES, DIGITS, LETTER_NAMES, MONTHS, SPELL
 
 EXTRACTOR_VERSION = "rex-4"
 
@@ -50,6 +45,11 @@ CORRECTION_MARKERS: dict[str, list[str]] = {
     "fr-FR": [
         "pardon, je corrige", "pardon", "je corrige", "non, en fait",
         "en fait", "excusez-moi", "non", "corrigé", "mais", "pas", "attends", "c'est",
+    ],
+    "es-ES": [
+        "perdón, me corrijo", "perdón", "me corrijo", "me corrigo", "perdona",
+        "disculpe", "no, es", "espere", "momento", "corregido", "rectifico",
+        "sino", "no",
     ],
 }
 
@@ -79,22 +79,38 @@ def _compound_numbers(locale: str) -> dict[str, str]:
     articles like FR "un" / DE "ein" are never touched.
     """
 
+    from ..corpus.verbalize import number_word
+
     maps = _number_word_maps(locale)
-    return {w: str(v) for w, v in maps.items() if v >= 10}
+    out = {w: str(v) for w, v in maps.items() if v >= 10}
+    if locale == "es-ES":
+        # "treinta y seis" must substitute as a whole phrase so digit runs
+        # do not fragment at the "y"
+        for n in range(31, 100):
+            if n % 10:
+                out[number_word(n, locale)] = str(n)
+    return out
 
 
 class LocaleMaps:
     def __init__(self, locale: str) -> None:
         self.locale = locale
-        self.digits = _invert({str(i): (DIGITS_DE if locale == "de-DE" else DIGITS_FR)[i] for i in range(10)})
+        # locale-keyed tables; an unknown locale raises instead of silently
+        # falling into another language's branch
+        self.digits = _invert({str(i): DIGITS[locale][i] for i in range(10)})
         self.digits.update({w: str(i) for i, w in enumerate(DIGITS_EN)})  # code-switched digits
-        self.spell = _invert(SPELL_DE if locale == "de-DE" else SPELL_FR)
-        self.letter_names = _invert(LETTER_NAMES_DE if locale == "de-DE" else LETTER_NAMES_FR)
-        self.months = _invert(MONTHS_DE if locale == "de-DE" else MONTHS_FR)
+        self.spell = _invert(SPELL[locale])
+        self.letter_names = _invert(LETTER_NAMES[locale])
+        self.months = _invert(MONTHS[locale])
         self.numbers = _number_word_maps(locale)
-        # both alphabets accepted on input regardless of locale (ASR may echo either)
-        other_spell = _invert(SPELL_FR if locale == "de-DE" else SPELL_DE)
-        self.spell.update(other_spell)
+        # all spelling alphabets accepted on input regardless of locale (ASR
+        # may echo either); the locale's own mapping wins on key conflicts
+        for other in SPELL:
+            if other != locale:
+                self.spell.update(_invert(SPELL[other]))
+        for word, letter in list(self.letter_names.items()):
+            if " " in word:
+                self.letter_names.setdefault(word.replace(" ", ""), letter)
         self.letter_to_word: dict[str, str] = {}
         for src in (self.spell, self.letter_names):
             for word, letter in src.items():
@@ -112,11 +128,11 @@ class ExtractionResult:
 # --- tokenizer ----------------------------------------------------------------------
 
 
-_TOKEN_RE = re.compile(r"(?<![\w'])o'[\w-]+|[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂ-]+|[.,;:!?+@]")
+_TOKEN_RE = re.compile(r"(?<![\w'])o'[\w-]+|[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂñÑáíóúÁÍÓÚ-]+|[.,;:!?+@/]")
 DIGITS_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-DOT_WORDS = ("punkt", "point", "dot", ".")
-UNDERSCORE_WORDS = ("unterstrich", "soulignement", "underscore")
-DASH_WORDS = ("bindestrich", "tiret", "dash", "-")
+DOT_WORDS = ("punkt", "point", "dot", "punto", ".")
+UNDERSCORE_WORDS = ("unterstrich", "soulignement", "underscore", "guionbajo")
+DASH_WORDS = ("bindestrich", "tiret", "dash", "guion", "-")
 
 
 def tokenize(text: str) -> list[str]:
@@ -153,7 +169,7 @@ def parse_number_stream(tokens: list[str], maps: LocaleMaps, *, allow_plus: bool
         if tok in (",", ".", ";"):
             i += 1
             continue
-        if allow_plus and tok in ("plus", "+"):
+        if allow_plus and tok in ("plus", "más", "mas", "+"):
             had_plus = True
             i += 1
             continue
@@ -223,6 +239,10 @@ def _segments(transcript: str, locale: str) -> list[list[str]]:
     if locale == "fr-FR":  # two-word letter names would split the letter run
         text = re.sub(r"\bdouble v[ée]\b", " w ", text)
         text = re.sub(r"\bi grec\b", " y ", text)
+    if locale == "es-ES":
+        text = re.sub(r"\buve doble\b", " w ", text)
+        text = re.sub(r"\bi griega\b", " y ", text)
+        text = re.sub(r"\bguion bajo\b", " guionbajo ", text)
     for word, digits in sorted(_compound_numbers(locale).items(), key=lambda kv: -len(kv[0])):
         text = re.sub(rf"(?<![\w-]){re.escape(word)}(?![\w-])", digits, text)
     segments = [seg.strip() for seg in text.split("¤") if seg.strip()]
@@ -267,7 +287,9 @@ def _extract_from_segment(seg: list[str], entity: str, maps: LocaleMaps, locale:
     return None
 
 
-CC = {"de-DE": "49", "fr-FR": "33"}
+# national-form rules: de/FR consume one trunk zero; ES keeps all 9 digits
+_NATIONAL_TRUNKLESS = {"de-DE": False, "fr-FR": False, "es-ES": True}
+_NATIONAL_LENGTH = {"de-DE": None, "fr-FR": None, "es-ES": 9}
 
 
 def _extract_phone(seg: list[str], maps: LocaleMaps) -> str | None:
@@ -275,15 +297,20 @@ def _extract_phone(seg: list[str], maps: LocaleMaps) -> str | None:
     if parsed is None:
         return None
     digits, had_plus = parsed
+    cc = COUNTRY_CODES[maps.locale]
     if had_plus or digits.startswith("00"):
         if digits.startswith("00"):
             return "+" + digits[2:]
-        if digits.startswith(CC[maps.locale]):
+        if digits.startswith(cc):
             return "+" + digits
         return "+" + digits
-    # national form: trunk zero rule mirrors the declared locale normalizer
-    if digits.startswith("0"):
-        return "+" + CC[maps.locale] + digits[1:]
+    # national form mirrors the declared locale normalizer:
+    # de/FR: trunk zero consumed; ES: 9 digits kept verbatim
+    if digits.startswith("0") and not _NATIONAL_TRUNKLESS[maps.locale]:
+        return "+" + cc + digits[1:]
+    expected = _NATIONAL_LENGTH[maps.locale]
+    if expected is not None and len(digits) == expected:
+        return "+" + cc + digits
     return digits
 
 
@@ -320,7 +347,7 @@ def _extract_reference(seg: list[str], maps: LocaleMaps) -> str | None:
 
 
 def _extract_email(seg: list[str], maps: LocaleMaps) -> str | None:
-    at_words = ("ät", "arobase", "at", "@")
+    at_words = ("ät", "arobase", "at", "arroba", "@")
     at_idx = None
     for i, tok in enumerate(seg):
         if tok in at_words:
@@ -346,6 +373,8 @@ _LOCAL_STOPS = {
     "l'adresse", "mon", "c'est", "est", "attention", "pardon", "korrigiere",
     "nein", "moment", "richtig", "nicht", "sondern", "ma", "lautet",
     "wiederhole", "nummer", "répète", "système", "delivrée",
+    "mi", "correo", "envíelo", "dirección", "sistema", "anótelo", "anote",
+    "dicto", "despacio", "carácter", "por", "lleva", "telefono",
 }
 
 
@@ -415,7 +444,7 @@ def _join_domain(tokens: list[str], maps: LocaleMaps) -> str:
     return ".".join(parts) if parts else ""
 
 
-_NUMERIC_DATE = re.compile(r"(?<!\d)(\d{1,2}) \. (\d{1,2})(?: \. (\d{4}))?(?!\d)")
+_NUMERIC_DATE = re.compile(r"(?<!\d)(\d{1,2}) [./] (\d{1,2})(?: [./] (\d{4}))?(?!\d)")
 
 
 def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
@@ -438,7 +467,13 @@ def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
     before = seg[:month_idx]
     while before and before[-1] == ".":  # written ordinal "11. Dezember"
         before = before[:-1]
+    if maps.locale == "es-ES":
+        # "16 de octubre": the preposition sits between day and month
+        while before and before[-1] == "de":
+            before = before[:-1]
     after = seg[month_idx + 1 :]
+    if maps.locale == "es-ES" and after and after[0] == "de":
+        after = after[1:]  # "de 2028"
     day = _parse_day(before, maps)
     if day is None:
         return None
@@ -447,13 +482,17 @@ def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
 
 
 _DE_ORDINAL_STEMS = {"erst": 1, "dritt": 3, "sieb": 7, "ach": 8}
+_ES_DAY_WORDS = {"primero": 1, "primer": 1, "uno": 1}
 
 
 def _parse_day(tokens: list[str], maps: LocaleMaps) -> int | None:
     if not tokens:
         return None
     tok = tokens[-1]
-    if maps.locale == "de-DE":
+    if maps.locale == "es-ES":
+        if tok in _ES_DAY_WORDS:
+            return _ES_DAY_WORDS[tok]
+    elif maps.locale == "de-DE":
         for suffix in ("ten", "en", "te"):
             if tok.endswith(suffix):
                 stem = tok[: -len(suffix)]
@@ -484,15 +523,17 @@ def _parse_year(tokens: list[str], maps: LocaleMaps) -> int | None:
     joined = parse_number_stream(tokens, maps, allow_plus=False)
     if joined and len(joined[0]) == 4:
         return int(joined[0])
-    # FR "deux mille vingt-sept" (compound substitution keeps 'mille' apart)
-    if "mille" in tokens:
-        i = tokens.index("mille")
-        if i > 0:
-            head = digits_in(tokens[i - 1]) or maps.digits.get(tokens[i - 1], "")
-            if head:
-                rest = parse_number_stream(tokens[i + 1 :], maps, allow_plus=False)
-                rest_digits = rest[0] if rest else "0"
-                return int(head) * 1000 + int(rest_digits)
+    # FR "deux mille vingt-sept" / ES "dos mil veintisiete" (compound
+    # substitution keeps mille/mil apart)
+    for mille_word in ("mille", "mil"):
+        if mille_word in tokens:
+            i = tokens.index(mille_word)
+            if i > 0:
+                head = digits_in(tokens[i - 1]) or maps.digits.get(tokens[i - 1], "")
+                if head:
+                    rest = parse_number_stream(tokens[i + 1 :], maps, allow_plus=False)
+                    rest_digits = rest[0] if rest else "0"
+                    return int(head) * 1000 + int(rest_digits)
     tok = tokens[0]
     if tok in maps.numbers and 1900 <= maps.numbers[tok] <= 2100:
         return maps.numbers[tok]
@@ -520,11 +561,24 @@ _STREET_CARRIERS_FR = {
     "j'habite", "au", "livrez", "envoyez", "chez", "pour", "pardon", "non",
     "corrigé", "attend", "mais", "attention", "notez", "tout",
 }
+_STREET_CARRIERS_ES = {
+    "mi", "dirección", "es", "entrega", "envíelo", "vivo", "en", "a",
+    "mándelo", "por", "anote", "todo", "espere", "perdón", "corregido",
+}
+# ES street names begin with a street-type word; frame words before it are
+# never part of the street
+_ES_STREET_TYPES = {"calle", "avenida", "camino", "paseo", "plaza", "carretera"}
+_STREET_CARRIERS = {
+    "de-DE": _STREET_CARRIERS_DE,
+    "fr-FR": _STREET_CARRIERS_FR,
+    "es-ES": _STREET_CARRIERS_ES,
+}
 _HOUSE_SUFFIX_WORDS = {"bis": "bis", "ter": "ter"}
 
 
 def _extract_address(seg: list[str], maps: LocaleMaps, locale: str) -> str | None:
-    labeled_keys = {"postleitzahl", "hausnummer", "ort", "code", "numéro", "numero", "ville"}
+    labeled_keys = {"postleitzahl", "hausnummer", "ort", "code", "numéro", "numero", "número",
+                    "ville", "código", "ciudad"}
     if any(t in labeled_keys for t in seg):
         return _extract_address_labeled(seg, maps, locale)
     seg = _split_house_suffixes(seg)
@@ -540,7 +594,8 @@ def _extract_address(seg: list[str], maps: LocaleMaps, locale: str) -> str | Non
     if postal is None:
         return None
     start, end = postal_span
-    _loc_tail = {"bitte", "alles", "notieren", "notez", "tout", "attends", "écoutez", "teilen"}
+    _loc_tail = {"bitte", "alles", "notieren", "notez", "tout", "attends", "écoutez", "teilen",
+                 "anote", "favor", "escuche", "elemento", "parte"}
     locality_toks = []
     for t in seg[end + 1 :]:
         if t in (",", ".", ";", ":", "!", "?"):
@@ -553,7 +608,7 @@ def _extract_address(seg: list[str], maps: LocaleMaps, locale: str) -> str | Non
     if not locality:
         return None
     before = seg[:start]
-    carriers = _STREET_CARRIERS_DE if locale == "de-DE" else _STREET_CARRIERS_FR
+    carriers = _STREET_CARRIERS[locale]
     if locale == "fr-FR":
         # spoken FR order: [house run] [street words] , [postal] [locality]
         house, house_end = _first_house_run(before, maps)
@@ -563,11 +618,21 @@ def _extract_address(seg: list[str], maps: LocaleMaps, locale: str) -> str | Non
             ).title()
             if street:
                 return f"{street} {house}, {postal} {locality}"
-    # DE order, also written FR: [street words] [house run] , [postal] [locality]
+    # DE order, also written FR and ES: [street words] [house run] , [postal] [locality]
     house, street_end = _house_run_before(before, maps)
     if house is None:
         return None
-    street = " ".join(t for t in before[:street_end] if t.isalpha() and t not in carriers).title()
+    street_span = before[:street_end]
+    if locale == "es-ES":
+        type_idx = None
+        for i, tok in enumerate(street_span):
+            if tok in _ES_STREET_TYPES:
+                type_idx = i
+                break
+        if type_idx is None:
+            return None
+        street_span = street_span[type_idx:]
+    street = " ".join(t for t in street_span if t.isalpha() and t not in carriers).title()
     if not street:
         return None
     return f"{street} {house}, {postal} {locality}"
@@ -632,15 +697,15 @@ def _extract_address_labeled(seg: list[str], maps: LocaleMaps, locale: str) -> s
                 return i
         return None
 
-    street_key = find_idx("strasse", "straße", "rue", "chemin", "allee", "allée", "weg")
-    house_key = find_idx("hausnummer", "numéro", "numero")
-    postal_key = find_idx("postleitzahl", "code")
-    city_key = find_idx("ort", "stadt", "ville")
+    street_key = find_idx("strasse", "straße", "rue", "chemin", "allee", "allée", "weg", "calle")
+    house_key = find_idx("hausnummer", "numéro", "numero", "número")
+    postal_key = find_idx("postleitzahl", "code", "código")
+    city_key = find_idx("ort", "stadt", "ville", "ciudad")
     if street_key is None or house_key is None or postal_key is None:
         return None
     street = " ".join(
         t for t in seg[street_key + 1 : min(house_key, postal_key)]
-        if t.isalpha() and t not in ("ist", "le", "la", "est", "die", "der", "das", "l")
+        if t.isalpha() and t not in ("ist", "le", "la", "est", "die", "der", "das", "l", "es", "el")
     ).title()
     house_run = _joined_digit_runs(seg[house_key + 1 : house_key + 6], maps)[0]
     house = None
@@ -652,6 +717,11 @@ def _extract_address_labeled(seg: list[str], maps: LocaleMaps, locale: str) -> s
             if nxt in maps.spell and len(nxt) > 2:
                 house = (house or "") + maps.spell[nxt]
                 break
+    elif locale == "es-ES":
+        for nxt in seg[house_key + 1 : house_key + 6]:
+            if nxt in _HOUSE_SUFFIX_WORDS and house:
+                house += _HOUSE_SUFFIX_WORDS[nxt]
+                break
     elif locale == "fr-FR":
         for t in seg[house_key + 1 : house_key + 5]:
             if t in _HOUSE_SUFFIX_WORDS and house:
@@ -661,7 +731,8 @@ def _extract_address_labeled(seg: list[str], maps: LocaleMaps, locale: str) -> s
     locality = None
     if city_key is not None:
         _loc_stops = {"ist", "für", "teil", "bestandteil", "est", "élément", "par", "pour",
-                     "bitte", "alles", "notieren", "écoutez", "notez", "tout"}
+                     "bitte", "alles", "notieren", "écoutez", "notez", "tout",
+                     "es", "por", "anótelo", "elemento", "parte"}
         locality = " ".join(
             t.title() for t in seg[city_key + 1 :]
             if (t.isalpha() or "-" in t) and t not in _loc_stops
@@ -732,8 +803,18 @@ _NAME_STOP_FR = {
 }
 
 
+_NAME_STOP_ES = {
+    "me", "llamo", "mi", "nombre", "es", "a", "de", "señora", "señor", "el",
+    "con", "anótelo", "anote", "bien", "le", "dicto", "deletreo", "deletree",
+    "y", "escuche", "despacio", "por", "favor", "apúnteme", "cita", "soy",
+    "apellido", "conmigo", "tilde", "exacto", "vengo", "perdón", "corrígeme",
+    "no", "sino", "espere", "momento", "lleva", "número",
+}
+_NAME_STOPS = {"de-DE": _NAME_STOP_DE, "fr-FR": _NAME_STOP_FR, "es-ES": _NAME_STOP_ES}
+
+
 def _name_words(tokens: list[str], locale: str) -> list[str]:
-    stop = _NAME_STOP_DE if locale == "de-DE" else _NAME_STOP_FR
+    stop = _NAME_STOPS[locale]
     words = [
         t
         for t in tokens

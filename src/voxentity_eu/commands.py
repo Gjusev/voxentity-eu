@@ -34,7 +34,11 @@ def dispatch(args: argparse.Namespace) -> dict[str, Any]:
         from .corpus.validate import cli_validate
 
         if args.corpus_command == "build":
-            return cli_build(args.config, args.out)
+            suite = getattr(args, "suite", "main")
+            out = args.out
+            if suite == "es" and out == "data/generated":
+                out = "data/ext/es"
+            return cli_build(args.config, out, suite=suite)
         if args.corpus_command == "validate":
             return cli_validate(args.manifest, args.gold)
         if args.corpus_command == "export-inputs":

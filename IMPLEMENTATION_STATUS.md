@@ -190,3 +190,27 @@ y «rex-2». Una revisión posterior detectó que el techo rex-2 era circular
   `release validate` (sin credenciales, checksums verificados).
 - Space y dataset HF: artefactos locales listos; publicación externa
   requiere autorización explícita.
+
+
+## Extensión es-ES (rama ext-es, fase texto completada)
+
+- Suite separada de 90 escenarios (6 celdas x 15; 5/4/3/3; 30 dev / 60 test)
+  en `data/ext/es/` con manifiesto propio. Hash del corpus ES:
+  `fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701`.
+- Corpus principal DE/FR verificado byte-idéntico tras el rebase sobre main
+  (test de regresión compara cada fila; hash b7513367... intacto).
+- rex-4 extendido con reglas ES (techo dev 30/30 en forma hablada Y escrita);
+  comportamiento de/fr sin cambios (suite completa del par en verde).
+- Verbalización/pools/plantillas ES con diccionarios por locale (sin caer
+  silenciosamente en la rama francesa); alfabeto radiotelefónico español
+  documentado; teléfonos +34 de 9 dígitos sin cero troncal; direcciones
+  calle-primero con sufijo bis.
+- Tests: 4 ficheros ES (verbalize/normalize/slots/corpus) + regresión de
+  bytes del corpus principal.
+
+### Pendiente (bloqueo coordinado)
+
+- GPU ocupada con las otras suites: síntesis Qwen3-TTS de los 90 escenarios,
+  canal telefónico, Whisper y scoring quedan a la espera. Qwen3-TTS
+  anuncia español; verificar con smoke de 1 clip por voz (serena/dylan)
+  antes de la corrida completa.

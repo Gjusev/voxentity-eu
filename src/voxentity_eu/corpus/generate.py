@@ -1,8 +1,14 @@
-"""Build the 180-scenario synthetic corpus (12 cells × 15 cases).
+"""Build the synthetic corpora.
 
-Difficulty mix per cell: 5 direct, 4 tricky (orthographic/phonetic),
-3 segmented/spelled, 3 correction. Split: 5 dev + 10 test per cell, with
-disjoint values and disjoint frame halves per family.
+Main suite (DE/FR): 180 scenarios, 12 cells × 15 cases — MUST stay
+byte-identical; its corpus_hash is referenced by published runs.
+Extension suite (ES): 90 scenarios, 6 cells × 15 cases under data/ext/es,
+its own manifest and splits (docs/09 §Extensiones: each extension has its
+own suite; the main corpus is never inflated).
+
+Both suites share the difficulty mix per cell: 5 direct, 4 tricky
+(orthographic/phonetic), 3 segmented/spelled, 3 correction. Split per cell:
+5 dev + 10 test, with disjoint values and disjoint frame halves per family.
 """
 
 from __future__ import annotations
@@ -22,7 +28,8 @@ from .verbalize import (
     verbalize_reference_code,
 )
 
-LOCALES = ("de-DE", "fr-FR")
+LOCALES = ("de-DE", "fr-FR")  # main suite; frozen
+SUITES = {"main": ("de-DE", "fr-FR"), "es": ("es-ES",)}
 ENTITIES = ("person_name", "phone", "email", "calendar_value", "postal_address", "reference_code")
 
 # cell layout: difficulty -> (dev_count, test_count)
@@ -89,10 +96,10 @@ def _spoken(value: Any, entity: str, locale: str, difficulty: str) -> str:
     if entity == "postal_address":
         street, house, postal, locality = value["street"], value["house_number"], value["postal_code"], value["locality"]
         if segmented:
-            from .verbalize import DIGITS_DE, DIGITS_FR, SPELL_DE, SPELL_FR, digits_spoken
+            from .verbalize import DIGITS, SPELL, digits_spoken
 
-            digit_table = DIGITS_DE if locale == "de-DE" else DIGITS_FR
-            spell_table = SPELL_DE if locale == "de-DE" else SPELL_FR
+            digit_table = DIGITS[locale]
+            spell_table = SPELL[locale]
             # house spoken digit-by-digit; letter suffix via the spelling
             # alphabet, word suffixes (bis/ter) spoken as words
             import re as _re
@@ -105,15 +112,21 @@ def _spoken(value: Any, entity: str, locale: str, difficulty: str) -> str:
                     number_word += f" {suffix_part.lower()}"
                 else:
                     number_word += f" {spell_table.get(suffix_part.lower(), suffix_part)}"
-            if locale == "de-DE":
-                return (
+            labeled = {
+                "de-DE": (
                     f"Die Straße ist {street}, die Hausnummer ist {number_word}, "
                     f"die Postleitzahl ist {digits_spoken(postal, locale)}, der Ort ist {locality}"
-                )
-            return (
-                f"La rue est {street}, le numéro est {number_word}, "
-                f"le code postal est {digits_spoken(postal, locale)}, la ville est {locality}"
-            )
+                ),
+                "fr-FR": (
+                    f"La rue est {street}, le numéro est {number_word}, "
+                    f"le code postal est {digits_spoken(postal, locale)}, la ville est {locality}"
+                ),
+                "es-ES": (
+                    f"La calle es {street}, el número es {number_word}, "
+                    f"el código postal es {digits_spoken(postal, locale)}, la ciudad es {locality}"
+                ),
+            }
+            return labeled[locale]
         return verbalize_postal_address(street, house, postal, locality, locale)
     if entity == "reference_code":
         return verbalize_reference_code(value, locale, spell=segmented or difficulty == "tricky")
@@ -198,8 +211,20 @@ def _entity_dict(entity: str, value: Any, mention: str, variants: list[str]) -> 
 
 
 def build_corpus() -> list[Scenario]:
+    """Main DE/FR suite; output is frozen (do not change its content)."""
+
+    return _build_suite(LOCALES)
+
+
+def build_corpus_es() -> list[Scenario]:
+    """Separate ES extension suite (6 cells × 15 = 90 scenarios)."""
+
+    return _build_suite(SUITES["es"])
+
+
+def _build_suite(locales: tuple[str, ...]) -> list[Scenario]:
     scenarios: list[Scenario] = []
-    for locale in LOCALES:
+    for locale in locales:
         for entity in ENTITIES:
             cell_pools = _cell_pools(locale, entity)
             # value budget: direct 5 (0:5), tricky 4, segmented 3 (5:8), correction 3 (8:11)
@@ -293,17 +318,18 @@ def _accepted_variants(entity: str, value: Any) -> list[str]:
     return []
 
 
-def cli_build(config: str, out: str) -> dict[str, Any]:
+def cli_build(config: str, out: str, suite: str = "main") -> dict[str, Any]:
     out_dir = Path(out)
     out_dir.mkdir(parents=True, exist_ok=True)
     gold_dir = out_dir / "gold"
     gold_dir.mkdir(exist_ok=True)
 
-    scenarios = build_corpus()
+    scenarios = build_corpus() if suite == "main" else build_corpus_es()
     lines = [s.model_dump_json() for s in sorted(scenarios, key=lambda s: s.scenario_id)]
     write_text_atomic(gold_dir / "scenarios.jsonl", "\n".join(lines) + "\n")
 
     summary = corpus_summary(scenarios)
+    summary["suite"] = suite
     write_text_atomic(out_dir / "corpus_manifest.json", json.dumps(summary, ensure_ascii=False, indent=1))
     return summary
 

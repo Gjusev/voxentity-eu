@@ -1,4 +1,4 @@
-"""Utterance frames per locale × entity × difficulty.
+"""Utterance frames per locale × entity × difficulty (DE/FR core, ES suite).
 
 Frames are plain carrier sentences; the entity value is inserted verbally by
 the generator. Dev and test draw from disjoint frame halves of the same
@@ -320,6 +320,162 @@ FRAMES: dict[tuple[str, str], dict[str, list[str]]] = {
             "C'est {prev}, je corrige, {e}.",
             "Le numéro de dossier est {prev}, non, c'est {e}.",
             "Pas {prev}, mais {e}.",
+        ],
+    },
+    ("es-ES", "person_name"): {
+        "direct": [
+            "Me llamo {e}.",
+            "Mi nombre es {e}.",
+            "Es a nombre de {e}.",
+            "El nombre es {e}, anótelo.",
+        ],
+        "tricky": [
+            "Es la señora {e}.",
+            "El señor {e}, con tilde.",
+            "El nombre es {e}.",
+            "Soy {e}.",
+        ],
+        "segmented": [
+            "Mi apellido es {e}, lo deletreo.",
+            "El nombre es {e}, deletreo.",
+            "Apellido {e}, deletree conmigo.",
+            "Le dicto el nombre: {e}.",
+        ],
+        "correction": [
+            "El nombre es {prev}, perdón, {e}.",
+            "Me llamo {prev}, me corrijo, {e}.",
+            "Es {prev}, no, es {e}.",
+            "Perdona, no {prev}, sino {e}.",
+        ],
+    },
+    ("es-ES", "phone"): {
+        "direct": [
+            "Mi número es {e}.",
+            "Puede llamarme al {e}.",
+            "Anote el número {e}.",
+            "Mi teléfono es {e}.",
+        ],
+        "tricky": [
+            "Mi número es {e}, escuche bien.",
+            "El número {e} tiene muchos dígitos iguales.",
+            "Repito el número: {e}.",
+            "El número es el {e}.",
+        ],
+        "segmented": [
+            "El número es {e}, dígito por dígito.",
+            "Digo el número despacio: {e}.",
+            "Número {e}, anote dígito a dígito.",
+            "Repito despacio: {e}.",
+        ],
+        "correction": [
+            "El número es {prev}, momento, me corrijo, es {e}.",
+            "Puede llamarme al {prev}, no, es el {e}.",
+            "Es el {prev}, perdón, el {e}.",
+            "No el {prev}, sino el {e}.",
+        ],
+    },
+    ("es-ES", "email"): {
+        "direct": [
+            "Mi correo es {e}.",
+            "Envíelo a {e}.",
+            "La dirección en el sistema es {e}.",
+            "Le dicto: {e}.",
+        ],
+        "tricky": [
+            "El correo es {e}, escuche bien.",
+            "Atención, la dirección es {e}.",
+            "La dirección de correo es {e}.",
+            "Anote {e}.",
+        ],
+        "segmented": [
+            "La dirección es {e}, lo deletreo todo.",
+            "Deletreo la dirección: {e}.",
+            "Correo {e}, carácter por carácter.",
+            "Despacio: {e}.",
+        ],
+        "correction": [
+            "La dirección es {prev}, perdón, me corrijo, {e}.",
+            "Envíelo a {prev}, no, espere, es {e}.",
+            "Es {prev}, disculpe, es {e}.",
+            "No {prev}, sino {e}.",
+        ],
+    },
+    ("es-ES", "calendar_value"): {
+        "direct": [
+            "Quisiera una cita el {e}.",
+            "Apúnteme para el {e}.",
+            "La cita es el {e}.",
+            "El {e} me viene bien.",
+        ],
+        "tricky": [
+            "La cita es el {e}, escuche bien.",
+            "El {e}, anótelo exacto.",
+            "Es para el {e}.",
+            "La cita tiene que ser el {e}.",
+        ],
+        "segmented": [
+            "La cita: {e}.",
+            "Lo digo por partes: {e}.",
+            "La fecha es {e}, parte por parte.",
+            "¿Cita anotada? {e}.",
+        ],
+        "correction": [
+            "El {prev}, perdón, me corrijo, el {e}.",
+            "La cita es el {prev}, no, es el {e}.",
+            "Para el {prev}, disculpe, para el {e}.",
+            "No el {prev}, sino el {e}.",
+        ],
+    },
+    ("es-ES", "postal_address"): {
+        "direct": [
+            "Mi dirección es {e}.",
+            "Envíelo a {e}.",
+            "La dirección de entrega es {e}.",
+            "Vivo en {e}.",
+        ],
+        "tricky": [
+            "La dirección es {e}, escuche bien.",
+            "Entrega en {e}, anote todo.",
+            "La dirección es {e}.",
+            "Mándelo a {e}.",
+        ],
+        "segmented": [
+            "La dirección, por partes: {e}.",
+            "Le dicto la dirección: {e}.",
+            "Dirección {e}, elemento por elemento.",
+            "Despacio la dirección: {e}.",
+        ],
+        "correction": [
+            "La dirección es {prev}, perdón, {e}.",
+            "Envíelo a {prev}, espere, es {e}.",
+            "Es {prev}, no, corregido: {e}.",
+            "No {prev}, sino {e}.",
+        ],
+    },
+    ("es-ES", "reference_code"): {
+        "direct": [
+            "Mi referencia es {e}.",
+            "El número de expediente es {e}.",
+            "Anote la referencia {e}.",
+            "El número de caso es {e}.",
+        ],
+        "tricky": [
+            "La referencia es {e}, escuche bien.",
+            "Referencia {e}, con exactitud.",
+            "El expediente lleva el número {e}.",
+            "Lo importante es la referencia {e}.",
+        ],
+        "segmented": [
+            "La referencia es {e}, la deletreo.",
+            "Deletreo la referencia: {e}.",
+            "Referencia {e}, carácter por carácter.",
+            "Despacio: {e}.",
+        ],
+        "correction": [
+            "La referencia es {prev}, perdón, {e}.",
+            "Es {prev}, me corrigo, {e}.",
+            "El número de expediente es {prev}, no, es {e}.",
+            "No {prev}, sino {e}.",
         ],
     },
 }

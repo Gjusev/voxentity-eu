@@ -17,7 +17,7 @@ MODEL_ID = "mistralai/Voxtral-Mini-3B-2507"
 MODEL_REVISION = "3060fe34b35ba5d44202ce9ff3c097642914f8f3"
 # transcription route per the model card: apply_transcription_request,
 # no chat template and no entity hints
-TRANSCRIPTION_LANGUAGES = {"de-DE": "de", "fr-FR": "fr"}
+TRANSCRIPTION_LANGUAGES = {"de-DE": "de", "fr-FR": "fr", "es-ES": "es"}
 
 
 class VoxtralMini(Asr):
