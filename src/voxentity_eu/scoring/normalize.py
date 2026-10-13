@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from dataclasses import dataclass
 from typing import Any
 
 from ..contracts import CalendarValue, EntityType, Locale, PostalAddressValue
@@ -57,15 +56,6 @@ COUNTRY_CODES: dict[str, str] = {"de-DE": "49", "fr-FR": "33"}
 _PHONE_SEPARATOR_RE = re.compile(r"[\s.\-()\u2013\u2014/\u00a0]")
 _REF_SPACE_RE = re.compile(r"[\s\u00a0]+")
 _WS_RE = re.compile(r"\s+")
-
-
-@dataclass(frozen=True)
-class NormalizedValue:
-    """Both scores for one value; ``canonical`` already embeds the locale rule."""
-
-    literal: str
-    canonical: Any  # str | tuple for structured entities
-    normalizer_version: str = NORMALIZER_VERSION
 
 
 def nfc(text: str) -> str:
@@ -176,20 +166,6 @@ def canonical_form(
     if entity_type == "reference_code":
         return canonical_reference_code(str(value), case_sensitive=case_sensitive)
     raise ValueError(f"unknown entity type {entity_type}")
-
-
-def normalize_value(
-    value: str | PostalAddressValue | CalendarValue,
-    entity_type: EntityType,
-    locale: Locale,
-    *,
-    case_sensitive: bool = True,
-) -> NormalizedValue:
-    """Full dual normalization of one value (prediction side or gold side)."""
-    return NormalizedValue(
-        literal=literal_form(value),
-        canonical=canonical_form(value, entity_type, locale, case_sensitive=case_sensitive),
-    )
 
 
 # --- parsing helpers for slot values (predictions are plain strings) ----------

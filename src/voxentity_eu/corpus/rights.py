@@ -90,13 +90,3 @@ def write_registry(out_path: Path | str) -> list[RightsEntry]:
 
     write_text_atomic(out_path, payload)
     return entries
-
-
-def blocked_assets(entries: list[RightsEntry]) -> list[str]:
-    return [e.source_id for e in entries if e.review_status == "blocked"]
-
-
-def load_registry(path: Path | str) -> list[RightsEntry]:
-    from ..contracts import read_jsonl
-
-    return list(read_jsonl(path, RightsEntry))

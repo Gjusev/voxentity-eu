@@ -25,17 +25,3 @@ class Asr(abc.ABC):
 
     @abc.abstractmethod
     def transcribe(self, audio_path: str, locale: str, **config: Any) -> AsrResult: ...
-
-
-@dataclass
-class SlotResult:
-    status: str  # ok | unsupported_parse | empty
-    slots: list[dict[str, str]] = field(default_factory=list)
-    raw: dict[str, Any] = field(default_factory=dict)
-
-
-class SlotExtractor(abc.ABC):
-    name: str = "extractor"
-
-    @abc.abstractmethod
-    def extract(self, transcript: str, requested_type: str, locale: str) -> SlotResult: ...

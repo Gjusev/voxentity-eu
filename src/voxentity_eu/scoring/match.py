@@ -25,8 +25,6 @@ from .normalize import (
     parse_slot_value,
 )
 
-OUTCOME_LABELS = ("correct", "omission", "substitution", "failure")
-
 
 @dataclass
 class ExampleResult:

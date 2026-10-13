@@ -1,8 +1,11 @@
 """Freeze measured results into space/results.json (+ audio refs).
 
 Deterministic; refuses to emit placeholder numbers: cases come only from
-scored run files. Audio is referenced by relative path and copied under
-space/audio/ (telephone at native 8 kHz; browsers handle it).
+scored run files. One case per (system, scenario, condition). Audio is
+copied to space/audio/{clean,telephone}/<scenario>.wav (both versions share
+the scenario file name, so they must live in separate folders) and stored
+as paths relative to space/. Transcripts are joined from the frozen run
+predictions (scored files do not carry them).
 """
 
 from __future__ import annotations
@@ -33,8 +36,13 @@ def main() -> int:
         return 0
 
     scenarios = {s.scenario_id: s for s in read_jsonl(scenarios_path, Scenario)}
+    to_audio_id: dict[str, str] = {}
+    for f in sorted((ROOT / "data/generated/gold").glob("input_mapping_*.json")):
+        to_audio_id.update(json.loads(f.read_text(encoding="utf-8")))
     cases: list[dict] = []
-    (space_dir / "audio").mkdir(parents=True, exist_ok=True)
+    shutil.rmtree(space_dir / "audio", ignore_errors=True)  # no stale or overwritten clips
+    for cond in ("clean", "telephone"):
+        (space_dir / "audio" / cond).mkdir(parents=True)
 
     for scored_file in sorted(results_dir.glob("*.json")):
         scored = json.loads(scored_file.read_text(encoding="utf-8"))
@@ -42,20 +50,27 @@ def main() -> int:
             continue
         scored = enrich_with_taxonomy(scored, scenarios)
         system = scored.get("run_id", scored_file.stem)
+        pred_path = ROOT / "runs" / scored_file.stem / "predictions.jsonl"
+        transcripts: dict[str, str | None] = {}
+        if pred_path.exists():
+            for line in pred_path.read_text(encoding="utf-8").splitlines():
+                if line.strip():
+                    p = json.loads(line)
+                    transcripts[to_audio_id.get(p["audio_id"], p["audio_id"])] = p.get("transcript")
         for r in scored.get("results", []):
             if r["split"] != "test":
                 continue
             sc = scenarios.get(r["scenario_id"])
             if sc is None:
                 continue
-            audio_clean = audio_root / "synthetic/clean" / f"{sc.scenario_id}.wav"
-            audio_tel = audio_root / "synthetic/telephone" / f"{sc.scenario_id}.wav"
-            for src in (audio_clean, audio_tel):
+            rel = {c: f"audio/{c}/{sc.scenario_id}.wav" for c in ("clean", "telephone")}
+            for cond, target in rel.items():
+                src = audio_root / "synthetic" / cond / f"{sc.scenario_id}.wav"
                 if src.exists():
-                    shutil.copyfile(src, space_dir / "audio" / src.name)
+                    shutil.copyfile(src, space_dir / target)
             cases.append(
                 {
-                    "case_id": f"{system}::{r['scenario_id']}",
+                    "case_id": f"{system}::{r['scenario_id']}::{r['condition']}",
                     "system": system,
                     "scenario_id": r["scenario_id"],
                     "locale": r["locale"],
@@ -65,14 +80,12 @@ def main() -> int:
                     "difficulty_tags": r["difficulty_tags"],
                     "gold_value": r.get("gold_literal", ""),
                     "predicted_value": r.get("predicted_value"),
-                    "transcript": r.get("transcript"),
+                    "transcript": transcripts.get(r["audio_id"]),
                     "correct": r["outcome"] == "correct",
                     "error_taxonomy": r.get("error_taxonomy"),
                     "qa_status": "automated-QA/provisional",
-                    "audio_clean": f"audio/{audio_clean.name}" if audio_clean.exists() else None,
-                    "audio_telephone": f"audio/{audio_tel.name}" if audio_tel.exists() else None,
-                    "condition_clean_ok": r["outcome"] if r["condition"] == "clean" else None,
-                    "condition_telephone_ok": r["outcome"] if r["condition"] == "telephone" else None,
+                    "audio_clean": rel["clean"] if (space_dir / rel["clean"]).exists() else None,
+                    "audio_telephone": rel["telephone"] if (space_dir / rel["telephone"]).exists() else None,
                 }
             )
 

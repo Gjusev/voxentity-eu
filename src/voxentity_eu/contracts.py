@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import math
-import re
 from pathlib import Path, PurePosixPath
 from typing import Any, Literal, Self
 
@@ -29,14 +28,6 @@ EntityType = Literal[
     "postal_address",
     "reference_code",
 ]
-ENTITY_TYPES: tuple[str, ...] = (
-    "person_name",
-    "phone",
-    "email",
-    "calendar_value",
-    "postal_address",
-    "reference_code",
-)
 Corpus = Literal["synthetic", "human_control"]
 Condition = Literal["clean", "telephone"]
 QaStatus = Literal[
@@ -58,8 +49,6 @@ DifficultyTag = Literal[
     "correction",
 ]
 
-ENTITY_TYPE_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
-ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 
 
 class StrictModel(BaseModel):

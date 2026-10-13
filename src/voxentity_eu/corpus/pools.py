@@ -12,7 +12,6 @@ Fiction-policy (docs/03-data.md §A):
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
 
 MASTER_SEED = 20261013
 
@@ -282,14 +281,3 @@ def tricky_reference_pool(locale: str, count: int) -> list[str]:
     shapes = ["BO-0081", "OS-5052", "ZB-2280", "SB-8855", "GO-0047", "DZ-2025",
               "BOS-8005", "ZOS-2008", "GSB-5588", "GDZ-2022"]
     return shapes[:count]
-
-
-@dataclass(frozen=True)
-class CellPools:
-    """All value pools for one locale × entity cell."""
-
-    locale: str
-    entity: str
-    primary: list  # dev gets [:5], test gets [5:15]
-    tricky: list
-    previous_extra: list  # spare values for correction previous-mentions

@@ -29,8 +29,6 @@ TARGET_SNR_DB = 20.0
 VAD_FRAME_S = 0.030
 VAD_THRESHOLD_REL = 0.05  # frame active if rms > 5% of the max frame rms
 
-A_LAW_A = 87.6
-
 
 def design_bandpass(fs: int) -> np.ndarray:
     sos = butter(FILTER_ORDER, BAND_HZ, btype="bandpass", fs=fs, output="sos")

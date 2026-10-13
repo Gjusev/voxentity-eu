@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from typing import Any
 
 from ..scoring.aggregate import summarize
@@ -43,16 +42,6 @@ def system_table(scored_runs: dict[str, dict[str, Any]], *, replicates: int = 20
             }
         )
     return rows
-
-
-def error_taxonomy_table(scored_runs: dict[str, dict[str, Any]]) -> dict[str, dict[str, int]]:
-    out: dict[str, dict[str, int]] = {}
-    for name, scored in scored_runs.items():
-        counts = Counter(
-            (_g(r, "error_taxonomy") or "correct") for r in scored.get("results", [])
-        )
-        out[name] = dict(sorted(counts.items(), key=lambda kv: -kv[1]))
-    return out
 
 
 def cell_matrix(scored: dict[str, Any]) -> list[list[Any]]:
