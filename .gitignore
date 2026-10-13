@@ -36,3 +36,5 @@ space/audio/
 space/results.json
 reproduced/
 review/
+data/ext/*/audio/
+data/ext/*/inputs/

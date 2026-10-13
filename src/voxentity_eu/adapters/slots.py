@@ -12,6 +12,11 @@ must be re-frozen on dev before any test-set comparison is reported.
 rex-3: also parses the written form ASR systems emit ("+49…", "a.b@c.de",
 "11. Dezember", "09.03.2026", "MMJ-0105", "55a", FR street-first addresses).
 rex-2 only covered the spoken form, so its 100% gold ceiling was circular.
+
+rex-4 (from code-switching dev failures): correction markers match whole
+words only (substring matching cut "manon" at "non"); English separators
+(dot/underscore/dash) and digit words (zero..nine) are accepted; Irish "O'"
+surnames stay one token.
 """
 
 from __future__ import annotations
@@ -31,7 +36,7 @@ from ..corpus.verbalize import (
     SPELL_FR,
 )
 
-EXTRACTOR_VERSION = "rex-3"
+EXTRACTOR_VERSION = "rex-4"
 
 # --- correction markers (design list, not a linguistic census) -------------------
 
@@ -82,6 +87,7 @@ class LocaleMaps:
     def __init__(self, locale: str) -> None:
         self.locale = locale
         self.digits = _invert({str(i): (DIGITS_DE if locale == "de-DE" else DIGITS_FR)[i] for i in range(10)})
+        self.digits.update({w: str(i) for i, w in enumerate(DIGITS_EN)})  # code-switched digits
         self.spell = _invert(SPELL_DE if locale == "de-DE" else SPELL_FR)
         self.letter_names = _invert(LETTER_NAMES_DE if locale == "de-DE" else LETTER_NAMES_FR)
         self.months = _invert(MONTHS_DE if locale == "de-DE" else MONTHS_FR)
@@ -106,7 +112,11 @@ class ExtractionResult:
 # --- tokenizer ----------------------------------------------------------------------
 
 
-_TOKEN_RE = re.compile(r"[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂ-]+|[.,;:!?+@]")
+_TOKEN_RE = re.compile(r"(?<![\w'])o'[\w-]+|[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂ-]+|[.,;:!?+@]")
+DIGITS_EN = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+DOT_WORDS = ("punkt", "point", "dot", ".")
+UNDERSCORE_WORDS = ("unterstrich", "soulignement", "underscore")
+DASH_WORDS = ("bindestrich", "tiret", "dash", "-")
 
 
 def tokenize(text: str) -> list[str]:
@@ -209,7 +219,7 @@ def _segments(transcript: str, locale: str) -> list[list[str]]:
     text = " " + unicodedata.normalize("NFC", transcript.lower()) + " "
     markers = sorted(CORRECTION_MARKERS[locale], key=len, reverse=True)
     for marker in markers:
-        text = text.replace(marker, " ¤ ")
+        text = re.sub(rf"(?<![\w']){re.escape(marker)}(?![\w'])", " ¤ ", text)
     for word, digits in sorted(_compound_numbers(locale).items(), key=lambda kv: -len(kv[0])):
         text = re.sub(rf"(?<![\w-]){re.escape(word)}(?![\w-])", digits, text)
     segments = [seg.strip() for seg in text.split("¤") if seg.strip()]
@@ -301,7 +311,7 @@ def _extract_reference(seg: list[str], maps: LocaleMaps) -> str | None:
     digits = parsed[0] if parsed else ""
     if letters and digits:
         return f"{letters.upper()}-{digits}"
-    if letters and any(t in ("bindestrich", "tiret", "-") for t in seg):
+    if letters and any(t in DASH_WORDS for t in seg):
         return letters.upper()
     return None
 
@@ -345,11 +355,11 @@ def _join_local(tokens: list[str], maps: LocaleMaps) -> str:
     for tok in reversed(tokens):
         if tok in _LOCAL_STOPS or tok in (",", ":", ";"):
             break
-        if tok in ("punkt", "point", "."):
+        if tok in DOT_WORDS:
             out.append(".")
-        elif tok in ("unterstrich", "soulignement"):
+        elif tok in UNDERSCORE_WORDS:
             out.append("_")
-        elif tok in ("bindestrich", "tiret"):
+        elif tok in DASH_WORDS[:-1]:
             out.append("-")
         elif spelled and tok in maps.spell:
             out.append(maps.spell[tok])
@@ -357,6 +367,8 @@ def _join_local(tokens: list[str], maps: LocaleMaps) -> str:
             out.append(maps.letter_names[tok])
         elif tok in maps.numbers:
             out.append(str(maps.numbers[tok]))
+        elif tok in maps.digits:
+            out.append(maps.digits[tok])
         elif tok.replace("_", "").isalnum():
             out.append(tok)
         elif (
@@ -383,7 +395,7 @@ def _join_domain(tokens: list[str], maps: LocaleMaps) -> str:
     current: list[str] = []
     saw_dot = False
     for tok in tokens:
-        if tok in ("punkt", "point", "."):
+        if tok in DOT_WORDS:
             if current:
                 parts.append("".join(current))
                 current = []

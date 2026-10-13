@@ -28,6 +28,25 @@ def test_written_forms(text, etype, locale, want):
     assert r.slots[0]["value"] == want
 
 
+@pytest.mark.parametrize(
+    ("text", "etype", "locale", "want"),
+    [  # rex-4, from code-switching dev cases
+        ("Écrivez à manon_yael@example.com.", "email", "fr-FR", "manon_yael@example.com"),  # 'non' inside a word
+        ("Schreiben Sie an emil dot weiss nine at example dot com.", "email", "de-DE", "emil.weiss9@example.com"),
+        ("Appelez le plus three three six two four three seven nine five zero two.", "phone", "fr-FR", "+33624379502"),
+        ("Ma référence est Echo Golf dash zero three five five.", "reference_code", "fr-FR", "EG-0355"),
+        ("Mein Name ist Siobhan O'Callaghan.", "person_name", "de-DE", "siobhan o'callaghan"),
+        ("Pardon, l'adresse est rue des Lilas", "person_name", "fr-FR", None),  # elisions still split
+    ],
+)
+def test_rex4_codeswitch_forms(text, etype, locale, want):
+    r = extract(text, etype, locale)
+    if want is None:
+        assert all("l'" not in s["value"] for s in r.slots)
+    else:
+        assert r.slots[0]["value"] == want
+
+
 def test_ordinal_day_with_written_period():
     r = extract("Am 11. Dezember passt es mir.", "calendar_value", "de-DE")
     assert r.slots[0]["value"] == "11.12"

@@ -1,0 +1,19 @@
+{
+ "suite": "codeswitch",
+ "total_scenarios": 56,
+ "splits": {
+  "dev": 16,
+  "test": 40
+ },
+ "cells": {
+  "de-DE|email": 7,
+  "de-DE|phone": 7,
+  "de-DE|reference_code": 7,
+  "de-DE|person_name": 7,
+  "fr-FR|email": 7,
+  "fr-FR|phone": 7,
+  "fr-FR|reference_code": 7,
+  "fr-FR|person_name": 7
+ },
+ "corpus_hash": "0700954754a9632784c9cc32cac17afc6cf8c769e2893958aacb03a255ba2436"
+}
