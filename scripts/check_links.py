@@ -5,12 +5,13 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIP = {".venv", ".venv-gpu", ".git", "release_bundle", "runs", "data", "node_modules"}
+SKIP = {"release_bundle", "runs", "data", "node_modules", "models"}  # plus any hidden dir (.venv*, .git)
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 
 bad = []
 for md in ROOT.rglob("*.md"):
-    if SKIP & set(md.relative_to(ROOT).parts):
+    parts = md.relative_to(ROOT).parts
+    if SKIP & set(parts) or any(p.startswith(".") for p in parts):
         continue
     for target in LINK.findall(md.read_text(encoding="utf-8")):
         if re.match(r"[a-z][a-z0-9+.-]*:", target) or target.startswith("#"):

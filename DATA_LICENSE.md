@@ -27,6 +27,17 @@ where each entry carries URL, revision, license text URL and review status.
 - Voices: predefined speakers `serena` and `dylan` selected via the official
   API; no cloned or personally recorded voices (decision D03).
 
+## Extension-suite audio (data/ext/*)
+
+- `codeswitch`, `multiturn`, `voices`: Qwen3-TTS, same terms and the same
+  provisional / conditional status as the core synthetic audio above (voices
+  serena, dylan, vivian, ryan; predefined speakers only).
+- `piper`: Piper voices (THIRD_PARTY_NOTICES.md). The French voice's training
+  data is CC-BY 4.0 (SIWIS): any redistributed `piper` French audio carries that
+  attribution. Status: **conditional**, same rule as above: audio ships only
+  after the rights-registry entry is verified; otherwise the pipeline and text
+  are the distributed artifacts.
+
 ## Human-control audio (FLEURS)
 
 - Source: google/fleurs, revision `70bb2e84b976b7e960aa89f1c648e09c59f894dd`,

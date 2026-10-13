@@ -39,6 +39,23 @@ cards / repositories at the revisions pinned below (rights registry:
 - Used for: independent human-speech control; never mixed into synthetic
   scores.
 
+## Piper voices (extension suite `piper`, second TTS family)
+
+- Source: https://huggingface.co/rhasspy/piper-voices (repo tag MIT)
+- Revision: c10ece1aade47bb51c153c893d14e5bf8e5b7117; `.onnx` SHA-256 pinned in
+  `src/voxentity_eu/ext/piper_tts.py`.
+- `de_DE-thorsten-medium`: trained on Thorsten-Voice
+  (https://github.com/thorstenMueller/Thorsten-Voice), dataset license CC0.
+- `fr_FR-siwis-medium`: trained on the SIWIS French Speech Synthesis Database
+  (University of Edinburgh, https://datashare.is.ed.ac.uk/handle/10283/2353),
+  dataset license CC BY 4.0 (verified in the dataset's end-user licence file).
+  Attribution: Yamagishi, J.; Honnet, P.-E.; Garner, P.; Lazaridis, A. (2017).
+  The SIWIS French Speech Synthesis Database [dataset]. University of Edinburgh,
+  CSTR. https://doi.org/10.7488/ds/1705
+- Runtime: `piper-tts` 1.8.0 (OHF-Voice/piper1-gpl, GPL-3.0-or-later), run as an
+  external tool from an isolated virtual environment; not a dependency of this
+  package and not redistributed. Gate and exclusions: research/second-tts-gate.md.
+
 ## voice-evals (S16)
 
 - Source: https://github.com/Gjusev/voice-evals

@@ -1,0 +1,18 @@
+{
+ "suite": "piper",
+ "scenarios": 120,
+ "synthesized": 120,
+ "failed": 0,
+ "model_id": "rhasspy/piper-voices",
+ "model_revision": "c10ece1aade47bb51c153c893d14e5bf8e5b7117",
+ "voices": {
+  "de-DE": "de_DE-thorsten-medium",
+  "fr-FR": "fr_FR-siwis-medium"
+ },
+ "voice_sha256": {
+  "de_DE-thorsten-medium": "7e64762d8e5118bb578f2eea6207e1a35a8e0c30595010b666f983fc87bb7819",
+  "fr_FR-siwis-medium": "641d1ab097da2b81128c076810edb052b385decc8be3381814802a64a73baf99"
+ },
+ "runtime": "piper-tts (GPL-3.0-or-later, isolated venv)",
+ "corpus_hash": "f82317ea112f89868e613bf04e01a06d6ac7275736c2b11e858933d190d88ce5"
+}
