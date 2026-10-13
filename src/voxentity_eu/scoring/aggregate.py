@@ -114,10 +114,14 @@ def paired_degradation(results: Iterable[ExampleResult]) -> dict[str, Any]:
 
 
 def compare_runs(scored_a: dict[str, Any], scored_b: dict[str, Any]) -> dict[str, Any]:
-    """Paired comparison of two runs over the same scenario list."""
+    """Paired comparison over the same (scenario, condition) cohort; keying by
+    scenario alone would collapse conditions and drop half the rows."""
 
-    ra = {r.scenario_id: r for r in scored_a.get("results", [])}
-    rb = {r.scenario_id: r for r in scored_b.get("results", [])}
+    def key(r: Any) -> tuple[str, str]:
+        return (r.scenario_id, r.condition)
+
+    ra = {key(r): r for r in scored_a.get("results", [])}
+    rb = {key(r): r for r in scored_b.get("results", [])}
     shared = sorted(set(ra) & set(rb))
     only_a = sorted(set(ra) - set(rb))
     only_b = sorted(set(rb) - set(ra))

@@ -118,20 +118,25 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
                 shutil.copyfile(src, target)
                 entries.append(target)
 
-    for rel in [
-        "data/generated/gold/scenarios.jsonl",
-        "data/generated/corpus_manifest.json",
-        "data/generated/rights_registry.jsonl",
-        "data/generated/synthesis.jsonl",
-        "data/generated/transforms.jsonl",
-        "data/generated/audio_manifest.jsonl",
-        "LICENSE",
-        "DATA_LICENSE.md",
-        "THIRD_PARTY_NOTICES.md",
-        "dataset_card/DATASET_CARD.md",
-        "reports/report.md",
+    for rel, dest in [
+        ("data/generated/gold/scenarios.jsonl", "gold/scenarios.jsonl"),
+        ("data/generated/gold/input_mapping_inputs.json", "gold/input_mapping_inputs.json"),
+        ("data/generated/corpus_manifest.json", "corpus_manifest.json"),
+        ("data/generated/rights_registry.jsonl", "rights_registry.jsonl"),
+        ("data/generated/synthesis.jsonl", "synthesis.jsonl"),
+        ("data/generated/transforms.jsonl", "transforms.jsonl"),
+        ("data/generated/audio_manifest.jsonl", "audio_manifest.jsonl"),
+        ("data/generated/qa.jsonl", "qa.jsonl"),
+        ("data/human_control/human_control_manifest.jsonl", "human_control_manifest.jsonl"),
+        ("data/human_control/attribution.json", "attribution.json"),
+        ("LICENSE", "LICENSE"),
+        ("DATA_LICENSE.md", "DATA_LICENSE.md"),
+        ("THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"),
+        ("dataset_card/DATASET_CARD.md", "dataset_card/DATASET_CARD.md"),
+        ("reports/report.md", "reports/report.md"),
+        ("uv-core.lock", "uv-core.lock"),
     ]:
-        copy_if_exists(rel)
+        copy_if_exists(rel, dest)
     copy_if_exists("runs", "predictions")
 
     lines = []

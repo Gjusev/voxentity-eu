@@ -59,9 +59,11 @@ reproducible con los comandos listados.
 - Whisper large-v3-turbo (fp16, GTX 1080): 360/360 sintéticos completos, 0
   fallos; además 200/200 del control humano. Se corrigió el mapeo de idioma
   (Whisper espera 'german'/'french'); caché invalidada y re-ejecutada.
-- Voxtral Mini 3B (bf16, Kaggle T4): kernel autocontenido (paquete embebido
-  base64 + dataset de inputs). Tras diagnosticar el layout nuevo de mounts
-  (`/kaggle/input/datasets/gjusev/...`), versión 8 en ejecución.
+- Voxtral Mini 3B (bf16, Kaggle T4, kernel autocontenido con paquete
+  embebido): **360/360 completos, 0 fallos**. Se corrigió la ruta de API
+  (transcripción vía `apply_transcription_request`, no chat template) y el
+  layout nuevo de mounts (`/kaggle/input/datasets/gjusev/...`); las
+  iteraciones fallidas del kernel quedan versionadas en Kaggle (v1-v8).
 - Manifiestos de run con hashes reales (o gaps de procedencia explícitos).
 
 ## P6 — Agente y voice-evals: COMPLETADO
@@ -90,14 +92,21 @@ Ver `reports/report.md` (regenerable offline). Números medidos actuales
 | sistema | exactitud slots | IC 95% | cobertura |
 | --- | --- | --- | --- |
 | gold→extractor (techo) | 100% | [100, 100] | 100% |
+| voxtral-mini→slots | 21.2% | [15.4, 27.1] | 100% |
 | whisper-turbo→slots | 20.8% | [15.4, 26.2] | 100% |
 | reference-agent (estado final) | 20.8% | [15.4, 26.2] | 100% |
 
-Hallazgo principal hasta ahora: el cuello de botella está en la capa ASR
-(techo del extractor 100% vs 20.8% a través de Whisper), con WER sintético
-0.706 contra el texto verbalizado (nota: esta cifra mezcla normalización de
-números con errores; el WER del control humano es la medida limpia).
-Voxtral pendiente de la corrida Kaggle.
+Comparación pareada whisper vs voxtral (n=240 pares escenario×condición):
+diferencia -0.4 puntos porcentuales, IC 95% [-3.8, +2.9] — **sin diferencia
+concluyente entre las dos familias ASR**; resultado nulo publicado como tal.
+Voxtral obtiene además mejor WER sintético (0.644 vs 0.706, advertencia de
+normalización de números aplicable a ambos).
+
+Hallazgo principal: el cuello de botella está en la capa ASR — el techo
+del extractor compartido es 100% sobre el texto gold y ambas familias ASR
+caen a ~21% de captura exacta de entidades a través del mismo extractor,
+con degradación por canal telefónico visible en el control humano (WER
+0.115 → 0.221). Corpus provisional (QA automática, sin escucha humana).
 
 ## P9 — Entrega: ESTRUCTURA COMPLETADA
 
@@ -116,6 +125,7 @@ y «rex-2». Los hallazgos y su resolución están en el historial git.
 
 - Escucha humana del corpus: pendiente → corpus «provisional», no «verified».
 - Derechos del audio sintético: condicionales (ver DATA_LICENSE.md).
-- Voxtral: kernel v8 en ejecución en Kaggle al cierre de este estado.
+- Voxtral: completado y puntuado; el bundle local `release_bundle/` pasa
+  `release validate` (sin credenciales, checksums verificados).
 - Space y dataset HF: artefactos locales listos; publicación externa
   requiere autorización explícita.
