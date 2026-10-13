@@ -15,10 +15,9 @@ from .base import Asr, AsrResult
 
 MODEL_ID = "mistralai/Voxtral-Mini-3B-2507"
 MODEL_REVISION = "3060fe34b35ba5d44202ce9ff3c097642914f8f3"
-TRANSCRIBE_PROMPTS = {
-    "de-DE": "Transkribiere dieses Audio wörtlich. Gib nur den Text aus.",
-    "fr-FR": "Transcris cet audio littéralement. Donne uniquement le texte.",
-}
+# transcription route per the model card: apply_transcription_request,
+# no chat template and no entity hints
+TRANSCRIPTION_LANGUAGES = {"de-DE": "de", "fr-FR": "fr"}
 
 
 class VoxtralMini(Asr):
@@ -49,18 +48,10 @@ class VoxtralMini(Asr):
         import torch
 
         self.load()
-        prompt = TRANSCRIBE_PROMPTS[locale]
-        conversation = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "audio", "audio_url": str(Path(audio_path).resolve())},
-                    {"type": "text", "text": prompt},
-                ],
-            }
-        ]
-        inputs = self._processor.apply_chat_template(
-            conversation, add_generation_prompt=True, return_tensors="pt"
+        inputs = self._processor.apply_transcription_request(
+            language=TRANSCRIPTION_LANGUAGES[locale],
+            audio=str(Path(audio_path).resolve()),
+            model_id=MODEL_ID,
         )
         inputs = {k: (v.to(self._model.device) if hasattr(v, "to") else v) for k, v in inputs.items()}
         with torch.no_grad():
@@ -73,5 +64,7 @@ class VoxtralMini(Asr):
             tokens = out.sequences
         else:
             tokens = out
-        text = self._processor.decode(tokens[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
+        text = self._processor.batch_decode(
+            tokens[:, inputs["input_ids"].shape[1]:], skip_special_tokens=True
+        )[0]
         return AsrResult(status="ok", transcript=text.strip(), raw={"model": MODEL_ID})
