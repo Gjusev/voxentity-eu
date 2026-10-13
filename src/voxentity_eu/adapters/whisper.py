@@ -13,6 +13,7 @@ from .base import Asr, AsrResult
 
 MODEL_ID = "openai/whisper-large-v3-turbo"
 MODEL_REVISION = "41f01f3fe87f28c78e2fbf8b568835947dd65ed9"
+WHISPER_LANGUAGES = {"de-DE": "german", "fr-FR": "french"}
 
 
 class WhisperTurbo(Asr):
@@ -46,15 +47,18 @@ class WhisperTurbo(Asr):
         self.load()
         import librosa as lb
 
+        language = WHISPER_LANGUAGES[locale]
         audio, sr = lb.load(audio_path, sr=16000, mono=True)
         inputs = self._processor(
-            audio, sampling_rate=16000, language=locale, return_tensors="pt"
+            audio, sampling_rate=16000, language=language, return_tensors="pt"
         )
-        features = inputs.input_features.to(self.device, self._model.dtype if hasattr(self._model, "dtype") else None)
+        features = inputs.input_features.to(
+            self.device, next(self._model.parameters()).dtype
+        )
         with torch.no_grad():
             predicted_ids = self._model.generate(
                 features,
-                language=locale,
+                language=language,
                 task="transcribe",
                 do_sample=False,
                 num_beams=1,

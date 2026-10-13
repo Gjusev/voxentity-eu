@@ -192,3 +192,194 @@ INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None
 Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
 INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
 Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+[synthesize] 100/180 done
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+[synthesize] 120/180 done
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+[synthesize] 140/180 done
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+[synthesize] 160/180 done
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+INFO qwen_tts.core.models.configuration_qwen3_tts: code_predictor_config is None. Initializing code_predictor model with default values
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+[synthesize] 180/180 done
+masters: 180
+failed: []
+attempts: 0
+voices: ('serena', 'dylan')

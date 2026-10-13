@@ -133,14 +133,27 @@ def run_asr(
         out_dir / "predictions.jsonl",
         "\n".join(json.dumps(r, ensure_ascii=False) for r in results) + "\n",
     )
+
+    # real provenance hashes: corpus manifest, git commit, core lock
+    dataset_hash = "0" * 64
+    corpus_manifest = Path("data/generated/corpus_manifest.json")
+    if corpus_manifest.exists():
+        cm = json.loads(corpus_manifest.read_text(encoding="utf-8"))
+        dataset_hash = cm.get("corpus_hash", dataset_hash)
+    from .provenance import code_commit, sha256_text
+
+    lock_hash = "0" * 64
+    if Path("uv-core.lock").exists():
+        lock_hash = sha256_file(Path("uv-core.lock"))
+
     manifest = {
         "run_id": f"{system_name}-asr",
         "schema_version": "0.2",
         "suite_version": "0.1.0",
-        "dataset_hash": "pending-score-time",
+        "dataset_hash": dataset_hash,
         "eligible_audio_ids_hash": sha256_json([r["input_id"] for r in rows]),
-        "code_commit": "pending-release",
-        "dependency_lock_hash": "pending-release",
+        "code_commit": code_commit(),
+        "dependency_lock_hash": lock_hash,
         "model_id": spec["model_id"],
         "model_revision": spec["revision"],
         "backend": system_name,

@@ -78,6 +78,12 @@ def cli_synthesize(manifest_path: str, profile: str = "qwen", resume: bool = Tru
     env_hash = environment_hash(include=("python", "torch", "transformers", "numpy", "soundfile"))
 
     records: list[SynthesisRecord] = list(done.values())
+    # merge into the existing manifest: telephone rows and QA verdicts must
+    # survive a resume; this run only rewrites clean rows it actually produced
+    existing: dict[str, AudioRecord] = {}
+    if manifest_file.exists():
+        for row in read_jsonl(manifest_file, AudioRecord):
+            existing[row.audio_id] = row
     audio_records: list[AudioRecord] = []
     attempts_logged: list[dict[str, Any]] = []
     failed: list[str] = []
@@ -132,23 +138,23 @@ def cli_synthesize(manifest_path: str, profile: str = "qwen", resume: bool = Tru
         clean_path = clean_dir / f"{sc.scenario_id}.wav"
         sf.write(clean_path, clean.astype(np.int16), MASTER_RATE, subtype="PCM_16")
 
-        audio_records.append(
-            AudioRecord.model_validate(
-                {
-                    "audio_id": sc.scenario_id,
-                    "scenario_id": sc.scenario_id,
-                    "corpus": "synthetic",
-                    "condition": "clean",
-                    "path": f"synthetic/clean/{sc.scenario_id}.wav",
-                    "sha256": sha256_file(clean_path),
-                    "sample_rate_hz": MASTER_RATE,
-                    "num_samples": int(len(clean)),
-                    "duration_seconds": len(clean) / MASTER_RATE,
-                    "synthesis_id": sid,
-                    "qa_status": "pending_review",
-                }
-            )
+        new_clean = AudioRecord.model_validate(
+            {
+                "audio_id": sc.scenario_id,
+                "scenario_id": sc.scenario_id,
+                "corpus": "synthetic",
+                "condition": "clean",
+                "path": f"synthetic/clean/{sc.scenario_id}.wav",
+                "sha256": sha256_file(clean_path),
+                "sample_rate_hz": MASTER_RATE,
+                "num_samples": int(len(clean)),
+                "duration_seconds": len(clean) / MASTER_RATE,
+                "synthesis_id": sid,
+                "qa_status": "pending_review",
+            }
         )
+        existing[new_clean.audio_id] = new_clean
+        audio_records.append(new_clean)
         if (i + 1) % 20 == 0:
             print(f"[synthesize] {i + 1}/{len(scenarios)} done", flush=True)
             # incremental checkpoint: crash-safe resume via synthesis.jsonl
@@ -157,14 +163,14 @@ def cli_synthesize(manifest_path: str, profile: str = "qwen", resume: bool = Tru
                 "\n".join(r.model_dump_json() for r in sorted(records, key=lambda r: r.synthesis_id)) + "\n",
             )
             write_text_atomic(
-                manifest_file.parent / "audio_manifest.jsonl",
-                "\n".join(a.model_dump_json() for a in sorted(audio_records, key=lambda a: a.audio_id)) + "\n",
+                manifest_file,
+                "\n".join(a.model_dump_json() for a in sorted(existing.values(), key=lambda a: a.audio_id)) + "\n",
             )
 
     write_text_atomic(synth_path, "\n".join(r.model_dump_json() for r in sorted(records, key=lambda r: r.synthesis_id)) + "\n")
     write_text_atomic(
-        manifest_file.parent / "audio_manifest.jsonl",
-        "\n".join(a.model_dump_json() for a in sorted(audio_records, key=lambda a: a.audio_id)) + "\n",
+        manifest_file,
+        "\n".join(a.model_dump_json() for a in sorted(existing.values(), key=lambda a: a.audio_id)) + "\n",
     )
     if attempts_logged:
         write_text_atomic(

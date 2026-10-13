@@ -209,8 +209,36 @@ def cli_transform(manifest_path: str, recipe: str, resume: bool = True) -> dict[
             raise InvalidInput(f"master audio missing: {src}")
         master, rate = sf.read(src, dtype="float64", always_2d=False)
         tid = f"tr-{a.audio_id}-tel"
-        if tid in done:
-            continue
+        current_input_sha = sha256_file(src)
+        prior = {t.transform_id: t for t in transforms}
+        if tid in done and prior[tid].input_sha256 == current_input_sha:
+            # cached: keep the telephone manifest row present even if the
+            # manifest was rewritten by a synthesis resume
+            tel_path_cached = audio_root / "synthetic" / "telephone" / f"{a.audio_id}.wav"
+            if tel_path_cached.exists() and f"{a.audio_id}-tel" not in {x.audio_id for x in audio}:
+                import soundfile as _sf
+
+                tel_data, tel_rate = _sf.read(tel_path_cached, dtype="int16", always_2d=False)
+                new_records.append(
+                    AudioRecord.model_validate(
+                        {
+                            "audio_id": f"{a.audio_id}-tel",
+                            "scenario_id": a.scenario_id,
+                            "corpus": "synthetic",
+                            "condition": "telephone",
+                            "parent_audio_id": a.audio_id,
+                            "path": f"synthetic/telephone/{a.audio_id}.wav",
+                            "sha256": prior[tid].output_sha256,
+                            "sample_rate_hz": TARGET_RATE,
+                            "num_samples": int(len(tel_data)),
+                            "duration_seconds": len(tel_data) / TARGET_RATE,
+                            "transform_id": tid,
+                            "qa_status": "pending_review",
+                        }
+                    )
+                )
+                audio.append(new_records[-1])
+            continue  # cached transform still matches the current master bytes
         result = telephone_from_master(master, rate, noise_seed=noise_seed_for(a.audio_id))
         tel_dir = audio_root / "synthetic" / "telephone"
         tel_dir.mkdir(parents=True, exist_ok=True)
@@ -231,7 +259,7 @@ def cli_transform(manifest_path: str, recipe: str, resume: bool = True) -> dict[
             command_argv=[],
             tool_versions={"numpy": np.__version__, "scipy": __import__("scipy").__version__},
         )
-        transforms.append(record)
+        transforms = [t for t in transforms if t.transform_id != tid] + [record]
         new_records.append(
             AudioRecord.model_validate(
                 {
@@ -254,9 +282,12 @@ def cli_transform(manifest_path: str, recipe: str, resume: bool = True) -> dict[
     write_text_atomic(
         transforms_path, "\n".join(t.model_dump_json() for t in transforms) + "\n"
     )
-    updated = list(audio) + new_records
+    merged: dict[str, AudioRecord] = {a.audio_id: a for a in audio}
+    for rec in new_records:
+        merged[rec.audio_id] = rec  # regenerated telephone replaces the stale row
     write_text_atomic(
-        out_dir / "audio_manifest.jsonl", "\n".join(r.model_dump_json() for r in updated) + "\n"
+        out_dir / "audio_manifest.jsonl",
+        "\n".join(r.model_dump_json() for r in sorted(merged.values(), key=lambda r: r.audio_id)) + "\n",
     )
     return {
         "transforms_total": len(transforms),
