@@ -182,8 +182,6 @@ def build_ui() -> gr.Blocks:
         with gr.Row():
             prev_btn = gr.Button("< prev")
             next_btn = gr.Button("next >")
-            correct_btn = gr.Button("show a correct example")
-            error_btn = gr.Button("show an error example")
         counter = gr.Markdown()
         page_state = gr.State(0)
         details = gr.Markdown()
@@ -195,7 +193,6 @@ def build_ui() -> gr.Blocks:
             json_btn, json_file = gr.Button("download JSON"), gr.File()
 
         inputs = [locale, entity, condition, system, error_type, search_id, page_state]
-        outputs = [case_selector, table, details, clean_audio, tel_audio, details, counter, page_state]
         for widget in inputs[:6]:
             widget.change(
                 lambda *a: render_page(*a, 0), inputs=inputs, outputs=[case_selector, table, details, clean_audio, tel_audio, counter, page_state]

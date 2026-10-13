@@ -145,11 +145,19 @@ def compare_runs(scored_a: dict[str, Any], scored_b: dict[str, Any]) -> dict[str
 
 def cli_compare(run_a_path: str, run_b_path: str, out_path: str) -> dict[str, Any]:
     from ..provenance import write_text_atomic
+    from .bootstrap import bootstrap_paired_difference
 
-    with open(run_a_path, encoding="utf-8") as fh:
-        scored_a = json.load(fh)
-    with open(run_b_path, encoding="utf-8") as fh:
-        scored_b = json.load(fh)
-    comparison = compare_runs(scored_a, scored_b)
-    write_text_atomic(out_path, json.dumps(comparison, ensure_ascii=False, indent=1))
-    return comparison
+    def load(path: str) -> dict[str, Any]:
+        # scored files are JSON; rebuild ExampleResult rows for attribute access
+        with open(path, encoding="utf-8") as fh:
+            scored = json.load(fh)
+        scored["results"] = [ExampleResult(**r) for r in scored.get("results", [])]
+        return scored
+
+    scored_a, scored_b = load(run_a_path), load(run_b_path)
+    result = {
+        "comparison": compare_runs(scored_a, scored_b),
+        "paired_difference": bootstrap_paired_difference(scored_a["results"], scored_b["results"]),
+    }
+    write_text_atomic(out_path, json.dumps(result, ensure_ascii=False, indent=1))
+    return result

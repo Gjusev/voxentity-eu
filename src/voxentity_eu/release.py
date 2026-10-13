@@ -70,7 +70,7 @@ def cli_release_validate(bundle: str) -> dict[str, Any]:
     if bm_path.exists():
         bm = json.loads(bm_path.read_text(encoding="utf-8"))
         for run in bm.get("runs", []):
-            pred = bundle_dir / "predictions" / f"{run}.jsonl"
+            pred = bundle_dir / "predictions" / run / "predictions.jsonl"
             if not pred.exists():
                 problems.append(f"bundle manifest names run without predictions: {run}")
 
@@ -147,7 +147,9 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
 
     manifest = {
         "bundle_version": "0.1.0",
-        "runs": sorted(p.stem for p in (out_dir / "predictions").glob("*.jsonl")) if (out_dir / "predictions").exists() else [],
+        "runs": sorted(p.name for p in (out_dir / "predictions").iterdir() if p.is_dir() and p.name != "scored")
+        if (out_dir / "predictions").exists()
+        else [],
         "files": len(entries),
         "notes": "local bundle; external publication requires explicit push commands",
     }
