@@ -68,7 +68,7 @@ Depende P1/P5.
 - [x] Descarga FLEURS selectiva por revisión, IDs y atribución. — evidencia: data/human_control/attribution.json.
 - [x] Muestreo determinista 50 por idioma y versiones acústicas. — evidencia: human_control_manifest.jsonl.
 - [x] Evaluación WER/CER separada. — evidencia: runs/scored/human_control_wer.json.
-- [ ] Investigar/implementar segundo sintetizador solo si derechos resueltos; reportar gate.
+- [x] Investigar/implementar segundo sintetizador solo si derechos resueltos; reportar gate. — evidencia: research/second-tts-gate.md (Piper thorsten CC0 + siwis CC-BY 4.0, revisión fijada; estado condicional, no ejecutado).
 Aceptación: control humano ejecutado o bloqueo verificable sin falso reclutamiento; todas las tablas distinguen corpus; alternativa TTS no bloquea release core.
 
 ## P8 — Informes y demo
@@ -84,7 +84,7 @@ Aceptación: demo reproduce números del reporte, audio correcto por ID, ningún
 Depende P8.
 - [x] Licencias oficiales, notices, dataset card, README y CONTRIBUTING. — evidencia: LICENSE, DATA_LICENSE.md, THIRD_PARTY_NOTICES.md, dataset_card/, CONTRIBUTING.md.
 - [x] Bundle con checksums, manifiesto y controles de release. — evidencia: release.py build_bundle; `release validate` ok; test_release.py.
-- [ ] Comandos de publicación y borradores de comunicación.
+- [x] Comandos de publicación y borradores de comunicación. — evidencia: PUBLISHING.md (gates, comandos `gh`/`hf` verificados contra la CLI instalada, borradores; nada ejecutado) y space/README.md (metadatos HF).
 - [x] Actualizar IMPLEMENTATION_STATUS con comandos ejecutados/evidencias. — evidencia: IMPLEMENTATION_STATUS.md.
 Aceptación: fresh-environment scoring offline idéntico, ninguna credencial, derechos resueltos para assets publicados, nombres y claims coherentes.
 

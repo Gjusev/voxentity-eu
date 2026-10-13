@@ -161,6 +161,12 @@ tienen por tanto exposición limitada a test y así se declaran.
 
 ## P9 — Entrega: ESTRUCTURA COMPLETADA
 
+- PUBLISHING.md: gates previos, comandos `gh`/`hf` (sintaxis verificada contra
+  la CLI instalada) y borradores de comunicación; nada ejecutado ni enviado.
+- Gate de reproducción: run_tracks → score_all → compare → report deja
+  reports/ idéntico al commit.
+- Segundo sintetizador: research/second-tts-gate.md (Piper, condicional).
+
 - LICENSE Apache-2.0 oficial, DATA_LICENSE, THIRD_PARTY_NOTICES, dataset
   card, CONTRIBUTING, validador de bundle (secretos + checksums + derechos).
 - Publicación externa NO ejecutada (pendiente de autorización): comandos
