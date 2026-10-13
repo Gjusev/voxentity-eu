@@ -8,6 +8,10 @@ not just any earlier number.
 
 EXTRACTOR_VERSION freezes the rule set; changes require a new version and
 must be re-frozen on dev before any test-set comparison is reported.
+
+rex-3: also parses the written form ASR systems emit ("+49…", "a.b@c.de",
+"11. Dezember", "09.03.2026", "MMJ-0105", "55a", FR street-first addresses).
+rex-2 only covered the spoken form, so its 100% gold ceiling was circular.
 """
 
 from __future__ import annotations
@@ -27,7 +31,7 @@ from ..corpus.verbalize import (
     SPELL_FR,
 )
 
-EXTRACTOR_VERSION = "rex-2"
+EXTRACTOR_VERSION = "rex-3"
 
 # --- correction markers (design list, not a linguistic census) -------------------
 
@@ -102,7 +106,7 @@ class ExtractionResult:
 # --- tokenizer ----------------------------------------------------------------------
 
 
-_TOKEN_RE = re.compile(r"[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂ-]+|[.,;:!?]")
+_TOKEN_RE = re.compile(r"[\wäöüßéèêëïîôçûàâÄÖÜÉÈÊËÏÎÔÇÛÀÂ-]+|[.,;:!?+@]")
 
 
 def tokenize(text: str) -> list[str]:
@@ -270,7 +274,26 @@ def _extract_phone(seg: list[str], maps: LocaleMaps) -> str | None:
     return digits
 
 
+_WRITTEN_CODE = re.compile(r"([a-z]{1,4})-(\d{2,})")
+
+
 def _extract_reference(seg: list[str], maps: LocaleMaps) -> str | None:
+    written = None
+    for tok in seg:
+        m = _WRITTEN_CODE.fullmatch(tok)
+        if m and m.group(1) not in maps.spell:
+            written = f"{m.group(1).upper()}-{m.group(2)}"
+    if written:
+        return written
+    # "Bravo Oscar-0081": alphabet word glued to the digits by a hyphen
+    split: list[str] = []
+    for tok in seg:
+        head, sep, tail = tok.rpartition("-")
+        if sep and tail.isdigit() and (head in maps.spell or head in maps.letter_names):
+            split.extend([head, "-", tail])
+        else:
+            split.append(tok)
+    seg = split
     # pattern: letters (alphabet or letter names or raw) [hyphen word] digits
     letter_run = contiguous_letter_run(seg, maps)
     letters = parse_letter_stream(letter_run, maps) if letter_run else None
@@ -294,8 +317,8 @@ def _extract_email(seg: list[str], maps: LocaleMaps) -> str | None:
         return None
     local_toks = seg[:at_idx]
     domain_toks = seg[at_idx + 1 :]
-    local = _join_local(local_toks, maps)
-    domain = _join_domain(domain_toks, maps)
+    local = _join_local(local_toks, maps).strip(".")
+    domain = _join_domain(domain_toks, maps).strip(".")
     if not local or not domain:
         return None
     return f"{local}@{domain}"
@@ -317,6 +340,8 @@ def _join_local(tokens: list[str], maps: LocaleMaps) -> str:
     """Scan backwards from the @ marker until a carrier word or the start."""
 
     out: list[str] = []
+    # a lone alphabet word ("gustav.kühn") is a name, not a spelled letter
+    spelled = sum(t in maps.spell for t in tokens) >= 2
     for tok in reversed(tokens):
         if tok in _LOCAL_STOPS or tok in (",", ":", ";"):
             break
@@ -326,15 +351,15 @@ def _join_local(tokens: list[str], maps: LocaleMaps) -> str:
             out.append("_")
         elif tok in ("bindestrich", "tiret"):
             out.append("-")
-        elif tok in maps.spell:
+        elif spelled and tok in maps.spell:
             out.append(maps.spell[tok])
         elif tok in maps.letter_names and len(tok) > 2:
             out.append(maps.letter_names[tok])
         elif tok in maps.numbers:
             out.append(str(maps.numbers[tok]))
-        elif digits_in(tok):
-            out.append(digits_in(tok))
-        elif tok.isalnum() or (
+        elif tok.replace("_", "").isalnum():
+            out.append(tok)
+        elif (
             "-" in tok
             and all(part.isalnum() for part in tok.split("-"))
             and not any(part in _LOCAL_STOPS for part in tok.split("-"))
@@ -375,7 +400,17 @@ def _join_domain(tokens: list[str], maps: LocaleMaps) -> str:
     return ".".join(parts) if parts else ""
 
 
+_NUMERIC_DATE = re.compile(r"(?<!\d)(\d{1,2}) \. (\d{1,2})(?: \. (\d{4}))?(?!\d)")
+
+
 def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
+    found = None
+    for m in _NUMERIC_DATE.finditer(" ".join(seg)):
+        d, mo = int(m.group(1)), int(m.group(2))
+        if 1 <= d <= 31 and 1 <= mo <= 12:
+            found = f"{d:02d}.{mo:02d}" + (f".{m.group(3)}" if m.group(3) else "")
+    if found:
+        return found
     month = None
     month_idx = None
     for i, tok in enumerate(seg):
@@ -386,6 +421,8 @@ def _extract_calendar(seg: list[str], maps: LocaleMaps) -> str | None:
     if month is None:
         return None
     before = seg[:month_idx]
+    while before and before[-1] == ".":  # written ordinal "11. Dezember"
+        before = before[:-1]
     after = seg[month_idx + 1 :]
     day = _parse_day(before, maps)
     if day is None:
@@ -475,47 +512,61 @@ def _extract_address(seg: list[str], maps: LocaleMaps, locale: str) -> str | Non
     labeled_keys = {"postleitzahl", "hausnummer", "ort", "code", "numéro", "numero", "ville"}
     if any(t in labeled_keys for t in seg):
         return _extract_address_labeled(seg, maps, locale)
+    seg = _split_house_suffixes(seg)
     runs = _joined_digit_runs(seg, maps)[0]
     postal = None
     postal_span = None
     for run, span in runs:
         if len(run) == 5:
             postal, postal_span = run, span  # prefer the last 5-run
+        elif len(run) > 5 and len(seg[span[1]]) == 5 and seg[span[1]].isdigit():
+            # written "Weg 61 37672 Ort" without comma: last token is the postal code
+            postal, postal_span = seg[span[1]], (span[1], span[1])
     if postal is None:
         return None
     start, end = postal_span
     _loc_tail = {"bitte", "alles", "notieren", "notez", "tout", "attends", "écoutez", "teilen"}
-    locality_toks = [t for t in seg[end + 1 :] if (t.isalpha() or "-" in t) and t not in _loc_tail]
+    locality_toks = []
+    for t in seg[end + 1 :]:
+        if t in (",", ".", ";", ":", "!", "?"):
+            if locality_toks:
+                break
+            continue
+        if (t.isalpha() or "-" in t) and t not in _loc_tail:
+            locality_toks.append(t)
     locality = " ".join(t.title() for t in locality_toks[:4])
     if not locality:
         return None
-    if locale == "de-DE":
-        # order: [street words] [house run] , [postal] [locality]
-        before = seg[:start]
-        house, street_end = _house_run_before(before, maps)
-        if house is None:
-            return None
-        street_words = [
-            t for t in before[:street_end]
-            if t.isalpha() and t not in _STREET_CARRIERS_DE
-        ]
-        street = " ".join(street_words).title()
-        if not street:
-            return None
-        return f"{street} {house}, {postal} {locality}"
-    # FR order: [house run] [street words] , [postal] [locality]
     before = seg[:start]
-    house, house_end = _first_house_run(before, maps)
+    carriers = _STREET_CARRIERS_DE if locale == "de-DE" else _STREET_CARRIERS_FR
+    if locale == "fr-FR":
+        # spoken FR order: [house run] [street words] , [postal] [locality]
+        house, house_end = _first_house_run(before, maps)
+        if house is not None:
+            street = " ".join(
+                t for t in before[house_end + 1 :] if t.isalpha() and t not in carriers
+            ).title()
+            if street:
+                return f"{street} {house}, {postal} {locality}"
+    # DE order, also written FR: [street words] [house run] , [postal] [locality]
+    house, street_end = _house_run_before(before, maps)
     if house is None:
         return None
-    street_words = [
-        t for t in before[house_end + 1 :]
-        if t.isalpha() and t not in _STREET_CARRIERS_FR
-    ]
-    street = " ".join(street_words).title()
+    street = " ".join(t for t in before[:street_end] if t.isalpha() and t not in carriers).title()
     if not street:
         return None
     return f"{street} {house}, {postal} {locality}"
+
+
+_HOUSE_SUFFIX_TOKEN = re.compile(r"(\d{1,4})(bis|ter|[a-z])")
+
+
+def _split_house_suffixes(seg: list[str]) -> list[str]:
+    out: list[str] = []
+    for tok in seg:
+        m = _HOUSE_SUFFIX_TOKEN.fullmatch(tok)
+        out.extend([m.group(1), m.group(2)] if m else [tok])
+    return out
 
 
 def _house_run_before(tokens: list[str], maps: LocaleMaps) -> tuple[str | None, int]:
@@ -531,8 +582,12 @@ def _house_run_before(tokens: list[str], maps: LocaleMaps) -> tuple[str | None, 
     if len(run) > 3:
         return None, -1
     house = str(int(run)) if not run.startswith("0") else run
-    if end + 1 < len(tokens) and tokens[end + 1] in maps.spell and len(tokens[end + 1]) > 2:
-        house += maps.spell[tokens[end + 1]]  # DE suffix convention: lowercase
+    if end + 1 < len(tokens):
+        nxt = tokens[end + 1]
+        if nxt in maps.spell and len(nxt) > 2:
+            house += maps.spell[nxt]  # DE suffix convention: lowercase
+        elif nxt in _HOUSE_SUFFIX_WORDS or (len(nxt) == 1 and nxt.isalpha()):
+            house += nxt  # written "55a" / "28ter" split by _split_house_suffixes
     return house, start
 
 

@@ -22,6 +22,7 @@ SCORED.mkdir(parents=True, exist_ok=True)
 RUNS = {
     "whisper-turbo-slots": Path("runs/whisper-turbo-slots"),
     "gold-extractor": Path("runs/gold-extractor"),
+    "gold-written-extractor": Path("runs/gold-written-extractor"),
     "reference-agent": Path("runs/reference-agent"),
     "voxtral-mini-slots": Path("runs/voxtral-mini-slots"),
 }
@@ -88,7 +89,14 @@ def human_wer() -> None:
 
 
 def synthetic_wer() -> None:
-    """Corpus WER/CER of ASR transcripts against the spoken synthesis_text."""
+    """Corpus WER/CER of ASR transcripts against the spoken synthesis_text.
+
+    Caveat: the reference is the spoken form ("einhundertdreiundvierzig",
+    "Ulrich Ludwig ...") while ASR emits written forms ("143"), so this WER
+    mostly counts formatting. The written form fails the other way (spelled
+    sequences become one token). Neither is a recognition-quality metric;
+    entity accuracy is. Do not compare this number with human-control WER.
+    """
 
     import jiwer
 

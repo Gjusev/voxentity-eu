@@ -67,9 +67,18 @@ def build_asr_slots_run(asr_run_dir: Path, inputs_dir: Path, out_dir: Path) -> d
 
 
 def build_gold_extractor_run(
-    scenarios_path: Path, audio_manifest_path: Path, inputs_dir: Path, out_dir: Path
+    scenarios_path: Path,
+    audio_manifest_path: Path,
+    inputs_dir: Path,
+    out_dir: Path,
+    text_field: str = "synthesis_text",
 ) -> dict[str, Any]:
-    """E2 control: extractor over the gold synthesis_text (ceiling estimate)."""
+    """E2 control: extractor over gold text (ceiling estimate).
+
+    text_field="synthesis_text" is the spoken form the TTS read;
+    text_field="written_text" is the written form an ideal ASR would emit.
+    Report both: the spoken ceiling alone is circular (rex-2 lesson).
+    """
 
     from voxentity_eu.contracts import AudioRecord, Scenario
 
@@ -92,15 +101,16 @@ def build_gold_extractor_run(
         sc = scenarios.get(sid)
         if sc is None:
             continue
-        r = extract(sc.synthesis_text, sc.entity_type, sc.locale)
+        text = getattr(sc, text_field)
+        r = extract(text, sc.entity_type, sc.locale)
         slots = [{"type": sc.entity_type, "value": s["value"]} for s in r.slots] if r.status == "ok" else []
         out.append(
             {
-                "run_id": "gold-extractor-ceiling",
+                "run_id": "gold-extractor-ceiling" if text_field == "synthesis_text" else "gold-written-extractor-ceiling",
                 "audio_id": input_id,
                 "track": "asr_slots",
                 "status": "ok",
-                "transcript": sc.synthesis_text,
+                "transcript": text,
                 "predicted_slots": slots,
                 "error_type": None,
                 "raw_artifact_path": None,
@@ -113,6 +123,31 @@ def build_gold_extractor_run(
         "\n".join(json.dumps(r, ensure_ascii=False) for r in out) + "\n",
     )
     return {"rows": len(out)}
+
+
+class FrozenAsr:
+    """Replays a finished ASR run by input id (file stem); never runs a model.
+
+    Lets the agent and extractor tracks be rebuilt on CPU from frozen
+    transcripts. A missing id is an error row, not a silent skip.
+    """
+
+    name = "frozen"
+
+    def __init__(self, predictions_path: Path) -> None:
+        self.rows = {
+            r["audio_id"]: r
+            for r in (json.loads(line) for line in predictions_path.read_text(encoding="utf-8").splitlines() if line.strip())
+        }
+
+    def load(self) -> None:
+        pass
+
+    def transcribe(self, audio_path: str, locale: str, **config: Any):
+        from voxentity_eu.adapters.base import AsrResult
+
+        row = self.rows[Path(audio_path).stem]
+        return AsrResult(status=row["status"], transcript=row["transcript"], error_type=row["error_type"])
 
 
 def run_reference_agent(
@@ -230,3 +265,29 @@ def human_control_wer_cer(
     out_path.parent.mkdir(parents=True, exist_ok=True)
     write_text_atomic(out_path, json.dumps(report, ensure_ascii=False, indent=1))
     return report
+
+
+def main() -> int:
+    """Rebuild every extractor-dependent track from frozen ASR transcripts."""
+
+    import shutil
+
+    inputs = Path("data/inputs")
+    for system in ("whisper-turbo", "voxtral-mini"):
+        print(system, build_asr_slots_run(Path(f"runs/{system}"), inputs, Path(f"runs/{system}-slots")))
+    gold, manifest = Path("data/generated/gold/scenarios.jsonl"), Path("data/generated/audio_manifest.jsonl")
+    print("gold-extractor", build_gold_extractor_run(gold, manifest, inputs, Path("runs/gold-extractor")))
+    print(
+        "gold-written-extractor",
+        build_gold_extractor_run(gold, manifest, inputs, Path("runs/gold-written-extractor"), "written_text"),
+    )
+    agent_dir = Path("runs/reference-agent")
+    shutil.rmtree(agent_dir / "agent_store", ignore_errors=True)  # strict reset: fresh sessions
+    frozen = Path("runs/whisper-turbo/predictions.jsonl")
+    print("reference-agent", run_reference_agent(inputs, agent_dir, lambda: FrozenAsr(frozen)))
+    print("extractor", EXTRACTOR_VERSION)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

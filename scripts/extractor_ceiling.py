@@ -1,4 +1,7 @@
-"""Gold->extractor ceiling: run the reference extractor over synthesis_text.
+"""Gold->extractor ceiling: run the reference extractor over gold text.
+
+Reports both forms: synthesis_text (spoken, what the TTS read) and
+written_text (what an ideal ASR emits). The spoken ceiling alone is circular.
 
 Uses the exact scorer path (parse_slot_value + canonical + variants) so the
 ceiling measures what track B will measure. Dev drives iteration; test is
@@ -15,10 +18,10 @@ from voxentity_eu.corpus.generate import build_corpus
 from voxentity_eu.scoring.normalize import canonical_form, parse_slot_value
 
 
-def check(s, split=None):
+def check(s, split=None, field="synthesis_text"):
     if split and s.split != split:
         return None
-    r = extract(s.synthesis_text, s.entity_type, s.locale)
+    r = extract(getattr(s, field), s.entity_type, s.locale)
     e = s.entities[0]
     cs = (e.case_sensitive or True) if s.entity_type == "reference_code" else True
     want = canonical_form(e.canonical_value, s.entity_type, s.locale, case_sensitive=cs)
@@ -36,14 +39,15 @@ def check(s, split=None):
 
 def main() -> int:
     corpus = build_corpus()
-    for split in ("dev", "test"):
-        results = [r for r in (check(s, split) for s in corpus) if r]
-        counts = Counter(r[0] for r in results)
-        print(f"[{split}] ok={counts['ok']} mismatch={counts['mismatch']} unsupported={counts['unsupported']} / {len(results)}")
-        for status, s, got, want in results:
-            if status != "ok":
-                print(f"  {s.scenario_id} {status}: got={got!r} want={want!r}")
-                print(f"    synth: {s.synthesis_text[:120]}")
+    for field in ("synthesis_text", "written_text"):
+        for split in ("dev", "test"):
+            results = [r for r in (check(s, split, field) for s in corpus) if r]
+            counts = Counter(r[0] for r in results)
+            print(f"[{field} {split}] ok={counts['ok']} mismatch={counts['mismatch']} unsupported={counts['unsupported']} / {len(results)}")
+            for status, s, got, want in results:
+                if status != "ok":
+                    print(f"  {s.scenario_id} {status}: got={got!r} want={want!r}")
+                    print(f"    text: {getattr(s, field)[:120]}")
     print(f"extractor version: {EXTRACTOR_VERSION}")
     return 0
 
