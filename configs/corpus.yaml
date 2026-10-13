@@ -1,0 +1,16 @@
+# Corpus configuration (frozen values; no calendar dates by policy D10)
+suite_version: 0.1.0
+locales: [de-DE, fr-FR]
+entities: [person_name, phone, email, calendar_value, postal_address, reference_code]
+cases_per_cell: 15
+split:
+  dev_per_cell: 5
+  test_per_cell: 10
+difficulty_mix:
+  direct: 5
+  tricky: 4   # orthographic or phonetic traps, tagged per entity
+  segmented: 3
+  correction: 3
+email_domains: [example.com, example.org]  # IANA-reserved (S15)
+phone_policy: "explicit test sequences; no DE/FR regulator-verified fictional range claimed"
+normalizer_version: norm-1
