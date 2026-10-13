@@ -62,6 +62,14 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
     rows = system_table(scored_runs)
     lines.append("## Systems")
     lines.append("")
+    lines.append(
+        "Ceiling controls: `gold-extractor` feeds the extractor the spoken gold text the TTS read "
+        "(sanity check, not a ceiling for ASR: ASR emits written forms); `gold-written-extractor` "
+        "feeds the written gold text, the form an ideal ASR would emit, and is the relevant ceiling "
+        "for the ASR rows. `reference-agent` replays the frozen whisper-turbo transcripts, so it "
+        "matches `whisper-turbo-slots` by construction; it checks persisted final state, not ASR."
+    )
+    lines.append("")
     lines.append("| system | track | N | slot accuracy | 95% CI | coverage | macro12 clean | macro12 tel | stale-rate |")
     lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for r in rows:

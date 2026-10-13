@@ -1,38 +1,38 @@
 # Backlog de implementación
 
-Orden por dependencias, sin calendario. Las casillas están pendientes; escribir documentación no significa haber implementado funcionalidad.
+Orden por dependencias, sin calendario. Una casilla marcada cita su evidencia; escribir documentación no significa haber implementado funcionalidad.
 
 ## P0 — Fundaciones
 
-- [ ] Crear pyproject, paquete, CLI y extras separados; escoger lock tool y registrar decisión.
-- [ ] Implementar schemas y validar ejemplos.
-- [ ] Crear tests de IDs, rutas, tipos, duplicados y aislamiento de gold.
-- [ ] Añadir CI CPU offline, lint y validación de links internos.
+- [x] Crear pyproject, paquete, CLI y extras separados; escoger lock tool y registrar decisión. — evidencia: pyproject + CLI `voxentity`, extras tts/asr-*/space; lock `uv-core.lock`.
+- [x] Implementar schemas y validar ejemplos. — evidencia: contracts.py; tests/unit/test_contracts.py.
+- [x] Crear tests de IDs, rutas, tipos, duplicados y aislamiento de gold. — evidencia: tests/unit/test_contracts.py, test_corpus.py.
+- [ ] Añadir CI CPU offline, lint y validación de links internos. — parcial: `.github/workflows/ci.yml` (ruff + pytest sobre uv-core.lock); falta validación de links internos.
 Aceptación: instalación limpia, import sin torch/GPU/red; CLI help y ejemplos parseables; tests adversariales pasan.
 
 ## P1 — Scorer
 
 Depende P0.
-- [ ] Normalización por entidad con literal/canonical separados.
-- [ ] Scoring con fallos, omisión, sustitución, extras y correcciones.
-- [ ] Agregación, comparación pareada e intervalos por cluster.
-- [ ] Fixtures con resultados calculados a mano y controles negativos.
+- [x] Normalización por entidad con literal/canonical separados. — evidencia: scoring/normalize.py (norm-2); test_normalize.py.
+- [x] Scoring con fallos, omisión, sustitución, extras y correcciones. — evidencia: scoring/match.py; outcomes en runs/scored/*.json.
+- [x] Agregación, comparación pareada e intervalos por cluster. — evidencia: scoring/aggregate.py + bootstrap.py; `voxentity compare` (test_compare_cli.py).
+- [x] Fixtures con resultados calculados a mano y controles negativos. — evidencia: tests/unit/test_normalize.py.
 Aceptación: errores de un dígito/acento se detectan; tasa global mantiene denominadores; runs incompletos no rankeados; informe CPU repetible.
 
 ## P2 — Casos y derechos
 
 Depende P0.
-- [ ] Escribir pools y plantillas DE/FR originales, matriz 180 casos.
-- [ ] Split 60 dev/120 test sin overlap de familia/valores equivalentes.
-- [ ] Manifest de fuentes y checklist de derechos por asset.
-- [ ] Export de inputs sin gold y IDs opacos.
+- [x] Escribir pools y plantillas DE/FR originales, matriz 180 casos. — evidencia: corpus/pools.py; 180 escenarios.
+- [x] Split 60 dev/120 test sin overlap de familia/valores equivalentes. — evidencia: corpus validate sin errores; test_corpus.py.
+- [x] Manifest de fuentes y checklist de derechos por asset. — evidencia: rights_registry.jsonl.
+- [x] Export de inputs sin gold y IDs opacos. — evidencia: data/inputs (ids opacos, orden por input_id).
 Aceptación: counts exactos, equilibrio de dificultad y voz, validación semántica de correcciones, ninguna fecha de desarrollo añadida.
 
 ## P3 — Síntesis y QA
 
 Depende P2.
-- [ ] Resolver Qwen y speaker IDs; smoke test por idioma/voz.
-- [ ] Generador reanudable, provenance, hashes y registros de intentos.
+- [x] Resolver Qwen y speaker IDs; smoke test por idioma/voz. — evidencia: scripts/smoke_tts.py; data/smoke_tts/report*.json.
+- [x] Generador reanudable, provenance, hashes y registros de intentos. — evidencia: synthesis.jsonl + synthesis_prev_attempts.jsonl.
 - [ ] QA automática, revisión de audio disponible y flujo de exclusiones.
 - [ ] Paquete de revisión para casos pending.
 Aceptación: 180 clean accepted para verified o estado provisional explícito; errores TTS no etiquetados como errores ASR; ningún filtro basado en resultados del modelo evaluado.
@@ -40,52 +40,52 @@ Aceptación: 180 clean accepted para verified o estado provisional explícito; e
 ## P4 — Canal
 
 Depende P3.
-- [ ] Implementar recipe fija, ruido seed, codec y checks de audio.
-- [ ] Generar 180 pares y verificar relaciones.
+- [x] Implementar recipe fija, ruido seed, codec y checks de audio. — evidencia: audio/channel.py tel-1; test_channel.py.
+- [x] Generar 180 pares y verificar relaciones. — evidencia: 360/360 QA accepted (qa.jsonl).
 Aceptación: 360 archivos válidos cuando P3 completo; sample rates y hashes coinciden; test de banda/SNR sin asumir latencia real.
 
 ## P5 — Baselines y runner
 
 Depende P1/P4.
-- [ ] Doctor Kaggle/HF; locks y smoke tests por backend.
-- [ ] Adaptadores Whisper y Voxtral; resume, timeouts y cache.
-- [ ] Extractor común y control gold→extractor.
-- [ ] Corridas completas con inputs aislados.
+- [x] Doctor Kaggle/HF; locks y smoke tests por backend. — evidencia: doctor.py perfiles hf/kaggle.
+- [x] Adaptadores Whisper y Voxtral; resume, timeouts y cache. — evidencia: adapters/whisper.py, voxtral.py.
+- [x] Extractor común y control gold→extractor. — evidencia: rex-3; techo hablado 100% y escrito 90.8% (test).
+- [x] Corridas completas con inputs aislados. — evidencia: whisper 360/360, voxtral 360/360.
 Aceptación: al menos dos familias ASR realmente ejecutadas; artefactos por clip; comparación con misma cohorte; OOM/error no oculto.
 
 ## P6 — Slots persistidos y voice-evals
 
 Depende P5.
-- [ ] Agente de referencia y storage instrumentado.
-- [ ] Corrección dentro del turno; control negativo stale-value.
-- [ ] Export fixtures separados por voz/condición y conversión explícita 8→16 kHz.
-- [ ] Contract test con versión fijada de voice-evals.
+- [x] Agente de referencia y storage instrumentado. — evidencia: adapters/agent.py; tests/integration/test_agent.py.
+- [x] Corrección dentro del turno; control negativo stale-value. — evidencia: tests/integration/test_agent.py.
+- [x] Export fixtures separados por voz/condición y conversión explícita 8→16 kHz. — evidencia: adapters/voice_evals_export.py (8→16 kHz explícito).
+- [x] Contract test con versión fijada de voice-evals. — evidencia: tests/contract/test_voice_evals.py (commit 3f6f9dd).
 Aceptación: scorer lee estado final real; replay no inventa timings; texto duplicado no sobrescribe audio; core funciona sin voice-evals instalado.
 
 ## P7 — Control humano y sensibilidad
 
 Depende P1/P5.
-- [ ] Descarga FLEURS selectiva por revisión, IDs y atribución.
-- [ ] Muestreo determinista 50 por idioma y versiones acústicas.
-- [ ] Evaluación WER/CER separada.
+- [x] Descarga FLEURS selectiva por revisión, IDs y atribución. — evidencia: data/human_control/attribution.json.
+- [x] Muestreo determinista 50 por idioma y versiones acústicas. — evidencia: human_control_manifest.jsonl.
+- [x] Evaluación WER/CER separada. — evidencia: runs/scored/human_control_wer.json.
 - [ ] Investigar/implementar segundo sintetizador solo si derechos resueltos; reportar gate.
 Aceptación: control humano ejecutado o bloqueo verificable sin falso reclutamiento; todas las tablas distinguen corpus; alternativa TTS no bloquea release core.
 
 ## P8 — Informes y demo
 
 Depende P5/P6; integrar P7 cuando disponible.
-- [ ] Tablas, bootstrap, taxonomía de errores y reporte en inglés.
-- [ ] Space CPU de resultados precalculados.
-- [ ] Notebooks de generación, evaluación y reproducción.
+- [x] Tablas, bootstrap, taxonomía de errores y reporte en inglés. — evidencia: reports/report.md.
+- [x] Space CPU de resultados precalculados. — evidencia: space/app.py + scripts/build_space_data.py (no desplegado).
+- [x] Notebooks de generación, evaluación y reproducción. — evidencia: notebooks/*; reproduce verificado idéntico al bundle.
 Aceptación: demo reproduce números del reporte, audio correcto por ID, ningún placeholder numérico presentado como hallazgo.
 
 ## P9 — Entrega publicable
 
 Depende P8.
-- [ ] Licencias oficiales, notices, dataset card, README y CONTRIBUTING.
-- [ ] Bundle con checksums, manifiesto y controles de release.
+- [x] Licencias oficiales, notices, dataset card, README y CONTRIBUTING. — evidencia: LICENSE, DATA_LICENSE.md, THIRD_PARTY_NOTICES.md, dataset_card/, CONTRIBUTING.md.
+- [x] Bundle con checksums, manifiesto y controles de release. — evidencia: release.py build_bundle; `release validate` ok; test_release.py.
 - [ ] Comandos de publicación y borradores de comunicación.
-- [ ] Actualizar IMPLEMENTATION_STATUS con comandos ejecutados/evidencias.
+- [x] Actualizar IMPLEMENTATION_STATUS con comandos ejecutados/evidencias. — evidencia: IMPLEMENTATION_STATUS.md.
 Aceptación: fresh-environment scoring offline idéntico, ninguna credencial, derechos resueltos para assets publicados, nombres y claims coherentes.
 
 ## Extensiones después del núcleo
