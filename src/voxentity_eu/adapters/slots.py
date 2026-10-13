@@ -16,7 +16,7 @@ rex-2 only covered the spoken form, so its 100% gold ceiling was circular.
 rex-4 (from code-switching dev failures): correction markers match whole
 words only (substring matching cut "manon" at "non"); English separators
 (dot/underscore/dash) and digit words (zero..nine) are accepted; Irish "O'"
-surnames stay one token.
+surnames stay one token; French two-word letter names (double vé, i grec).
 """
 
 from __future__ import annotations
@@ -220,6 +220,9 @@ def _segments(transcript: str, locale: str) -> list[list[str]]:
     markers = sorted(CORRECTION_MARKERS[locale], key=len, reverse=True)
     for marker in markers:
         text = re.sub(rf"(?<![\w']){re.escape(marker)}(?![\w'])", " ¤ ", text)
+    if locale == "fr-FR":  # two-word letter names would split the letter run
+        text = re.sub(r"\bdouble v[ée]\b", " w ", text)
+        text = re.sub(r"\bi grec\b", " y ", text)
     for word, digits in sorted(_compound_numbers(locale).items(), key=lambda kv: -len(kv[0])):
         text = re.sub(rf"(?<![\w-]){re.escape(word)}(?![\w-])", digits, text)
     segments = [seg.strip() for seg in text.split("¤") if seg.strip()]

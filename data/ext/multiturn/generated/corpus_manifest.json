@@ -1,0 +1,15 @@
+{
+ "suite": "multiturn",
+ "cases": 48,
+ "turn_audios_clean": 96,
+ "splits": {
+  "dev": 16,
+  "test": 32
+ },
+ "kinds": {
+  "correction": 24,
+  "confirmation": 16,
+  "repeat": 8
+ },
+ "corpus_hash": "e554333bfc03257d82872555b8db899f0410d63f9d22bc19d07080b7b275c842"
+}

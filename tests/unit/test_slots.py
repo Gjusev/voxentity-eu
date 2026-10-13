@@ -36,6 +36,7 @@ def test_written_forms(text, etype, locale, want):
         ("Appelez le plus three three six two four three seven nine five zero two.", "phone", "fr-FR", "+33624379502"),
         ("Ma référence est Echo Golf dash zero three five five.", "reference_code", "fr-FR", "EG-0355"),
         ("Mein Name ist Siobhan O'Callaghan.", "person_name", "de-DE", "siobhan o'callaghan"),
+        ("La bonne valeur est elle dé double vé tiret quatre-vingts zéro cinq.", "reference_code", "fr-FR", "LDW-8005"),
         ("Pardon, l'adresse est rue des Lilas", "person_name", "fr-FR", None),  # elisions still split
     ],
 )
