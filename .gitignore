@@ -38,3 +38,5 @@ reproduced/
 review/
 data/ext/*/audio/
 data/ext/*/inputs/
+data/ext/*/*.log
+runs_ext_*.log

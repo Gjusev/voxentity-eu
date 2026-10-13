@@ -1,0 +1,10 @@
+{
+ "suite": "voices",
+ "voices": [
+  "vivian",
+  "ryan"
+ ],
+ "scenarios": 240,
+ "core_test_scenarios": 120,
+ "corpus_hash": "e47919bc37eb6206084a5c49afa4917e8c1be5ea4baf2ba969e46a184c05ab69"
+}

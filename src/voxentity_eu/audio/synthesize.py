@@ -29,6 +29,8 @@ CELL_ORDER = [
 
 
 def voice_for(scenario_id: str, locale: str, entity: str, case_index: int) -> str:
+    if scenario_id.startswith("vx-"):  # voices extension: vx-<voice>-<core id> pins the speaker
+        return scenario_id.split("-")[1]
     cell_index = CELL_ORDER.index((locale, entity))
     return VOICES[(cell_index + case_index) % 2]
 
