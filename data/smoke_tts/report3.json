@@ -1,0 +1,9 @@
+{
+ "trials": [
+  {
+   "dtype": "fp16",
+   "ok": false,
+   "error": "RuntimeError"
+  }
+ ]
+}

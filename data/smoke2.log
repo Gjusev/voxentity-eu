@@ -1,0 +1,18 @@
+Der Befehl "sox" ist entweder falsch geschrieben oder
+konnte nicht gefunden werden.
+SoX could not be found!
+
+    If you do not have SoX, proceed here:
+     - - - http://sox.sourceforge.net/ - - -
+
+    If you do (or think that you should) have SoX, double-check your
+    path variables.
+    
+
+********
+Warning: flash-attn is not installed. Will only run the manual PyTorch version. Please install flash-attn for faster inference.
+********
+ 
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|##########| 4/4 [00:00<00:00, 2001.58it/s]
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+{'ok': {'sr': 24000, 'dur': 7.2}}

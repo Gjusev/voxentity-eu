@@ -1,0 +1,19 @@
+Der Befehl "sox" ist entweder falsch geschrieben oder
+konnte nicht gefunden werden.
+SoX could not be found!
+
+    If you do not have SoX, proceed here:
+     - - - http://sox.sourceforge.net/ - - -
+
+    If you do (or think that you should) have SoX, double-check your
+    path variables.
+    
+
+********
+Warning: flash-attn is not installed. Will only run the manual PyTorch version. Please install flash-attn for faster inference.
+********
+ 
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files: 100%|##########| 4/4 [00:00<00:00, 3298.06it/s]
+Setting `pad_token_id` to `eos_token_id`:2150 for open-end generation.
+C:\actions-runner\_work\pytorch\pytorch\builder\windows\pytorch\aten\src\ATen\native\cuda\TensorCompare.cu:110: block: [0,0,0], thread: [0,0,0] Assertion `input[0] != 0` failed.
+{'trials': [{'dtype': 'fp16', 'ok': False, 'error': 'RuntimeError'}]}

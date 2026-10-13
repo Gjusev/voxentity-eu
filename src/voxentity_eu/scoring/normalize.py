@@ -204,7 +204,7 @@ def parse_slot_value(raw: str, entity_type: EntityType, locale: Locale) -> str |
 
 _POSTAL_RE = {
     "de-DE": re.compile(
-        r"^(?P<street>.+?)\s+(?P<number>\d+\s*[a-zA-Z]?(?:\s*-\s*\d+)?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
+        r"^(?P<street>.+?)\s+(?P<number>\d+\s*(?:[a-zA-Z]{1,4}|bis|ter)?(?:\s*-\s*\d+)?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
     ),
     "fr-FR": re.compile(
         r"^(?P<number>\d+\s*[a-zA-Z]?),?\s+(?P<street>.+?)\s*,?\s*(?P<postal>\d{5})\s+(?P<locality>\S.*)$"
@@ -250,8 +250,12 @@ _DIGIT_WORD_RE = re.compile(r"\d+")
 
 
 def _parse_postal_address(text: str, locale: Locale) -> str | PostalAddressValue:
-    pattern = _POSTAL_RE.get(locale)
-    if pattern is not None:
+    # locale shape first, then the other shape as fallback: both "street number"
+    # and "number street" are legitimate textual address forms.
+    for key in (locale, "fr-FR" if locale == "de-DE" else "de-DE"):
+        pattern = _POSTAL_RE.get(key)
+        if pattern is None:
+            continue
         m = pattern.match(text)
         if m:
             return PostalAddressValue(
@@ -264,6 +268,14 @@ def _parse_postal_address(text: str, locale: Locale) -> str | PostalAddressValue
 
 
 def _parse_calendar(text: str, locale: Locale) -> str | CalendarValue:
+    # numeric form first: "14.05", "09.03.2026", "14/05/2027"
+    m = re.fullmatch(r"\s*(\d{1,2})[./](\d{1,2})(?:[./](\d{4}))?\s*", text)
+    if m:
+        try:
+            return CalendarValue(day=int(m.group(1)), month=int(m.group(2)),
+                                 year=int(m.group(3)) if m.group(3) else None)
+        except Exception:  # noqa: BLE001
+            return text
     words = text.lower()
     day = month = year = None
     for word, num in _MONTH_WORDS.get(locale, {}).items():
@@ -273,9 +285,8 @@ def _parse_calendar(text: str, locale: Locale) -> str | CalendarValue:
     days = _DIGIT_WORD_RE.findall(text)
     nums = [int(d) for d in days]
     if month is not None:
-        rest = [n for n in nums]
         # heuristics kept deliberately narrow: day is 1..31, a 4-digit >1000 is a year
-        for n in rest:
+        for n in nums:
             if 1000 < n <= 2100 and year is None:
                 year = n
             elif day is None and 1 <= n <= 31:

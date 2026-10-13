@@ -93,7 +93,18 @@ def _spoken(value: Any, entity: str, locale: str, difficulty: str) -> str:
 
             digit_table = DIGITS_DE if locale == "de-DE" else DIGITS_FR
             spell_table = SPELL_DE if locale == "de-DE" else SPELL_FR
-            number_word = " ".join(digit_table[int(c)] if c.isdigit() else spell_table.get(c, c) for c in house)
+            # house spoken digit-by-digit; letter suffix via the spelling
+            # alphabet, word suffixes (bis/ter) spoken as words
+            import re as _re
+
+            m = _re.match(r"(\d+)([A-Za-z]*)", house)
+            digits_part, suffix_part = m.groups()
+            number_word = " ".join(digit_table[int(c)] for c in digits_part)
+            if suffix_part:
+                if suffix_part.lower() in ("bis", "ter"):
+                    number_word += f" {suffix_part.lower()}"
+                else:
+                    number_word += f" {spell_table.get(suffix_part.lower(), suffix_part)}"
             if locale == "de-DE":
                 return (
                     f"Die Straße ist {street}, die Hausnummer ist {number_word}, "

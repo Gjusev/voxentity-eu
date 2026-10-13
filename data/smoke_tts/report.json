@@ -1,0 +1,71 @@
+{
+ "torch": "2.5.1+cu121",
+ "cuda": true,
+ "gpu": "NVIDIA GeForce GTX 1080",
+ "speakers": [
+  "aiden",
+  "dylan",
+  "eric",
+  "ono_anna",
+  "ryan",
+  "serena",
+  "sohee",
+  "uncle_fu",
+  "vivian"
+ ],
+ "languages": [
+  "auto",
+  "chinese",
+  "english",
+  "french",
+  "german",
+  "italian",
+  "japanese",
+  "korean",
+  "portuguese",
+  "russian",
+  "spanish"
+ ],
+ "generations": [
+  {
+   "speaker": "aiden",
+   "language": "German",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "aiden",
+   "language": "French",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "dylan",
+   "language": "German",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "dylan",
+   "language": "French",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "eric",
+   "language": "German",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "eric",
+   "language": "French",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "ono_anna",
+   "language": "German",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  },
+  {
+   "speaker": "ono_anna",
+   "language": "French",
+   "error": "RuntimeError: CUDA error: device-side assert triggered\nCUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.\nFor debugging consider passing CUDA_LAUNCH_BLOCKING=1\nCompile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.\n"
+  }
+ ]
+}

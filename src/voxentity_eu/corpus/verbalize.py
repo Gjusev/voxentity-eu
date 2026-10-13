@@ -55,6 +55,7 @@ MONTHS_FR = {
 AT_WORD = {"de-DE": "Ät", "fr-FR": "arobase"}
 DOT_WORD = {"de-DE": "Punkt", "fr-FR": "point"}
 DASH_WORD = {"de-DE": "Bindestrich", "fr-FR": "tiret"}
+UNDERSCORE_WORD = {"de-DE": "Unterstrich", "fr-FR": "soulignement"}
 PLUS_WORD = {"de-DE": "Plus", "fr-FR": "plus"}
 
 _TENS_DE = {10: "zehn", 11: "elf", 12: "zwölf", 13: "dreizehn", 14: "vierzehn", 15: "fünfzehn",
@@ -193,11 +194,15 @@ def verbalize_email(email: str, locale: str, *, spell_local: bool = False) -> st
                 words.append(dot)
             elif ch == "-":
                 words.append(DASH_WORD[locale])
+            elif ch == "_":
+                words.append(UNDERSCORE_WORD[locale])
         local_part = " ".join(words)
     else:
         # digit runs inside the local part are dictated digit by digit
         expanded = re.sub(r"\d+", lambda m: " " + " ".join(digit_table[int(c)] for c in m.group()) + " ", local)
-        local_part = expanded.replace(".", f" {dot} ").replace("_", f" {dot} ")
+        local_part = (
+            expanded.replace(".", f" {dot} ").replace("_", f" {UNDERSCORE_WORD[locale]} ")
+        )
     domain_part = domain.replace(".", f" {dot} ")
     return f"{local_part} {at} {domain_part}"
 
@@ -273,11 +278,14 @@ def verbalize_postal_address(
 
 
 def digits_and_suffix(house_number: str, locale: str) -> str:
-    m = re.match(r"(\d+)([A-Za-z]?)", house_number)
+    m = re.match(r"(\d+)([A-Za-z]*)", house_number)
     if not m:
         return house_number
     digits, suffix = m.groups()
     spoken = number_word(int(digits), locale)
     if suffix:
-        return f"{spoken} {SPELL_DE.get(suffix.lower(), suffix) if locale == 'de-DE' else SPELL_FR.get(suffix.lower(), suffix)}"
+        if suffix.lower() in ("bis", "ter"):
+            return f"{spoken} {suffix.lower()}"  # French suffix words are spoken as words
+        table = SPELL_DE if locale == "de-DE" else SPELL_FR
+        return f"{spoken} {table.get(suffix.lower(), suffix)}"
     return spoken
