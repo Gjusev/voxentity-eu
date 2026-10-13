@@ -1,0 +1,30 @@
+{
+ "total_scenarios": 180,
+ "splits": {
+  "dev": 60,
+  "test": 120
+ },
+ "per_cell": {
+  "de-DE|calendar_value": 15,
+  "de-DE|email": 15,
+  "de-DE|person_name": 15,
+  "de-DE|phone": 15,
+  "de-DE|postal_address": 15,
+  "de-DE|reference_code": 15,
+  "fr-FR|calendar_value": 15,
+  "fr-FR|email": 15,
+  "fr-FR|person_name": 15,
+  "fr-FR|phone": 15,
+  "fr-FR|postal_address": 15,
+  "fr-FR|reference_code": 15
+ },
+ "difficulty_mix": {
+  "correction": 36,
+  "direct": 60,
+  "orthographic": 24,
+  "phonetic": 24,
+  "segmented": 18,
+  "spelling": 18
+ },
+ "corpus_hash": "b7513367297700f3cd89df1e781af5a636f44beec320defbbd64234e2e1dde4b"
+}

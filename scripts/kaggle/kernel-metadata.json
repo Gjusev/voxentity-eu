@@ -1,0 +1,12 @@
+{
+  "id": "gjusev/voxentity-eu-voxtral-run",
+  "title": "voxentity-eu-voxtral-run",
+  "code_file": "voxtral_run.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "dataset_sources": ["gjusev/voxentity-eu-src", "gjusev/voxentity-eu-inputs"]
+}
