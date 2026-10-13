@@ -67,7 +67,6 @@ def test_voice_assignment_alternates_within_cell_regardless_of_difficulty():
     from voxentity_eu.audio.synthesize import CELL_ORDER, voice_for
 
     for locale, entity in CELL_ORDER:
-        cell_index = CELL_ORDER.index((locale, entity))
         voices = [voice_for("ignored", locale, entity, i) for i in range(15)]
         # alternation, never keyed on difficulty (idx blocks map to difficulties)
         assert voices.count(voices[0]) in (7, 8)
@@ -212,7 +211,6 @@ def test_export_order_does_not_leak_audio_id_structure(tmp_path: Path, corpus):
     ids = [r["input_id"] for r in rows]
     assert ids == sorted(ids), "rows must be ordered by opaque input_id"
     # the sorted order must NOT coincide with audio_id order for this set
-    audio_order = [m1 for m1 in rows]  # mapping check: decrypt
     mapping = result["mapping"]
     decrypted = [mapping[i] for i in ids]
     assert decrypted != sorted(decrypted), "opaque order must not reproduce audio_id order"

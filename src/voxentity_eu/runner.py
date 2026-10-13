@@ -134,17 +134,23 @@ def run_asr(
         "\n".join(json.dumps(r, ensure_ascii=False) for r in results) + "\n",
     )
 
-    # real provenance hashes: corpus manifest, git commit, core lock
+    # real provenance hashes: corpus manifest, git commit, core lock; explicit
+    # gap markers when a source is absent (never silent zeros)
+    provenance_gaps: list[str] = []
     dataset_hash = "0" * 64
     corpus_manifest = Path("data/generated/corpus_manifest.json")
     if corpus_manifest.exists():
         cm = json.loads(corpus_manifest.read_text(encoding="utf-8"))
         dataset_hash = cm.get("corpus_hash", dataset_hash)
+    else:
+        provenance_gaps.append("dataset_hash:zeros(no corpus manifest at run site)")
     from .provenance import code_commit
 
     lock_hash = "0" * 64
     if Path("uv-core.lock").exists():
         lock_hash = sha256_file(Path("uv-core.lock"))
+    else:
+        provenance_gaps.append("dependency_lock_hash:zeros(no lock at run site)")
 
     manifest = {
         "run_id": f"{system_name}-asr",
