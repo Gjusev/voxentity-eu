@@ -170,7 +170,7 @@ def run_asr(
         "failed_count": failed,
         "access_mode": "local",
         "charge_limit": 0.0,
-        "observed_usage": {"wall_clock_seconds": round(time.time() - t_start, 1)},
+        "observed_usage": {"wall_clock_seconds": round(time.time() - t_start, 1), "provenance_gaps": provenance_gaps},
         "incomplete": completed + failed != len(rows),
     }
     write_text_atomic(out_dir / "run_manifest.json", json.dumps(manifest, ensure_ascii=False, indent=1))

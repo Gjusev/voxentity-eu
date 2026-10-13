@@ -63,9 +63,15 @@ def test_correction_semantics(corpus):
             assert not s.previous_mentions
 
 
-def test_voice_assignment_not_by_difficulty_is_deferred_to_synthesis():
-    # voices are assigned at synthesis; corpus validation must not depend on them
-    assert True
+def test_voice_assignment_alternates_within_cell_regardless_of_difficulty():
+    from voxentity_eu.audio.synthesize import CELL_ORDER, voice_for
+
+    for locale, entity in CELL_ORDER:
+        cell_index = CELL_ORDER.index((locale, entity))
+        voices = [voice_for("ignored", locale, entity, i) for i in range(15)]
+        # alternation, never keyed on difficulty (idx blocks map to difficulties)
+        assert voices.count(voices[0]) in (7, 8)
+        assert all(v in ("serena", "dylan") for v in voices)
 
 
 def test_verbalization_roundtrips_for_reference_blocks():
@@ -174,6 +180,42 @@ def test_scenario_ids_are_opaque_to_difficulty_of_answers(corpus):
     for s in corpus:
         val = literal_form(s.entities[0].canonical_value)
         assert val.split(" ")[0][:6].lower() not in s.scenario_id
+
+
+def test_export_order_does_not_leak_audio_id_structure(tmp_path: Path, corpus):
+    """Rows/files are ordered by opaque input_id, never by audio_id (which
+    encodes split+difficulty). Regression test for the audit finding."""
+    import numpy as np
+    import soundfile as sf
+
+    audio_src = tmp_path / "audio"
+    audio = []
+    for s in corpus[:8]:
+        rel = f"synthetic/clean/{s.scenario_id}.wav"
+        p = audio_src / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        sf.write(p, np.zeros(1600, dtype="int16"), 16000, subtype="PCM_16")
+        audio.append(
+            AudioRecord.model_validate(
+                {
+                    "audio_id": s.scenario_id, "scenario_id": s.scenario_id,
+                    "corpus": "synthetic", "condition": "clean", "path": rel,
+                    "sha256": "a" * 64, "sample_rate_hz": 16000, "num_samples": 1600,
+                    "duration_seconds": 0.1, "qa_status": "accepted",
+                }
+            )
+        )
+    out = tmp_path / "inputs"
+    result = export_inputs(corpus, audio, audio_src, out)
+    assert result["exported"] == 8
+    rows = [json.loads(line) for line in (out / "inputs.jsonl").read_text(encoding="utf-8").splitlines()]
+    ids = [r["input_id"] for r in rows]
+    assert ids == sorted(ids), "rows must be ordered by opaque input_id"
+    # the sorted order must NOT coincide with audio_id order for this set
+    audio_order = [m1 for m1 in rows]  # mapping check: decrypt
+    mapping = result["mapping"]
+    decrypted = [mapping[i] for i in ids]
+    assert decrypted != sorted(decrypted), "opaque order must not reproduce audio_id order"
 
 
 def test_summary_counts(corpus):

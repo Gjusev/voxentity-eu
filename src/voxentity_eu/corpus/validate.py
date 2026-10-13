@@ -75,22 +75,22 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
             "person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"
         ):
             cell = [s for s in scenarios if s.locale == locale and s.entity_type == entity]
-            seen: dict[str, str] = {}  # canonical -> scenario_id
+            seen: dict[str, tuple[str, str]] = {}  # canonical -> (scenario_id, split)
             for s in cell:
                 for e in s.entities:
                     key = repr(canonical_form(e.canonical_value, s.entity_type, s.locale))
-                    if key in seen and seen[key].split != s.split:
+                    if key in seen and seen[key][1] != s.split:
                         errors.append(
-                            f"equivalent value in both splits: {s.scenario_id} and {seen[key]} ({entity})"
+                            f"equivalent value in both splits: {s.scenario_id} and {seen[key][0]} ({entity})"
                         )
-                    seen.setdefault(key, s.scenario_id)
+                    seen.setdefault(key, (s.scenario_id, s.split))
                 for m in s.previous_mentions:
                     key = repr(canonical_form(m.value, m.type, s.locale))
-                    if key in seen and seen[key].split != s.split:
+                    if key in seen and seen[key][1] != s.split:
                         errors.append(
-                            f"previous-mention value leaks across splits: {s.scenario_id} vs {seen[key]}"
+                            f"previous-mention value leaks across splits: {s.scenario_id} vs {seen[key][0]}"
                         )
-                    seen.setdefault(key, s.scenario_id)
+                    seen.setdefault(key, (s.scenario_id, s.split))
 
     # --- correction semantics
     for s in scenarios:
@@ -110,9 +110,9 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
             if s.entities[0].mention_text not in s.written_text:
                 errors.append(f"{s.scenario_id}: mention_text not part of written_text")
 
-    # --- synthesis text must be verbalized (no raw '+' in synthesis, etc.)
+    # --- synthesis text must be fully verbalized: phones say 'Plus', never '+'
     for s in scenarios:
-        if "+" in s.synthesis_text and s.entity_type != "phone" and s.entity_type != "email":
+        if "+" in s.synthesis_text:
             errors.append(f"{s.scenario_id}: synthesis_text contains raw '+'")
 
     return {"errors": errors, "warnings": warnings, "total": len(scenarios)}
@@ -139,11 +139,20 @@ def cli_validate(manifest_path: str, gold_path: str) -> dict[str, Any]:
             check_references(audio, scenario_ids)
         except ValueError as exc:
             report["errors"].append(f"audio integrity: {exc}")
-        # pair leakage: same scenario in both dev and test audio
+        # pair leakage: telephone rows must pair with a clean row of the same
+        # scenario; a scenario can never span splits (covered above for values)
         split_by_scenario = {s.scenario_id: s.split for s in scenarios}
+        clean_scenarios = {a.scenario_id for a in audio if a.condition == "clean"}
+        by_id = {a.audio_id: a for a in audio}
         for a in audio:
-            if a.corpus == "synthetic" and a.scenario_id in split_by_scenario:
-                pass  # same scenario -> same split by construction; covered above
+            if a.corpus != "synthetic":
+                continue
+            if a.condition == "telephone" and a.scenario_id not in clean_scenarios:
+                report["errors"].append(f"telephone audio without clean pair: {a.audio_id}")
+            parent = by_id.get(a.parent_audio_id) if a.parent_audio_id else None
+            if parent is not None:
+                if split_by_scenario.get(parent.scenario_id) != split_by_scenario.get(a.scenario_id):
+                    report["errors"].append(f"pair spans splits: {a.audio_id}")
 
     if report["errors"]:
         raise QualityGateFailed(f"{len(report['errors'])} corpus validation errors: {report['errors'][:5]}")

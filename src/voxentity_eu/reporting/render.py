@@ -8,7 +8,7 @@ from typing import Any
 
 from ..provenance import write_text_atomic
 from .errors import enrich_with_taxonomy
-from .tables import cell_matrix, error_taxonomy_table, system_table
+from .tables import cell_matrix, system_table
 
 
 def load_scored(path: Path) -> dict[str, Any]:
@@ -34,11 +34,20 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
 
     scenarios = {s.scenario_id: s for s in read_jsonl(scenarios_path, Scenario)}
     scored_runs: dict[str, dict[str, Any]] = {}
+    taxonomy_tables: dict[str, dict[str, int]] = {}
     for f in sorted(results_dir.glob("*.json")):
         scored = load_scored(f)
         if "results" not in scored:
             continue  # wer blocks and other non-run artifacts
         scored = enrich_with_taxonomy(scored, scenarios)  # works on dicts
+        from collections import Counter
+
+        taxonomy_tables[f.stem] = dict(
+            sorted(
+                Counter((r.get("error_taxonomy") or "correct") for r in scored["results"]).items(),
+                key=lambda kv: -kv[1],
+            )
+        )
         scored["results"] = _to_example_results(scored)  # aggregate needs objects
         scored_runs[f.stem] = scored
 
@@ -98,7 +107,7 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
             )
         lines.append("")
 
-    tax = error_taxonomy_table(scored_runs)
+    tax = taxonomy_tables
     lines.append("## Error taxonomy (heuristic, revisable)")
     lines.append("")
     for name, counts in tax.items():

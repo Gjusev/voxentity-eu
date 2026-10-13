@@ -90,19 +90,19 @@ def bootstrap_paired_difference(
 ) -> dict[str, Any]:
     """CI for accuracy(A) - accuracy(B) resampling the SAME scenario clusters."""
 
-    by_scenario_a = {r.scenario_id: r for r in results_a}
-    by_scenario_b = {r.scenario_id: r for r in results_b}
-    shared = sorted(set(by_scenario_a) & set(by_scenario_b))
-    point = _accuracy([by_scenario_a[s] for s in shared])
-    point_b = _accuracy([by_scenario_b[s] for s in shared])
+    # clusters are (scenario, condition) rows of BOTH systems resampled
+    # together; collapsing conditions would drop half the data
+    by_key_a = {(r.scenario_id, r.condition): r for r in results_a}
+    by_key_b = {(r.scenario_id, r.condition): r for r in results_b}
+    shared = sorted(set(by_key_a) & set(by_key_b))
+    point = _accuracy([by_key_a[s] for s in shared])
+    point_b = _accuracy([by_key_b[s] for s in shared])
     if point is None or point_b is None:
         return {"n": 0, "point_difference": None, "ci95": None}
 
-    clusters = []
-    for s in shared:
-        clusters.append((by_scenario_a[s], by_scenario_b[s]))
+    pairs = [(by_key_a[s], by_key_b[s]) for s in shared]
     strata: dict[tuple[str, str], list[tuple[ExampleResult, ExampleResult]]] = defaultdict(list)
-    for pair in clusters:
+    for pair in pairs:
         key = (pair[0].locale, pair[0].entity_type)
         strata[key].append(pair)
 

@@ -38,9 +38,10 @@ def export_inputs(
     problems: list[str] = []
 
     (out_dir / "audio").mkdir(parents=True, exist_ok=True)
-    for a in sorted(audio, key=lambda r: r.audio_id):
-        if a.corpus != corpus or a.qa_status != "accepted":
-            continue
+    # iteration order is by opaque input_id: ordering by audio_id would leak
+    # the split/difficulty structure encoded in the audio_id string
+    prepared = [a for a in audio if a.corpus == corpus and a.qa_status == "accepted"]
+    for a in sorted(prepared, key=lambda r: opaque_id(r.audio_id, run_scope)):
         sc = scenario_by_id.get(a.scenario_id)
         if sc is None:
             problems.append(f"{a.audio_id}: no scenario (non-synthetic should use corpus=human_control)")
@@ -49,9 +50,9 @@ def export_inputs(
         if not src.exists():
             problems.append(f"{a.audio_id}: audio file missing {src}")
             continue
-        # answers must not leak through the filename
-        canon = str(canonical_form(sc.entities[0].canonical_value, sc.entity_type, sc.locale))
-        if any(tok and tok in canon and len(tok) >= 3 for tok in src.stem.replace("-", " ").split()):
+        # answers must not leak through the filename (case-insensitive)
+        canon = str(canonical_form(sc.entities[0].canonical_value, sc.entity_type, sc.locale)).lower()
+        if any(tok and tok.lower() in canon and len(tok) >= 3 for tok in src.stem.replace("-", " ").split()):
             problems.append(f"{a.audio_id}: filename appears to encode the answer ({src.stem})")
             continue
         oid = opaque_id(a.audio_id, run_scope)

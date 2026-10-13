@@ -98,13 +98,13 @@ def score_example(
     target_type = scenario.entity_type
     is_correction = bool(scenario.previous_mentions)
 
+    case_sensitive = entity.case_sensitive if entity.case_sensitive is not None else True
     gold_canonical = canonical_form(
-        entity.canonical_value, target_type, scenario.locale,
-        case_sensitive=entity.case_sensitive or True,
+        entity.canonical_value, target_type, scenario.locale, case_sensitive=case_sensitive
     )
     gold_literal = literal_form(entity.canonical_value)
     variant_canonicals = [
-        canonical_form(v, target_type, scenario.locale, case_sensitive=entity.case_sensitive or True)
+        canonical_form(v, target_type, scenario.locale, case_sensitive=case_sensitive)
         for v in entity.accepted_variants
     ]
 
@@ -129,11 +129,12 @@ def score_example(
         outcome = "omission"
     else:
         predicted_value = str(candidate_slots[0].get("value", "") if isinstance(candidate_slots[0], dict) else candidate_slots[0].value)
+        # literal score compares the RAW predicted string (NFC + trim), never
+        # the post-parse reconstruction (docs/04 literal policy)
+        pred_literal = literal_form(predicted_value)
         structured = parse_slot_value(predicted_value, target_type, scenario.locale)
-        pred_literal = literal_form(structured)
         pred_canonical = canonical_form(
-            structured, target_type, scenario.locale,
-            case_sensitive=entity.case_sensitive or True,
+            structured, target_type, scenario.locale, case_sensitive=case_sensitive,
         )
         literal_correct = pred_literal == gold_literal
         canonical_correct = pred_canonical == gold_canonical or pred_canonical in variant_canonicals

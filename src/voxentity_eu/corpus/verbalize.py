@@ -235,7 +235,8 @@ def verbalize_reference_code(code: str, locale: str, *, spell: bool = True) -> s
 
 def verbalize_calendar(day: int, month: int, year: int | None, locale: str, *, segmented: bool = False) -> str:
     if locale == "de-DE":
-        day_word = f"{number_word_de(day)}ten"
+        irregular = {1: "ersten", 3: "dritten", 7: "siebten", 8: "achten"}
+        day_word = irregular.get(day) or f"{number_word_de(day)}ten"
         text = f"{day_word} {MONTHS_DE[month]}"
         if year is not None:
             text += f" {year_word_de(year, segmented=segmented)}"

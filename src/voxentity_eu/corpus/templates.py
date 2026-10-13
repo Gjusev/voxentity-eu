@@ -306,7 +306,7 @@ FRAMES: dict[tuple[str, str], dict[str, list[str]]] = {
         "tricky": [
             "La référence est {e}, écoutez bien.",
             "Référence {e}, précisément.",
-            "Le numéro de dossier est {e}.",
+            "Notez bien la référence {e}.",
             "L'important est la référence {e}.",
         ],
         "segmented": [

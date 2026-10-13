@@ -90,8 +90,11 @@ def test_phone_loses_leading_zero_is_incorrect():
     assert canonical_phone("0170 1234567", "de-DE") == "+491701234567"  # declared trunk rule
     assert canonical_phone("1701234567", "de-DE") == "1701234567"  # lost trunk zero -> mismatch
     assert canonical_phone("0049 170 1234567", "de-DE") == "+491701234567"  # 00-prefix rule
-    # leading zeros after the prefix are preserved
-    assert canonical_phone("+49 0170", "de-DE") == "+490170"
+    # the "+49 (0)171..." convention repeats the trunk zero after the country
+    # code; norm-2 drops exactly that single zero (documented rule change)
+    assert canonical_phone("+49 0170", "de-DE") == "+49170"
+    # service numbers keep interior zeros untouched
+    assert canonical_phone("+49 800 123", "de-DE") == "+49800123"
 
 
 def test_sharp_s_and_accents_stay_distinct():

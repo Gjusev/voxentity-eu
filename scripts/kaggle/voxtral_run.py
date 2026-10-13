@@ -1,8 +1,7 @@
 """Kaggle GPU kernel: Voxtral-Mini-3B ASR run over the frozen inputs bundle.
 
-Run from scripts/kaggle/ after uploading the src+inputs dataset. Produces
-runs/voxtral-mini/{predictions.jsonl,run_manifest.json,cache.jsonl} in the
-kernel output. Gold is never present in the inputs bundle.
+Robust to dataset layout (files or zip); prints the mounted layout for
+diagnosability. Gold is never present in the inputs dataset.
 """
 
 from __future__ import annotations
@@ -13,9 +12,35 @@ import sys
 import zipfile
 from pathlib import Path
 
-SRC_ZIP = Path("/kaggle/input/voxentity-eu-src/src.zip")
-SRC = Path("/kaggle/working/pkg")
 INPUTS = Path("/kaggle/input/voxentity-eu-inputs")
+
+
+def find_package_root() -> Path:
+    base = Path("/kaggle/input/voxentity-eu-src")
+    candidates = [
+        base / "src",                    # dataset ships src/voxentity_eu/...
+        base,                            # dataset ships voxentity_eu/...
+        base / "src" / "src",            # zipped src/ containing src/
+    ]
+    for c in candidates:
+        if (c / "voxentity_eu" / "__init__.py").exists():
+            return c
+    # zip fallback: extract the first zip that contains the package
+    for z in base.rglob("*.zip"):
+        out = Path("/kaggle/working/pkg")
+        if (out / "voxentity_eu" / "__init__.py").exists():
+            return out
+        out.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(z) as zf:
+            zf.extractall(out)
+        if (out / "voxentity_eu" / "__init__.py").exists():
+            return out
+        if (out / "src" / "voxentity_eu" / "__init__.py").exists():
+            return out / "src"
+    print("DATASET LAYOUT:", file=sys.stderr)
+    for p in sorted(base.rglob("*"))[:40]:
+        print("  ", p, file=sys.stderr)
+    raise SystemExit(3)
 
 
 def main() -> int:
@@ -27,10 +52,9 @@ def main() -> int:
         ],
         check=False,
     )
-    SRC.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(SRC_ZIP) as z:
-        z.extractall(SRC)
-    sys.path.insert(0, str(SRC / "src"))
+    pkg = find_package_root()
+    print("package root:", pkg, flush=True)
+    sys.path.insert(0, str(pkg))
     import torch  # noqa: F401  (verifies CUDA torch availability)
 
     from voxentity_eu.runner import run_asr

@@ -32,17 +32,17 @@ from typing import Any
 
 from ..contracts import CalendarValue, EntityType, Locale, PostalAddressValue
 
-NORMALIZER_VERSION = "norm-1"
+NORMALIZER_VERSION = "norm-2"
 
 # Public abbreviation allowlist for postal streets. Frozen; extending it is a
 # new NORMALIZER_VERSION. Keys are compared after lowercase+NFC.
 STREET_ABBREVIATIONS: dict[str, str] = {
-    "de-de": {
+    "de-DE": {
         "str.": "straße",
         "str": "straße",
         "pl.": "platz",
     },
-    "fr-fr": {
+    "fr-FR": {
         "av.": "avenue",
         "bd": "boulevard",
         "bvd": "boulevard",
@@ -103,6 +103,13 @@ def canonical_phone(value: str, locale: Locale) -> str:
         if cc is None:
             raise ValueError(f"no declared phone rule for locale {locale}")
         text = "+" + cc + text[1:]
+    # international form that repeats the trunk zero after the country code,
+    # e.g. "+49 (0)171 2345678" → drop that single in-parens trunk zero
+    for cc in COUNTRY_CODES.values():
+        prefix = "+" + cc + "0"
+        if text.startswith(prefix):
+            text = "+" + cc + text[len(prefix):]
+            break
     return text
 
 

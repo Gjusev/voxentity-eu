@@ -126,7 +126,7 @@ def compare_runs(scored_a: dict[str, Any], scored_b: dict[str, Any]) -> dict[str
     b_better = sum(not ra[s].correct and rb[s].correct for s in shared)
     return {
         "run_a": scored_a.get("run_id"),
-        "run_b": scored_b.get("run_b") or scored_b.get("run_id"),
+        "run_b": scored_b.get("run_id"),
         "n_shared": len(shared),
         "only_in_a": only_a,
         "only_in_b": only_b,
