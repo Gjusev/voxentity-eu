@@ -87,9 +87,11 @@ Secondary hooks, each its own future announcement (see Ongoing):
   commands in PUBLISHING.md §Tier 1; then open both URLs logged out and
   confirm files load; record URLs + SHAs in `RELEASE_MANIFEST.json`; replace
   "not yet published" wording in README and dataset card.
-- **P3 Announcements (held).** Entry: P2 URLs live and verified (met) **and** a
-  listening spot check of the synthetic clips (council condition: Taleb,
-  Kahneman), reported in the post either way. Order: Show HN
+- **P3 Announcements (unblocked; owner-triggered only).** Entry: P2 URLs live
+  and verified (met) **and** a listening spot check of the synthetic clips
+  (council condition: Taleb, Kahneman), reported in the post either way.
+  Spot check done by the owner, no issues surfaced; recorded in the post
+  draft below. Nothing is posted by repository tooling. Order: Show HN
   (morning-neutral, author available all day to answer), maintainer's stronger
   social platform, then the subreddit, then the HF forum thread. One platform
   per working session so questions get real answers.
@@ -206,9 +208,10 @@ real scoring bug, someone adding a system to `runs/`.
 > conclusion. I retracted it publicly and the changelog documents what was
 > measured wrong.
 >
-> Status: synthetic speech, simulated channel, automated QA only. No human
-> listening review yet, so the corpus is provisional. Everything rescores on
-> a CPU with no network.
+> Status: synthetic speech, simulated channel, review is automated QA plus my
+> listening spot check, which surfaced no issues. The systematic per-clip
+> review is still open, so the corpus stays provisional. Everything rescores
+> on a CPU with no network.
 >
 > Link in the first comment.
 >

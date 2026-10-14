@@ -27,8 +27,9 @@ character fails the slot.
 </p>
 
 > **Read this first.** The speech is synthetic (Qwen3-TTS), the telephone channel
-> is simulated, and no human has listened to the clips yet (automated QA only), so
-> the corpus is labelled provisional. Absolute numbers depend on the synthesizer;
+> is simulated, and review is automated QA plus a maintainer listening spot
+> check (no issues found); no systematic human review yet, so the corpus is
+> labelled provisional. Absolute numbers depend on the synthesizer;
 > see the Piper result below.
 
 **Try it:** browse and listen to every scored case in the

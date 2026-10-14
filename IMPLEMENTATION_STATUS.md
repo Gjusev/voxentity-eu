@@ -201,7 +201,9 @@ rex-3. Findings and their resolution are in git history.
 
 ## Blockages and limitations
 
-- Human listening of the corpus: pending → corpus «provisional», not «verified».
+- Human listening of the corpus: owner listening spot check done, no issues
+  surfaced; the systematic per-clip review (`review_package.py apply`,
+  180/180) is still pending → corpus stays «provisional», not «verified».
 - Synthetic audio rights: published by the recorded owner decision (S03, S17,
   see DATA_LICENSE.md); not a legal opinion.
 - Transcripts entirely unrelated to the text (e.g. FR emails turned into

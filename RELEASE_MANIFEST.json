@@ -24,6 +24,6 @@
   }
  },
  "rights": "synthetic audio published by owner decision recorded in data/generated/rights_registry.jsonl (S03, S17); not a legal opinion; takedown via GitHub issues",
- "review_status": "automated QA only, no human listening review (provisional)",
- "announcement": "not posted; LinkedIn draft held until a listening spot check (docs/launch/LAUNCH.md)"
+ "review_status": "automated QA plus maintainer listening spot check; no systematic human review yet (provisional)",
+ "announcement": "not posted; owner listening spot check done (no issues); posting is the owner's explicit action only (docs/launch/LAUNCH.md P3)"
 }
