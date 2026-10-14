@@ -1,0 +1,1 @@
+A caller says +33 6 05 36 23 71. On the phone line Whisper heard a 7, on clean audio it captured nothing, and Voxtral dropped the 0. VoxEntity-EU scores the slot, not the words: an open German/French benchmark on synthetic speech, provisional (automated QA only).

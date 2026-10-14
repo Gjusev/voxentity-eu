@@ -22,13 +22,13 @@ condition holds, not on a schedule.
 ## Positioning
 
 One sentence: *an open, CPU-reproducible benchmark measuring whether speech
-systems capture exact entities — names, phone numbers, emails, dates,
-addresses, reference codes — in German and French dictation, in clean and
+systems capture exact entities (names, phone numbers, emails, dates,
+addresses, reference codes) in German and French dictation, in clean and
 simulated-telephone audio.*
 
 The hook that travels: **both ASR families tested capture barely a third of
 entities exactly (34.2% / 37.1%, overlapping CIs) against a 91% written-text
-ceiling, and emails fail almost completely (0–20% in all three languages
+ceiling, and emails fail almost completely (0 to 20% in all three languages
 tested)**. A transcript that reads fine can still carry the wrong digit. That is
 a concrete, verifiable claim from `reports/report.md`; it is about the two ASR
 systems measured, not about any commercial voice agent.
@@ -55,8 +55,8 @@ Secondary hooks, each its own future announcement (see Ongoing):
   README + dataset card as the permanent explainer. Everything rented/borrowed
   links only here. No email list or blog exists yet; add when there is
   traffic worth capturing.
-- **Rented (1–2, chosen):** X/Twitter or LinkedIn for the maintainer's
-  existing network (pick whichever has real followers — check before launch);
+- **Rented (1 to 2, chosen):** X/Twitter or LinkedIn for the maintainer's
+  existing network (pick whichever has real followers; check before launch);
   Hacker News *Show HN*; one subreddit post (r/MachineLearning or
   r/speechrecognition). Rented posts exist to funnel to the dataset/repo.
 - **Borrowed (identify, do not pitch from this session):** HF community forum
@@ -67,13 +67,13 @@ Secondary hooks, each its own future announcement (see Ongoing):
 
 ## Phases (entry conditions, not dates)
 
-- **P0 Internal (done).** Gates G1–G6 green with evidence
+- **P0 Internal (done).** Gates G1 to G6 green with evidence
   (`reports/release_gates.md`); adversarial audit closed; bundle validates;
   notebook reproduces byte-identical numbers from the bundle.
 - **P0.5 Private reproduction (alpha): skipped by owner decision** (went public
   directly). Its goal moves to P4: ask early readers for reproductions.
   Original plan: Entry: P0. The owner shares the repo
-  privately with 2–3 people who know speech evaluation and asks one thing: run
+  privately with 2 to 3 people who know speech evaluation and asks one thing: run
   `notebooks/reproduce/reproduce.ipynb` from a clean checkout and try to break
   the scorer. Exit: at least one independent reproduction reports identical
   numbers, and every reported problem is fixed or documented. (Invitations are
@@ -146,22 +146,22 @@ real scoring bug, someone adding a system to `runs/`.
 
 ### Show HN title + text
 
-> **Show HN: VoxEntity-EU – can ASR capture your phone number in German or French?**
+> **Show HN: VoxEntity-EU, can ASR capture your phone number in German or French?**
 >
 > Open benchmark for exact spoken-entity capture: names, phone numbers,
-> emails, dates, addresses, reference codes — the part voice assistants
-> actually have to get right character-for-character. 180 synthetic scenarios
+> emails, dates, addresses, reference codes: the part a voice form has to get
+> right character for character. 180 synthetic scenarios
 > (Qwen3-TTS, DE+FR), each as clean audio and a simulated 8 kHz telephone
 > channel; 120 independent test scenarios per system. Automated QA only, no
-> human listening review yet — provisional by design.
+> human listening review yet, so it is provisional.
 >
 > Headline results (test, n=240 scenario×condition, same extractor for all
 > systems): Whisper large-v3-turbo 34.2% [28.3, 40.4] and Voxtral Mini
 > 37.1% [30.0, 43.8] exact capture, vs a 90.8% written-text ceiling. The two
-> ASR families are statistically indistinguishable. Emails fail at 0–20% in
+> ASR families are statistically indistinguishable. Emails fail at 0 to 20% in
 > German, French and Spanish. The simulated phone channel alone costs +5 pp
 > (whisper). And on the same scenarios a second TTS family (Piper) scores
-> +10 pp — so corpus numbers are synthesizer-conditional, which we publish
+> +10 pp, so corpus numbers depend on the synthesizer, which we publish
 > per-family.
 >
 > Everything is CPU-reproducible from frozen predictions (checksums in the
@@ -177,10 +177,10 @@ real scoring bug, someone adding a system to `runs/`.
 > open DE/FR benchmark for exact entity capture (names, phones, emails,
 > dates, addresses, codes). 120 independent synthetic test scenarios × clean
 > + simulated telephone. Result: Whisper 34%, Voxtral 37% exact capture vs a
-> 91% ceiling; emails ≈ 0–20% in all 3 languages we tested. Provisional
+> 91% ceiling; emails ≈ 0 to 20% in all 3 languages we tested. Provisional
 > (automated QA). CPU-reproducible, data + demo: https://github.com/Gjusev/voxentity-eu
 
-### Reddit (r/MachineLearning, title prefixed `[P]`) — opening text
+### Reddit (r/MachineLearning, title prefixed `[P]`): opening text
 
 > We built a benchmark for the boring but decisive part of voice interfaces:
 > whether the system captures exact values (phone numbers, emails, names,
@@ -190,16 +190,16 @@ real scoring bug, someone adding a system to `runs/`.
 > systems: Whisper large-v3-turbo 34.2%, Voxtral Mini 37.1% (CIs overlap) vs
 > 90.8% written ceiling; per-cell failure analysis in the report. A second
 > TTS family moves the numbers +10 pp, so we publish per-synthesizer. Happy
-> to answer methods questions; criticism of the scorer welcome — norm-2 and
+> to answer methods questions; criticism of the scorer is welcome; norm-2 and
 > the extractor are frozen and documented. Links in the repo README.
 
-### HF community forum — opening text
+### HF community forum: opening text
 
 > Sharing a DE/FR spoken-entity benchmark (names/phones/emails/dates/
 > addresses/codes): 180 synthetic scenarios (Qwen3-TTS; provisional,
 > automated QA only), clean + simulated telephone, frozen predictions in the
 > release bundle, CPU notebook that reproduces every number. Two ASR families
-> land at ~34–37% exact capture vs a 91% written ceiling; emails fail almost
+> land at ~34 to 37% exact capture vs a 91% written ceiling; emails fail almost
 > everywhere. Extension suites: code-switching, multi-turn corrections,
 > voice variation, second TTS family (+10 pp), Spanish. Looking for
 > third-party reproductions and scorer criticism, not applause.

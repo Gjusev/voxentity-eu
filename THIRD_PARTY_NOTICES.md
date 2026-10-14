@@ -34,7 +34,7 @@ cards / repositories at the revisions pinned below (rights registry:
 
 - Source: https://huggingface.co/datasets/google/fleurs
 - Revision: 70bb2e84b976b7e960aa89f1c648e09c59f894dd
-- License: CC-BY-4.0 — attribution and modification flagging obligations are
+- License: CC-BY-4.0; attribution and modification flagging obligations are
   documented in DATA_LICENSE.md and the dataset card.
 - Used for: independent human-speech control; never mixed into synthetic
   scores.
@@ -66,6 +66,18 @@ cards / repositories at the revisions pinned below (rights registry:
   manifests; the upstream repository is never modified and nothing from it is
   redistributed in the release bundle. The integration stays optional and
   isolated (core scoring works without it).
+
+## Demo video and brand assets
+
+Used in `brag-output/composition/` (the demo source) and `docs/brand/`, `docs/media/`:
+
+- IBM Plex Sans and IBM Plex Mono (IBM), SIL Open Font License 1.1, from Google
+  Fonts; bundled as woff2 for the offline render.
+- Music: "Happy Beats / Business Moves" vol. 12 by ende.app, CC BY 4.0
+  (https://ende.app/en/standard-license); credited in the video.
+- Sound effects: Kenney.nl, CC0 1.0 (public domain).
+- GSAP 3.14.2 (GreenSock), under the GSAP standard "no charge" license, used to
+  animate the demo composition; rendered with HyperFrames.
 
 ## Python dependencies
 

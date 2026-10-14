@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VoxEntity-EU lockup (render source)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600&family=IBM+Plex+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+  :root { --ground:#fcfcfb; --ink:#0b0b0b; --muted:#898781; --err:#eb6834; }
+  body { margin:0; background:transparent; font-family:"IBM Plex Sans", sans-serif; }
+  .theme-dark { --ground:#1a1a19; --ink:#f0efec; --muted:#a3a19a; --err:#d95926; }
+  .lockup { display:inline-flex; align-items:center; gap:22px; padding:28px 40px; background:var(--ground); }
+  .lockup svg { width:84px; height:84px; display:block; }
+  .ink { fill:none; stroke:var(--ink); stroke-width:5; stroke-linecap:square; }
+  .bar { fill:var(--ink); } .err { fill:var(--err); }
+  .word { font-weight:600; font-size:62px; letter-spacing:-0.035em; color:var(--ink); line-height:1; }
+  .word span { color:var(--muted); font-weight:500; }
+  .tag { display:block; margin-top:10px; font:500 15px/1 "IBM Plex Mono", monospace; letter-spacing:0.02em; color:var(--muted); }
+</style>
+</head>
+<body>
+  <div id="light" class="lockup">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><path class="ink" d="M17 9.5H9.5V54.5H17"/><path class="ink" d="M47 9.5H54.5V54.5H47"/><rect class="bar" x="19.5" y="24" width="4" height="16"/><rect class="bar" x="26.5" y="17" width="4" height="30"/><rect class="err" x="33.5" y="27" width="4" height="22"/><rect class="bar" x="40.5" y="26" width="4" height="12"/></svg>
+    <div><div class="word">VoxEntity<span>-EU</span></div><span class="tag">exact spoken-entity capture, DE / FR</span></div>
+  </div>
+  <br>
+  <div id="dark" class="lockup theme-dark">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><path class="ink" d="M17 9.5H9.5V54.5H17"/><path class="ink" d="M47 9.5H54.5V54.5H47"/><rect class="bar" x="19.5" y="24" width="4" height="16"/><rect class="bar" x="26.5" y="17" width="4" height="30"/><rect class="err" x="33.5" y="27" width="4" height="22"/><rect class="bar" x="40.5" y="26" width="4" height="12"/></svg>
+    <div><div class="word">VoxEntity<span>-EU</span></div><span class="tag">exact spoken-entity capture, DE / FR</span></div>
+  </div>
+  <br>
+  <div id="icon" style="display:inline-block;background:#fcfcfb;padding:0">
+    <svg viewBox="0 0 64 64" width="256" height="256" aria-hidden="true"><path class="ink" d="M17 9.5H9.5V54.5H17"/><path class="ink" d="M47 9.5H54.5V54.5H47"/><rect class="bar" x="19.5" y="24" width="4" height="16"/><rect class="bar" x="26.5" y="17" width="4" height="30"/><rect class="err" x="33.5" y="27" width="4" height="22"/><rect class="bar" x="40.5" y="26" width="4" height="12"/></svg>
+  </div>
+</body>
+</html>

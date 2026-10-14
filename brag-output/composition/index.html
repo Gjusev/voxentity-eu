@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>VoxEntity-EU: the slot, not the words</title>
+<script src="assets/vendor/gsap.min.js"></script>
+<style>
+  @font-face { font-family: "Plex Sans"; src: url("assets/fonts/IBMPlexSans-var.woff2") format("woff2"); font-weight: 100 700; }
+  @font-face { font-family: "Plex Mono"; src: url("assets/fonts/IBMPlexMono-500.woff2") format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Plex Mono"; src: url("assets/fonts/IBMPlexMono-600.woff2") format("woff2"); font-weight: 600; }
+  :root { --ground:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#76746f; --line:#e1e0d9; --err:#eb6834; --sig:#2a78d6; --sig2:#184f95; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:"Plex Sans", sans-serif; }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--ground); }
+  .clip { position:absolute; inset:0; }
+  .pad { position:absolute; left:160px; right:160px; top:0; bottom:0; }
+  .label { font:500 28px/1.2 "Plex Mono", monospace; color:var(--muted); letter-spacing:0.01em; }
+  .mono { font-family:"Plex Mono", monospace; font-weight:600; }
+  .err { color:var(--err); }
+
+  /* scene 1 */
+  #s1-said-label { position:absolute; top:190px; left:0; }
+  #s1-said { position:absolute; top:236px; left:0; font-size:118px; line-height:1; letter-spacing:-0.01em; }
+  #s1-said .d0 { display:inline-block; }
+  #s1-under { position:absolute; top:362px; left:0; height:8px; width:68px; background:var(--err); transform-origin:left center; }
+  #s1-cap-label { position:absolute; top:500px; left:0; }
+  #s1-slot { position:absolute; top:548px; left:0; display:flex; align-items:center; font-size:118px; line-height:1; }
+  #s1-slot .br { color:var(--ink); font-weight:500; }
+  #s1-slot .ch { display:inline-block; }
+  #s1-verdict { position:absolute; top:760px; left:0; font-size:52px; font-weight:600; letter-spacing:-0.02em; }
+
+  /* scene 2 */
+  #s2-title { position:absolute; top:170px; left:0; font-size:64px; font-weight:600; letter-spacing:-0.025em; }
+  .row { position:absolute; left:0; right:0; display:grid; grid-template-columns:620px 1fr; align-items:baseline; border-top:2px solid var(--line); padding-top:26px; }
+  .row .val { font-size:76px; line-height:1; }
+  .row .none { font:500 44px/1 "Plex Mono", monospace; color:var(--muted); }
+  #r1 { top:330px; } #r2 { top:500px; } #r3 { top:670px; }
+  .gap { display:inline-block; width:0.6em; height:0.78em; border:5px solid var(--err); box-sizing:border-box; vertical-align:-0.06em; }
+  #s2-foot { position:absolute; top:880px; left:0; font:500 26px/1.35 "Plex Sans", sans-serif; color:var(--muted); }
+
+  /* scene 3 */
+  #s3-title { position:absolute; top:150px; left:0; font-size:64px; font-weight:600; letter-spacing:-0.025em; }
+  #s3-sub { position:absolute; top:240px; left:0; font:500 30px/1.3 "Plex Sans", sans-serif; color:var(--ink2); }
+  .bar-row { position:absolute; left:0; width:1600px; height:120px; }
+  #b1 { top:380px; } #b2 { top:560px; }
+  .bar-name { position:absolute; top:0; left:0; font:600 32px/1 "Plex Sans", sans-serif; }
+  .bar-track { position:absolute; top:52px; left:0; width:1300px; height:46px; background:var(--line); }
+  .bar-fill { position:absolute; top:0; left:0; height:46px; width:1300px; transform-origin:left center; }
+  #b1 .bar-fill { background:var(--sig); } #b2 .bar-fill { background:var(--sig2); }
+  .bar-num { position:absolute; top:44px; left:1330px; font:600 58px/1 "Plex Mono", monospace; }
+  .bar-ci { position:absolute; top:4px; left:1330px; font:500 22px/1 "Plex Mono", monospace; color:var(--muted); }
+  #ceil { position:absolute; top:360px; left:1177px; width:6px; height:340px; background:var(--ink2); }
+  #ceil-label { position:absolute; top:720px; left:1050px; width:260px; text-align:center; font:600 30px/1.25 "Plex Sans", sans-serif; color:var(--ink2); }
+  #s3-foot { position:absolute; top:880px; left:0; font:500 26px/1.35 "Plex Sans", sans-serif; color:var(--muted); }
+
+  /* scene 4 */
+  #s4-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #s4-lockup { display:flex; align-items:center; gap:40px; }
+  #s4-mark { width:210px; height:210px; display:block; }
+  #s4-mark .ink { fill:none; stroke:var(--ink); stroke-width:5; stroke-linecap:square; }
+  #s4-mark .bar { fill:var(--ink); } #s4-mark .orange { fill:var(--err); }
+  #s4-word { font-size:132px; font-weight:600; letter-spacing:-0.04em; line-height:1; }
+  #s4-word span { color:var(--muted); font-weight:500; }
+  #s4-line { margin-top:56px; font-size:48px; font-weight:500; letter-spacing:-0.015em; }
+  #s4-url { margin-top:22px; font:500 34px/1 "Plex Mono", monospace; color:var(--ink2); }
+  #s4-foot { position:absolute; bottom:90px; left:0; right:0; text-align:center; font:500 26px/1.35 "Plex Sans", sans-serif; color:var(--muted); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="21.5">
+
+  <section id="s1" class="clip" data-start="0" data-duration="5" data-track-index="1">
+    <div id="s1-wrap" class="pad">
+      <div id="s1-said-label" class="label">A caller dictates (French test case, test-fr-phone-010)</div>
+      <div id="s1-said" class="mono">+33 6 <span class="d0">0</span>5 36 23 71</div>
+      <div id="s1-under"></div>
+      <div id="s1-cap-label" class="label">Whisper large-v3-turbo · simulated phone line</div>
+      <div id="s1-slot" class="mono"><span class="br" id="s1-bl">[</span><span id="s1-chars"></span><span class="br" id="s1-br">]</span></div>
+      <div id="s1-verdict"><span class="err">Slot failed.</span> One digit.</div>
+    </div>
+  </section>
+
+  <section id="s2" class="clip" data-start="5" data-duration="5" data-track-index="1">
+    <div id="s2-wrap" class="pad">
+      <div id="s2-title">Same number. Three captures.</div>
+      <div id="r1" class="row"><div class="label">Whisper · clean audio</div><div class="none">nothing captured</div></div>
+      <div id="r2" class="row"><div class="label">Whisper · phone line</div><div class="val mono">+33 6 <span class="err">7</span>5 36 23 71</div></div>
+      <div id="r3" class="row"><div class="label">Voxtral Mini · clean and phone line</div><div class="val mono">+33 6 <span class="gap"></span>5 36 23 71</div></div>
+      <div id="s2-foot">Real outputs from the published test set. Synthetic speech (Qwen3-TTS), simulated telephone channel.</div>
+    </div>
+  </section>
+
+  <section id="s3" class="clip" data-start="10" data-duration="7" data-track-index="1">
+    <div id="s3-wrap" class="pad">
+      <div id="s3-title">Exact capture across the test set</div>
+      <div id="s3-sub">120 scenarios in German and French, each clean and through a simulated phone line</div>
+      <div id="b1" class="bar-row"><div class="bar-name">Whisper large-v3-turbo</div><div class="bar-track"><div class="bar-fill"></div></div><div class="bar-ci">95% CI 28.3 to 40.4</div><div class="bar-num" id="n1">0.0%</div></div>
+      <div id="b2" class="bar-row"><div class="bar-name">Voxtral Mini 3B</div><div class="bar-track"><div class="bar-fill"></div></div><div class="bar-ci">95% CI 30.0 to 43.8</div><div class="bar-num" id="n2">0.0%</div></div>
+      <div id="ceil"></div>
+      <div id="ceil-label">90.8% with the correct text</div>
+      <div id="s3-foot">Every row uses the same extractor. QA is automated only, with no human listening yet, so the results are provisional.</div>
+    </div>
+  </section>
+
+  <section id="s4" class="clip" data-start="17" data-duration="4.5" data-track-index="1">
+    <div id="s4-center">
+      <div id="s4-lockup">
+        <svg id="s4-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <path id="m-bl" class="ink" d="M17 9.5H9.5V54.5H17"/>
+          <path id="m-br" class="ink" d="M47 9.5H54.5V54.5H47"/>
+          <rect id="m-b1" class="bar" x="19.5" y="24" width="4" height="16"/>
+          <rect id="m-b2" class="bar" x="26.5" y="17" width="4" height="30"/>
+          <rect id="m-b3" class="orange" x="33.5" y="27" width="4" height="22"/>
+          <rect id="m-b4" class="bar" x="40.5" y="26" width="4" height="12"/>
+        </svg>
+        <div id="s4-word">VoxEntity<span>-EU</span></div>
+      </div>
+      <div id="s4-line">Scores the slot, not the words.</div>
+      <div id="s4-url">github.com/Gjusev/voxentity-eu</div>
+    </div>
+    <div id="s4-foot">German and French · open data, audio and code · music: ende.app (CC BY 4.0)</div>
+  </section>
+
+  <audio id="music" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3" data-start="0" data-duration="21.5" data-track-index="2" data-volume="0.32"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.6,"v":0.32},{"t":19.4,"v":0.32},{"t":21.4,"v":0}]}]}'></audio>
+  <audio id="sfx-k1" src="assets/sfx/keypress-001.wav" data-start="1.60" data-duration="0.3" data-track-index="3" data-volume="0.35"></audio>
+  <audio id="sfx-k2" src="assets/sfx/keypress-002.wav" data-start="1.95" data-duration="0.3" data-track-index="3" data-volume="0.35"></audio>
+  <audio id="sfx-k3" src="assets/sfx/keypress-003.wav" data-start="2.30" data-duration="0.3" data-track-index="3" data-volume="0.35"></audio>
+  <audio id="sfx-k4" src="assets/sfx/keypress-001.wav" data-start="2.65" data-duration="0.3" data-track-index="3" data-volume="0.35"></audio>
+  <audio id="sfx-err" src="assets/sfx/error_005.ogg" data-start="2.95" data-duration="0.5" data-track-index="4" data-volume="0.55"></audio>
+  <audio id="sfx-r1" src="assets/sfx/click_003.ogg" data-start="6.00" data-duration="0.01" data-track-index="3" data-volume="0.5"></audio>
+  <audio id="sfx-r2" src="assets/sfx/click_003.ogg" data-start="6.80" data-duration="0.01" data-track-index="3" data-volume="0.5"></audio>
+  <audio id="sfx-r3" src="assets/sfx/click_003.ogg" data-start="7.60" data-duration="0.01" data-track-index="3" data-volume="0.5"></audio>
+  <audio id="sfx-ceil" src="assets/sfx/click_003.ogg" data-start="13.11" data-duration="0.01" data-track-index="3" data-volume="0.55"></audio>
+  <audio id="sfx-drop" src="assets/sfx/drop_001.ogg" data-start="17.47" data-duration="0.11" data-track-index="4" data-volume="0.55"></audio>
+</div>
+
+<script>
+document.fonts.ready.then(() => {
+  // underline the dictated digit that was misheard, measured from the real glyph
+  const d0 = document.querySelector("#s1-said .d0");
+  const under = document.getElementById("s1-under");
+  under.style.left = d0.offsetLeft + "px";
+  under.style.width = d0.offsetWidth + "px";
+
+  // build the captured characters (real Whisper capture on the phone-line audio)
+  const captured = "+33 6 75 36 23 71";
+  const host = document.getElementById("s1-chars");
+  captured.split("").forEach((c, i) => {
+    const s = document.createElement("span");
+    s.className = "ch" + (i === 6 ? " wrong" : "");
+    s.textContent = c === " " ? " " : c;
+    host.appendChild(s);
+  });
+
+  const tl = gsap.timeline({ paused: true });
+  const E = "power3.out";
+
+  // scene 1: the slot
+  tl.fromTo("#s1-said-label", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 0.15);
+  tl.fromTo("#s1-said", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 0.3);
+  tl.fromTo("#s1-cap-label", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 1.2);
+  tl.fromTo("#s1-slot .br", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.3);
+  tl.fromTo("#s1-chars .ch", { opacity: 0, y: -18 }, { opacity: 1, y: 0, duration: 0.12, stagger: 0.075, ease: E }, 1.6);
+  // the wrong digit (index 6): 0 heard as 7, lands at 1.6 + 6*0.075 = 2.05, turns orange at 2.95
+  tl.to("#s1-chars .wrong", { color: "#eb6834", duration: 0.2 }, 2.95);
+  tl.to(["#s1-bl", "#s1-br"], { color: "#eb6834", duration: 0.2 }, 2.95);
+  tl.to("#s1-said .d0", { color: "#eb6834", duration: 0.2 }, 2.95);
+  tl.fromTo("#s1-under", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.3, ease: E }, 2.95);
+  tl.fromTo("#s1-verdict", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 3.2);
+  tl.to("#s1-wrap", { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 4.6);
+
+  // scene 2: three captures
+  tl.fromTo("#s2-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: E }, 5.15);
+  tl.fromTo("#r1", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 6.0);
+  tl.fromTo("#r2", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 6.8);
+  tl.fromTo("#r3", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 7.6);
+  tl.fromTo("#s2-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 8.0);
+  tl.to("#s2-wrap", { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 9.6);
+
+  // scene 3: the measured gap
+  tl.fromTo("#s3-title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: E }, 10.15);
+  tl.fromTo("#s3-sub", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 10.4);
+  tl.fromTo(".bar-row", { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.15 }, 10.8);
+  tl.fromTo("#b1 .bar-fill", { scaleX: 0 }, { scaleX: 0.342, duration: 1.2, ease: E }, 11.0);
+  tl.fromTo("#b2 .bar-fill", { scaleX: 0 }, { scaleX: 0.371, duration: 1.2, ease: E }, 11.15);
+  const c1 = { v: 0 }, c2 = { v: 0 };
+  tl.to(c1, { v: 34.2, duration: 1.2, ease: E, onUpdate: () => { document.getElementById("n1").textContent = c1.v.toFixed(1) + "%"; } }, 11.0);
+  tl.to(c2, { v: 37.1, duration: 1.2, ease: E, onUpdate: () => { document.getElementById("n2").textContent = c2.v.toFixed(1) + "%"; } }, 11.15);
+  // ceiling tick at 90.8% of the 1300px track, beat-locked: 13.11s
+  tl.fromTo("#ceil", { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.4, ease: E }, 13.11);
+  tl.fromTo("#ceil-label", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, ease: E }, 13.3);
+  tl.fromTo("#s3-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 13.9);
+  tl.to("#s3-wrap", { opacity: 0, duration: 0.4 }, 16.6);
+
+  // scene 4: the mark assembles; orange bar drops in, beat-locked: 17.47s
+  tl.fromTo(["#m-bl", "#m-br"], { strokeDasharray: 60, strokeDashoffset: 60 }, { strokeDashoffset: 0, duration: 0.5, ease: E }, 17.05);
+  tl.fromTo(["#m-b1", "#m-b2", "#m-b4"], { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.35, stagger: 0.07, ease: E }, 17.2);
+  tl.fromTo("#m-b3", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "back.out(2)" }, 17.47);
+  tl.fromTo("#s4-word", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.45, ease: E }, 17.8);
+  tl.fromTo("#s4-line", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, 18.35);
+  tl.fromTo("#s4-url", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 18.8);
+  tl.fromTo("#s4-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 19.1);
+
+  window.__timelines["main"] = tl;
+});
+</script>
+</body>
+</html>

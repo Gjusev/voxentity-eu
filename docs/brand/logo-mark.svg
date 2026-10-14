@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="VoxEntity-EU mark: a waveform inside a form-field slot, one bar landed wrong">
+  <style>
+    .ink{fill:none;stroke:#0b0b0b;stroke-width:5;stroke-linecap:square}
+    .bar{fill:#0b0b0b}
+    .err{fill:#eb6834}
+    @media (prefers-color-scheme:dark){.ink{stroke:#f0efec}.bar{fill:#f0efec}.err{fill:#d95926}}
+  </style>
+  <path class="ink" d="M17 9.5H9.5V54.5H17"/>
+  <path class="ink" d="M47 9.5H54.5V54.5H47"/>
+  <rect class="bar" x="19.5" y="24" width="4" height="16"/>
+  <rect class="bar" x="26.5" y="17" width="4" height="30"/>
+  <rect class="err" x="33.5" y="27" width="4" height="22"/>
+  <rect class="bar" x="40.5" y="26" width="4" height="12"/>
+</svg>

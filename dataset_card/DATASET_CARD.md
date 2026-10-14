@@ -41,7 +41,7 @@ cases additionally record the superseded previous mention.
   `85e237c12c027371202489a0ec509ded67b5e4b5`), predefined voices `serena` and
   `dylan`, fp32 on a GTX 1080, sdpa attention. Masters are frozen at 24 kHz;
   clean is the peak-normalized 16 kHz PCM16 derivation; telephone passes the
-  documented simulated channel (Butterworth-6 300–3400 Hz → 8 kHz → seeded
+  documented simulated channel (Butterworth-6 300 to 3400 Hz → 8 kHz → seeded
   Gaussian noise at 20 dB active-speech SNR → G.711 A-law round trip).
 - The telephone condition is a **simulation**, not a PSTN call, and does not
   represent every codec.
@@ -57,7 +57,7 @@ per-audio provenance (synthesis and transform records with hashes).
 ## QA status
 
 - Automated QA: decodability, mono, clipping fraction < 0.1%, energy, duration
-  1–45 s, abrupt-ending alerts. ASR disagreement produces alerts only, never
+  1 to 45 s, abrupt-ending alerts. ASR disagreement produces alerts only, never
   exclusions.
 - Human listening review status is tracked in [IMPLEMENTATION_STATUS.md](https://github.com/Gjusev/voxentity-eu/blob/main/IMPLEMENTATION_STATUS.md); until
   completed, the corpus is labeled `automated-QA/provisional`, not `verified`.

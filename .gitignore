@@ -42,3 +42,7 @@ data/ext/*/*.log
 runs_ext_*.log
 .venv-piper/
 *.log
+brag-output/composition/.hyperframes/
+brag-output/*.mp4
+brag-output/*.jpg
+.playwright-mcp/
