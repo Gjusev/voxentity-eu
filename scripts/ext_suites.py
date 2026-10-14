@@ -205,5 +205,55 @@ def voices() -> int:
     return 0
 
 
+def piper() -> int:
+    """Second TTS family: same core test scenarios and conditions, paired against Qwen."""
+
+    from dataclasses import replace
+
+    from voxentity_eu.cli import main as cli_main
+    from voxentity_eu.scoring.bootstrap import bootstrap_paired_difference
+    from voxentity_eu.scoring.match import ExampleResult
+
+    p = _paths("piper")
+    scored = p["runs"] / "scored"
+    build_asr_slots_run(p["runs"] / "whisper-turbo", p["inputs"], p["runs"] / "whisper-turbo-slots")
+    rc = cli_main(["score", "--gold", str(p["gold"]), "--predictions", str(p["runs"] / "whisper-turbo-slots/predictions.jsonl"),
+                   "--manifest", str(p["manifest"]), "--out", str(scored / "whisper-turbo-slots.json")])
+    if rc:
+        return rc
+    data = json.loads((scored / "whisper-turbo-slots.json").read_text(encoding="utf-8"))
+    piper_rows = [replace(ExampleResult(**r), scenario_id=r["scenario_id"].removeprefix("px-")) for r in data["results"]]
+    core = [ExampleResult(**r) for r in json.loads((ROOT / "runs/scored/whisper-turbo-slots.json").read_text(encoding="utf-8"))["results"]]
+    d = bootstrap_paired_difference(core, piper_rows)
+
+    def pct(x):
+        return "-" if x is None else f"{100 * x:.1f}"
+
+    def acc(rs):
+        return sum(r.outcome == "correct" for r in rs) / len(rs) if rs else None
+
+    lines = ["# Extension: second TTS family (Piper) on the core test scenarios", "",
+             "Same 120 core test scenarios and text, synthesized with Piper (thorsten DE, siwis FR; one voice per "
+             "locale) instead of Qwen3-TTS, then the same simulated telephone channel. Whisper large-v3-turbo -> "
+             f"extractor {EXTRACTOR_VERSION}. Synthetic speech, automated QA only. Gate and rights: "
+             "research/second-tts-gate.md.", "",
+             "| synthesizer | N items | exact slot accuracy |", "| --- | --- | --- |",
+             f"| Qwen3-TTS (core, serena/dylan) | {len(core)} | {pct(acc(core))} |",
+             f"| Piper (thorsten/siwis) | {len(piper_rows)} | {pct(acc(piper_rows))} |", "",
+             f"Paired Qwen - Piper (same scenario and condition, n={d['n']}): {100 * d['point_difference']:+.1f} pp "
+             f"[{100 * d['ci95'][0]:+.1f}, {100 * d['ci95'][1]:+.1f}].", "",
+             "| cell | Qwen | Piper |", "| --- | --- | --- |"]
+    cells = sorted({(r.locale, r.entity_type) for r in core})
+    for loc, ent in cells:
+        lines.append(f"| {loc} {ent} | {pct(acc([r for r in core if (r.locale, r.entity_type) == (loc, ent)]))} | "
+                     f"{pct(acc([r for r in piper_rows if (r.locale, r.entity_type) == (loc, ent)]))} |")
+    lines += ["", "A single synthesizer per locale is a limitation: differences mix TTS family and voice."]
+    out = p["report"] / "report.md"
+    write_text_atomic(out, "\n".join(lines) + "\n")
+    print(out)
+    return 0
+
+
 if __name__ == "__main__":
-    sys.exit({"codeswitch": codeswitch, "multiturn": multiturn, "voices": voices}[sys.argv[1]]())
+    suites = {"codeswitch": codeswitch, "multiturn": multiturn, "voices": voices, "piper": piper}
+    sys.exit(suites[sys.argv[1]]())

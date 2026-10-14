@@ -200,9 +200,9 @@ def score_rows(cases: list[MultiTurnCase], rows: list[dict]) -> list[dict]:
             outcome = "omission"
         elif c.kind == "correction" and got == gold_first:
             outcome = "stale"
-        elif c.kind != "correction":
-            outcome = "spurious_change"  # gold is the first value and the state moved off it
-        else:
+        elif c.kind != "correction" and t1 == gold_first:
+            outcome = "spurious_change"  # turn 1 stored the right value; turn 2 moved the state off it
+        else:  # includes a misheard turn 1 that turn 2 never touched (not a persistence failure)
             outcome = "wrong_value"
         out.append({**r, "split": c.split, "locale": c.locale, "entity_type": c.entity_type, "kind": c.kind,
                     "outcome": outcome, "correct": outcome == "correct",
