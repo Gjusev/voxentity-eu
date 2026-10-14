@@ -94,9 +94,10 @@ def render_page(locale, entity, condition, system, outcome, search, page: int) -
 
 
 def deterministic_example(kind: str) -> tuple[Any, ...]:
-    """First case by id among correct (or incorrect) ones: same pick on every load."""
+    """Deterministic pick: ASR systems before gold-text controls, then first case id."""
 
-    pool = sorted(c["case_id"] for c in CASES if c["correct"] == (kind == "correct"))
+    pool = [c["case_id"] for c in sorted(CASES, key=lambda c: (c["system"].startswith("gold-"), c["case_id"]))
+            if c["correct"] == (kind == "correct")]
     if not pool:
         return gr.update(choices=[], value=None), f"No {kind} example available.", None, None
     return (gr.update(choices=[pool[0]], value=pool[0]), *case_view(pool[0]))
@@ -151,8 +152,8 @@ def build_ui() -> gr.Blocks:
         case = gr.Dropdown(choices=[], label="Case (exact link: paste its id in 'Case id contains')")
         details = gr.Markdown()
         with gr.Row():
-            clean_audio = gr.Audio(label="clean (16 kHz)", type="filepath")
-            tel_audio = gr.Audio(label="telephone (8 kHz, simulated channel)", type="filepath")
+            clean_audio = gr.Audio(label="clean (16 kHz)", type="filepath", visible=AUDIO_PUBLISHED)
+            tel_audio = gr.Audio(label="telephone (8 kHz, simulated channel)", type="filepath", visible=AUDIO_PUBLISHED)
         with gr.Row():
             csv_btn, csv_file = gr.Button("download CSV"), gr.File()
             json_btn, json_file = gr.Button("download JSON"), gr.File()

@@ -52,16 +52,18 @@ def cell_accuracy_svg(runs: dict[str, dict[str, Any]], series: list[tuple[str, s
     """runs: name -> scored summary; series: [(run name, label)] for slots 1-2."""
 
     cells = sorted(runs[series[0][0]]["cells_locale_entity"])
-    left, plot_w, row_h, bar_h, top = 190, 420, 34, 10, 70
+    left, plot_w, row_h, bar_h, top = 190, 420, 34, 10, 90
     height = top + row_h * len(cells) + 40
     x = lambda acc: left + plot_w * acc  # noqa: E731
-    body = ["<text x='16' y='24' class='t'>Exact slot accuracy by cell (test, n=20 per cell: 10 scenarios x clean+telephone)</text>"]
+    body = ["<text x='16' y='24' class='t'>Exact slot accuracy by cell (test, n=20 per cell: 10 scenarios x clean+telephone)</text>",
+            "<text x='16' y='42' class='m'>Synthetic speech (Qwen3-TTS), simulated telephone channel, automated QA only (provisional). "
+            "Same extractor for every row.</text>"]
     # legend: always present for 2 series
     lx = left
     for (_, label), var in zip(series, ("--s1", "--s2"), strict=True):
-        body.append(f"<rect x='{lx}' y='38' width='10' height='10' rx='2' fill='var({var})'/><text x='{lx + 14}' y='47'>{escape(label)}</text>")
+        body.append(f"<rect x='{lx}' y='58' width='10' height='10' rx='2' fill='var({var})'/><text x='{lx + 14}' y='67'>{escape(label)}</text>")
         lx += 14 + 7 * len(label) + 24
-    body.append(f"<rect x='{lx}' y='36' width='2' height='14' fill='var(--ref)'/><text x='{lx + 8}' y='47'>written-gold extractor ceiling</text>")
+    body.append(f"<rect x='{lx}' y='56' width='2' height='14' fill='var(--ref)'/><text x='{lx + 8}' y='67'>written-gold extractor ceiling</text>")
     for pct in (0, 25, 50, 75, 100):
         gx = x(pct / 100)
         body.append(f"<line x1='{gx}' y1='{top - 6}' x2='{gx}' y2='{top + row_h * len(cells)}' class='{'b' if pct == 0 else 'g'}'/>")
