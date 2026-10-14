@@ -1,33 +1,33 @@
-# Encargo para el siguiente agente
+# Brief for the next agent
 
-Implementa VoxEntity-EU a partir de esta especificación. El objetivo es un proyecto público independiente que muestre capacidad de ingeniería de evaluación y resultados reproducibles sobre entidades habladas DE/FR.
+Implement VoxEntity-EU from this specification. The goal is an independent public project that demonstrates evaluation engineering capability and reproducible results on spoken entities in DE/FR.
 
-## Orden de lectura
+## Reading order
 
-1. README.md y AGENTS.md.
-2. docs/01-product.md y docs/02-research.md.
-3. docs/03-data.md a docs/07-compute.md.
-4. docs/08-publication.md a docs/11-decisions.md.
-5. research/artifacts.json y los ejemplos en examples/.
+1. README.md and AGENTS.md.
+2. docs/01-product.md and docs/02-research.md.
+3. docs/03-data.md through docs/07-compute.md.
+4. docs/08-publication.md through docs/11-decisions.md.
+5. research/artifacts.json and the examples in examples/.
 
-Los enlaces a internet justifican capacidades existentes. Las decisiones de diseño y umbrales de aceptación son decisiones de este proyecto, no resultados empíricos.
+External links justify existing capabilities. Design decisions and acceptance thresholds are decisions of this project, not empirical results.
 
-## Primera acción de implementación
+## First implementation action
 
-Comprobar git status, crear el paquete Python mínimo, contratos tipados y tests del scorer. Crear un conjunto diminuto de fixtures textuales con resultados calculados a mano. No descargar un corpus completo ni iniciar GPU antes de validar contratos, aislamiento del gold y smoke tests.
+Check git status, create the minimal Python package, typed contracts and scorer tests. Create a tiny set of textual fixtures with hand-calculated results. Do not download a full corpus or start a GPU before validating contracts, gold isolation and smoke tests.
 
-## Secuencia
+## Sequence
 
-Contratos y scorer → casos → generación y QA → transformaciones acústicas → baselines → agente con slots → control humano → informes → Space/notebooks → preparación de publicación.
+Contracts and scorer → cases → generation and QA → acoustic transforms → baselines → agent with slots → human control → reports → Space/notebooks → publication preparation.
 
-Si no hay GPU o credenciales, continuar con todo el trabajo offline y preparar jobs reanudables. Registrar lo pendiente en IMPLEMENTATION_STATUS.md. No inventar resultados para dar por terminada una fase.
+If there is no GPU or credentials, continue with all offline work and prepare resumable jobs. Record what is pending in IMPLEMENTATION_STATUS.md. Do not invent results to declare a phase complete.
 
-## Definición de finalización
+## Definition of completion
 
-Un tercero puede obtener el dataset publicado, ejecutar scoring offline sobre predicciones verificables, reproducir al menos dos baselines abiertos, escuchar errores en el Space y entender exactamente qué mide cada tabla. Las referencias públicas deben existir y abrirse antes de declararlas publicadas.
+A third party can obtain the published dataset, run offline scoring on verifiable predictions, reproduce at least two open baselines, listen to errors in the Space and understand exactly what each table measures. Public references must exist and open before declaring them published.
 
-El alcance obligatorio incluye un agente de referencia que persiste slots observables. Dos proveedores comerciales son una ampliación condicionada a acceso y presupuesto; no bloquean la versión abierta.
+The mandatory scope includes a reference agent that persists observable slots. Two commercial providers are an extension conditioned on access and budget; they do not block the open version.
 
-## Prompt de continuación sugerido
+## Suggested continuation prompt
 
-> Lee AGENTS.md y START_HERE.md. Implementa el backlog de docs/09-implementation.md en orden, respetando sus criterios de aceptación y docs/10-validation.md. Mantén el alcance DE/FR y los resultados sintéticos separados del control humano. Usa los recursos de HF/Kaggle cuando estén configurados y deja trazabilidad de cualquier bloqueo externo. No añadas fechas ni estimaciones de duración.
+> Read AGENTS.md and START_HERE.md. Implement the backlog in docs/09-implementation.md in order, respecting its acceptance criteria and docs/10-validation.md. Keep the DE/FR scope and synthetic results separate from human control. Use HF/Kaggle resources once configured and leave a trace of any external blocker. Do not add dates or duration estimates.

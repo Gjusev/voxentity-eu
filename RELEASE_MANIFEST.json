@@ -5,7 +5,7 @@
   "github": {
    "url": "https://github.com/Gjusev/voxentity-eu",
    "visibility": "public",
-   "commit_published": "769e6e3986a5f822161e719cd0139e47cc01add4",
+   "commit_published": "v0.1.0 (tag; SHAs before the history rewrite are invalid)",
    "ci_first_run": "green on ubuntu (lock install, ruff, link check, pytest)"
   },
   "hf_dataset": {

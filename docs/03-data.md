@@ -1,64 +1,64 @@
-# Corpus, adquisición y derechos
+# Corpus, acquisition and rights
 
-## A. Corpus sintético principal
+## A. Main synthetic corpus
 
-180 casos = 2 idiomas × 6 clases × 15 casos por clase. Un caso tiene una entidad objetivo; una corrección puede mencionar también un valor previo, pero el gold contiene solo el final. Cada caso genera un audio limpio y una transformación telefónica: 360 archivos, con relación parent explícita.
+180 cases = 2 languages × 6 classes × 15 cases per class. A case has one target entity; a correction may also mention a previous value, but the gold contains only the final one. Each case generates a clean audio and a telephone transform: 360 files, with an explicit parent relation.
 
-Clases: person_name, phone, email, calendar_value, postal_address, reference_code.
+Classes: person_name, phone, email, calendar_value, postal_address, reference_code.
 
-Por celda idioma/clase distribuir 15 casos en: 5 directos, 4 con dificultad ortográfica/fonética, 3 segmentados o deletreados, 3 con autocorrección. Para fechas, segmentación significa verbalización de componentes, no deletreo artificial. Cada idioma requiere plantillas propias.
+Per language/class cell distribute 15 cases as: 5 direct, 4 with spelling/phonetic difficulty, 3 segmented or spelled out, 3 with self-correction. For dates, segmentation means verbalization of components, not artificial spelling. Each language requires its own templates.
 
-Separar 5 casos dev y 10 test por celda: 60 dev/120 test, 120/240 audios. Asignar familias de plantilla y valores a un solo split. Mantener todas las versiones acústicas, voces y sintetizadores del mismo escenario en su partición. No generar sinónimos casi idénticos a ambos lados.
+Reserve 5 dev and 10 test cases per cell: 60 dev / 120 test, 120/240 audios. Assign template families and values to a single split. Keep all acoustic versions, voices and synthesizers of the same scenario in its partition. Do not generate near-identical synonyms on both sides.
 
-Crear pools originales con seed y reglas, sin scraping de nombres/direcciones de personas. Los valores ficticios pueden coincidir con personas reales; nunca afirmar que son identidades verificadamente inexistentes. No vincular múltiples identificadores a personas reales.
+Create original pools with seed and rules, without scraping real people's names/addresses. Fictitious values may coincide with real people; never claim they are verifiably nonexistent identities. Do not link multiple identifiers to real people.
 
-Emails: example.com/example.org. Teléfonos: preferir rangos de ficción documentados por regulador; si no se verifica un rango DE/FR, usar secuencias de prueba explícitas, no asegurar que son números reservados. No llamar ni validar por SMS. La tarea mide copia de dígitos y prefijos, no alcanzabilidad. Direcciones: combinaciones ficticias, sin geocodificación ni identidad asociada.
+Emails: example.com/example.org. Phones: prefer fictional ranges documented by the regulator; if no DE/FR range is verified, use explicit test sequences, do not assert they are reserved numbers. Do not call or validate by SMS. The task measures digit and prefix copying, not reachability. Addresses: fictitious combinations, no geocoding or attached identity.
 
-## B. Generación de voz
+## B. Voice generation
 
-Qwen CustomVoice 0.6B es candidato principal (S03). Usar voces predefinidas, sin grabación personal ni clonación. Elegir dos speaker IDs válidos mediante la API, probar ambos en ambos idiomas y equilibrar 90 casos por voz: por cada celda, 8/7 alternando. No asignar voz según dificultad.
+Qwen CustomVoice 0.6B is the primary candidate (S03). Use predefined voices, no personal recording or cloning. Choose two valid speaker IDs via the API, test both in both languages and balance 90 cases per voice: per cell, 8/7 alternating. Do not assign voice by difficulty.
 
-Guardar texto escrito, texto efectivamente enviado a TTS, parámetros, voz, revisión, entorno, seed y todos los intentos. Verbalizar números, signos y abreviaturas explícitamente cuando la pronunciación sea parte del caso. No sustituir las grafías objetivo del gold por la pronunciación.
+Save written text, text actually sent to TTS, parameters, voice, revision, environment, seed and all attempts. Verbalize numbers, signs and abbreviations explicitly when pronunciation is part of the case. Do not replace the target spellings in the gold with pronunciation.
 
-No asumir audio idéntico entre GPUs. Congelar bytes y hashes; regeneración es una nueva versión de artefacto. Una segunda familia TTS es un análisis separado con los mismos casos, sin añadir falsamente independencia estadística.
+Do not assume identical audio across GPUs. Freeze bytes and hashes; regeneration is a new artifact version. A second TTS family is a separate analysis over the same cases, without falsely adding statistical independence.
 
-## C. QA sin nuevos hablantes
+## C. QA without new speakers
 
-La ausencia de reclutamiento no exige ausencia de revisión. El autor o implementador puede escuchar material ya generado; no tiene que aportar su voz.
+Lack of recruitment does not imply lack of review. The author or implementer may listen to already generated material; they do not have to contribute their voice.
 
-Validación automática: archivo decodificable, mono, amplitud finita, sin clipping material, energía no nula, duración razonable para la longitud, ausencia de truncado. Valores propuestos: duración entre 1 y 45 segundos, fracción de muestras saturadas menor de 0.1%; registrar excepciones justificadas.
+Automated validation: decodable file, mono, finite amplitude, no material clipping, nonzero energy, duration reasonable for length, no truncation. Proposed values: duration between 1 and 45 seconds, saturated-sample fraction below 0.1%; record justified exceptions.
 
-La transcripción por uno o varios ASR solo produce alertas. Nunca descartar un audio porque el modelo evaluado no lo transcribe: sesgaría el benchmark.
+Transcription by one or more ASRs only produces alerts. Never discard an audio because the evaluated model cannot transcribe it: that would bias the benchmark.
 
-Antes de llamar al corpus 'verified', revisar cada audio limpio escuchando las entidades y correcciones. Categorías: accepted, wrong_synthesis, ambiguous, truncated, pending_review. Ante pronunciación incorrecta, corregir la generación o excluir con motivo; nunca modificar el gold para favorecer una predicción. Registrar IDs sustituidos e intentos.
+Before calling the corpus 'verified', review each clean audio by listening to the entities and corrections. Categories: accepted, wrong_synthesis, ambiguous, truncated, pending_review. On wrong pronunciation, fix the generation or exclude with a reason; never modify the gold to favor a prediction. Record replaced IDs and attempts.
 
-Si el implementador carece de escucha fiable o competencia lingüística, publicar únicamente una versión 'automated-QA/provisional' con esa limitación. No declarar revisión humana inexistente. La entrega técnica puede avanzar; el calificativo 'verified' queda bloqueado.
+If the implementer lacks reliable hearing or language competence, publish only an 'automated-QA/provisional' version with that limitation. Do not declare human review nonexistent. Technical delivery may advance; the 'verified' label stays blocked.
 
-Revisar las transformaciones acústicas automáticamente y escuchar una muestra estratificada más todos los fallos técnicos. El ruido no debe introducir habla ni PII externa.
+Review acoustic transforms automatically and listen to a stratified sample plus all technical failures. The noise must not introduce external speech or PII.
 
-## D. Canal acústico
+## D. Acoustic channel
 
-clean: PCM16 mono 16 kHz, derivado de master TTS conservado.
-telephone: partir del mismo master; filtro 300–3400 Hz, resample a 8 kHz, ruido gaussiano generado con seed a 20 dB SNR de habla activa, encode/decode G.711 A-law; almacenar PCM16 mono 8 kHz.
+clean: PCM16 mono 16 kHz, derived from a preserved TTS master.
+telephone: from the same master; 300–3400 Hz filter, resample to 8 kHz, seeded gaussian noise at 20 dB SNR of active speech, G.711 A-law encode/decode; store PCM16 mono 8 kHz.
 
-Fijar implementación y coeficientes del filtro (Butterworth orden 6 SOS), resampler, cálculo de actividad/energía, seed, codec y versiones. Medir SNR antes del codec. Ajustar ganancia de la pareja con regla común y registrar clipping, nunca normalizar cada condición arbitrariamente después.
+Pin the implementation and filter coefficients (order-6 Butterworth SOS), resampler, activity/energy calculation, seed, codec and versions. Measure SNR before the codec. Adjust the gain of the pair with a common rule and record clipping, never normalize each condition arbitrarily afterwards.
 
-Es un canal simulado, no una llamada PSTN ni una representación de todos los codecs. Añadir bandlimit-only y ruido de distinta intensidad como ablation opcional; la comparación principal mezcla efectos y no identifica causalmente cada uno.
+This is a simulated channel, not a PSTN call nor a representation of all codecs. Add bandlimit-only and noise of varying intensity as optional ablations; the main comparison mixes effects and does not causally identify each one.
 
-## E. Control humano existente
+## E. Existing human control
 
-FLEURS de_de y fr_fr, revisión fijada. Seleccionar determinísticamente 50 filas por idioma del split test por hash de ID sin mirar resultados. Si hay menos, informar cantidad exacta. No alterar texto ni reemplazarlo por entidades sintéticas sobre audio original.
+FLEURS de_de and fr_fr, pinned revision. Deterministically select 50 rows per language from the test split by ID hash without looking at results. If fewer exist, report the exact quantity. Do not alter text or replace it with synthetic entities over the original audio.
 
-100 grabaciones originales; versiones limpias/telefónicas emparejadas permiten medir WER y degradación en lectura humana. Etiquetar corpus=human_control y conservar hablante si existe; nunca inferir identidad ausente.
+100 original recordings; paired clean/telephone versions allow measuring WER and degradation on human reading speech. Tag corpus=human_control and preserve speaker if present; never infer absent identity.
 
-No forzar seis clases de entidades ni recortar para fingir llamadas. Una futura anotación manual de entidades audibles sería otra suite con cobertura propia. No mezclar puntuación principal sintética con este control.
+Do not force six entity classes or trim to fake calls. A future manual annotation of audible entities would be another suite with its own coverage. Do not mix main synthetic scoring with this control.
 
-Descargar solo DE/FR y split requerido. Usar snapshot pin, lista explícita de archivos y lector seguro; no habilitar ejecución remota de scripts por defecto. Si formato antiguo lo exige, inspeccionar script y buscar exportación oficial segura antes de decidir.
+Download only DE/FR and the required split. Use a pinned snapshot, an explicit file list and a safe reader; do not enable remote script execution by default. If an old format requires it, inspect the script and look for a safe official export before deciding.
 
-## F. Registro de derechos obligatorio
+## F. Mandatory rights registry
 
-Cada fuente: source_id, URL, revisión, archivo y SHA256, licencia declarada, URL del texto de licencia, titular/atribución, transformaciones, condiciones de redistribución, estado de revisión (verified/conditional/blocked), motivo.
+Each source: source_id, URL, revision, file and SHA256, declared license, license text URL, holder/attribution, transformations, redistribution conditions, review status (verified/conditional/blocked), reason.
 
-Separar licencia de código, pesos, dataset de entrenamiento, audio resultante y anotación. FLEURS requiere atribución y señalar modificaciones. CC0/CC-BY de un dataset base no basta para deducir derechos de un checkpoint derivado.
+Separate licenses for code, weights, training dataset, resulting audio and annotation. FLEURS requires attribution and indicating modifications. CC0/CC-BY of a base dataset does not suffice to infer rights over a derived checkpoint.
 
-No descargar corpus de llamadas comerciales ni reutilizar YouTube/podcasts simplemente por ser accesibles. No usar audios de personas para clonar voces. El núcleo no depende de ese material.
+Do not download commercial call corpora or reuse YouTube/podcasts merely because they are accessible. Do not use people's audio to clone voices. The core does not depend on that material.

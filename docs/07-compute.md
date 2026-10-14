@@ -1,44 +1,44 @@
-# HF PRO, Kaggle y reproducibilidad
+# HF PRO, Kaggle and reproducibility
 
-## Preflight obligatorio
+## Mandatory preflight
 
-Comprobar identidad de cuenta, acceso a modelos, cuota GPU real, disco/RAM, GPU/VRAM/CUDA, acceso a internet y secreto disponible. Imprimir solo nombres de variables y estado presente/ausente. No asumir que una suscripción está autenticada en esta máquina.
+Check account identity, model access, real GPU quota, disk/RAM, GPU/VRAM/CUDA, internet access and available secrets. Print only variable names and present/absent status. Do not assume a subscription is authenticated on this machine.
 
-No usar cifras fijas de créditos o horas. HF PRO no equivale a inference endpoints dedicados gratis (S07). Kaggle asigna recursos sujetos a disponibilidad; no prometer dos GPUs ni ejecución ininterrumpida.
+Do not use fixed figures for credits or hours. HF PRO is not equal to free dedicated inference endpoints (S07). Kaggle assigns resources subject to availability; do not promise two GPUs or uninterrupted execution.
 
-## Reparto
+## Distribution
 
-- Local CPU: generación de casos, contratos, transformaciones, scorer, informes y Space con resultados guardados.
-- Kaggle GPU: síntesis y baselines secuenciales, un modelo a la vez, batch inicial 1.
-- HF Dataset: distribución versionada; HF Space CPU: exploración de audio y errores.
-- ZeroGPU: extensión opcional interactiva, nunca dependencia para reproducir el resultado publicado.
+- Local CPU: case generation, contracts, transforms, scorer, reports and Space with saved results.
+- Kaggle GPU: sequential synthesis and baselines, one model at a time, initial batch 1.
+- HF Dataset: versioned distribution; HF Space CPU: audio and error exploration.
+- ZeroGPU: optional interactive extension, never a dependency to reproduce the published result.
 
-Si Voxtral no cabe: medir pico, bajar batch y usar offload documentado; evaluar cuantización como sistema distinto con configuración explícita. No cambiar silenciosamente de modelo. Si sigue bloqueado, dejar sistema pending, mantener resultados del disponible y no declarar comparación de dos modelos completada.
+If Voxtral does not fit: measure peak, lower batch and use documented offload; treat quantization as a distinct system with explicit configuration. Do not silently switch models. If it stays blocked, leave the system pending, keep results for the available one and do not declare a two-model comparison completed.
 
-## Notebooks requeridos
+## Required notebooks
 
-generate: instalar entorno fijado, cargar plantillas, verificar derechos, generar lotes, guardar QA/provenance y checkpoint por clip.
-evaluate: recibir audio congelado, descargar pesos por SHA, transcribir por modelo y guardar predicciones; gold solo se monta en etapa de scoring separada.
-reproduce: CPU y sin internet con bundle preparado; verificar hashes y regenerar todas las tablas a partir de predicciones incluidas.
+generate: install pinned environment, load templates, verify rights, generate batches, save QA/provenance and per-clip checkpoint.
+evaluate: receive frozen audio, download weights by SHA, transcribe per model and save predictions; gold is only mounted in a separate scoring stage.
+reproduce: CPU and offline with the prepared bundle; verify hashes and regenerate all tables from included predictions.
 
-Código fuente en scripts importables y notebook fino; evitar lógica duplicada en celdas. Dataset de entrada Kaggle privado durante preparación, público solo cuando rights/release gates pasan. Todo output debe sobrevivir reinicio a partir del bundle versionado, no del disco efímero.
+Source code in importable scripts and thin notebook; avoid duplicated logic in cells. Kaggle input dataset private during preparation, public only when rights/release gates pass. Every output must survive restart from the versioned bundle, not ephemeral disk.
 
-## Dependencias y artefactos
+## Dependencies and artifacts
 
-Resolver versiones desde docs oficiales y verificar instalación; crear locks por perfil core/tts/asr1/asr2/space. Registrar Python, torch, CUDA, hardware y precisión. No usar latest/main en corridas de release.
+Resolve versions from official docs and verify installation; create per-profile locks core/tts/asr1/asr2/space. Record Python, torch, CUDA, hardware and precision. Do not use latest/main in release runs.
 
-Bundle: manifests, gold, inputs, licencias, checksums, scripts/notebooks, locks, predicciones completas, reporte y dataset card. Pesos no se redistribuyen por defecto; indicar descargas oficiales fijadas. Datos humanos como IDs/receta o audio con atribución conforme a derechos.
+Bundle: manifests, gold, inputs, licenses, checksums, scripts/notebooks, locks, full predictions, report and dataset card. Weights are not redistributed by default; point to pinned official downloads. Human data as IDs/recipe or audio with attribution per rights.
 
-## Cuentas y gasto
+## Accounts and spend
 
-Usar HF_TOKEN con permisos mínimos y Kaggle Secrets para jobs. No almacenar kaggle.json o tokens en notebooks/salidas. No lanzar jobs de pago ni autoampliar cuota por defecto. Config max_paid_spend=0; implementador puede completar núcleo con cómputo disponible y preparar adaptadores pagos desactivados.
+Use HF_TOKEN with minimal permissions and Kaggle Secrets for jobs. Never store kaggle.json or tokens in notebooks/outputs. Do not launch paid jobs or self-extend quota by default. Set max_paid_spend=0; the implementer can complete the core with available compute and prepare disabled paid adapters.
 
-Faltan autenticación o recursos: documentar diagnóstico exacto, comandos preparados y siguiente paso; seguir trabajo local independiente. No solicitar claves por chat ni inferir crédito de otras cuentas.
+Missing auth or resources: document the exact diagnosis, prepared commands and next step; continue independent local work. Never request keys via chat nor infer credit from other accounts.
 
-## Reproducción
+## Reproduction levels
 
-Nivel 1 obligatorio: scoring idéntico desde predicciones congeladas en CPU.
-Nivel 2 obligatorio: nueva inferencia con mismos pesos/config, admitiendo diferencias GPU documentadas.
-Nivel 3 informativo: resíntesis desde recipe, sin prometer igualdad de bytes.
+Level 1 mandatory: identical offline scoring from frozen predictions on CPU.
+Level 2 mandatory: fresh inference with same weights/config, accepting documented GPU differences.
+Level 3 informational: re-synthesis from recipe, without promising byte equality.
 
-Las cifras de latencia de Kaggle solo describen ese entorno, no rendimiento de llamadas de usuarios.
+Kaggle latency figures only describe that environment, not user-call performance.

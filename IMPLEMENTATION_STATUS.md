@@ -1,303 +1,297 @@
-# Estado de implementación
+# Implementation status
 
-Registro por fase con evidencia real. Nada aquí se marca por anticipado; una
-casilla sin evidencia es una deuda, no un resultado. Todo lo ejecutado es
-reproducible con los comandos listados.
+Per-phase record with real evidence. Nothing here is checked in advance; a
+checkbox without evidence is debt, not a result. Everything executed is
+reproducible with the listed commands.
 
-## Convenciones
+## Conventions
 
-- `.venv` (Python 3.11, CPU): scoring, contratos, corpus, informes.
-- `.venv-gpu` (torch 2.5.1+cu121): síntesis Qwen y Whisper local (GTX 1080).
-- Kaggle (T4, usuario gjusev): Voxtral Mini; credencial solo en variables de
-  entorno, nunca en el repo.
-- SoX requerido en PATH para `qwen-tts`.
+- `.venv` (Python 3.11, CPU): scoring, contracts, corpus, reports.
+- `.venv-gpu` (torch 2.5.1+cu121): Qwen synthesis and local Whisper (GTX 1080).
+- Kaggle (T4, user gjusev): Voxtral Mini; credential only in environment
+  variables, never in the repo.
+- SoX required on PATH for `qwen-tts`.
 
-## P0 — Fundaciones: COMPLETADO
+## P0 — Foundations: COMPLETED
 
-- Paquete instalable, CLI completa (exit 0/1/2/3), contratos Pydantic con
-  validación adversarial, 92 tests offline verdes, ruff limpio.
-- Evidencia: `python -m pytest -q` → 92 passed (79 antes de rex-3).
+- Installable package, full CLI (exit 0/1/2/3), Pydantic contracts with
+  adversarial validation, 92 offline tests green, ruff clean.
+- Evidence: `python -m pytest -q` → 92 passed (79 before rex-3).
 
-## P1 — Scorer: COMPLETADO (norm-2)
+## P1 — Scorer: COMPLETED (norm-2)
 
-- `norm-1` congelada antes de inferir; tras la auditoría adversa se publicó
-  `norm-2` con cambios explícitos: allowlist de abreviaturas de calle (claves
-  de locale corregidas), sufijos bis/ter en direcciones FR número-primero, y
-  forma internacional con cero troncal repetido («+49 (0)…»).
-- Métricas con denominadores explícitos; comparaciones pareadas por
-  (scenario_id, condition) — se corrigió el colapso por scenario_id que
-  descartaba la mitad de las filas.
-- Evidencia: tests de scorering + `scripts/score_all.py`.
+- `norm-1` frozen before inference; after the adversarial audit `norm-2` was
+  published with explicit changes: street-abbreviation allowlist (locale keys
+  corrected), FR number-first street bis/ter suffixes, and the international
+  form with repeated trunk zero («+49 (0)…»).
+- Metrics with explicit denominators; paired comparisons by
+  (scenario_id, condition) — fixed the collapse by scenario_id that discarded
+  half the rows.
+- Evidence: scorer tests + `scripts/score_all.py`.
 
-## P2 — Casos y derechos: COMPLETADO (corpus provisional)
+## P2 — Cases and rights: COMPLETED (provisional corpus)
 
-- 180 escenarios; validate sin errores; exportación de inputs sin gold con
-  ids opacos y **orden por input_id** (la auditoría detectó que el orden por
-  audio_id filtraba split/dificultad; corregido y con test de regresión).
-- Auditoría: frame duplicado dev/test en refs corregido (1 clip dev
-  regenerado); ordinales alemanes irregulares (ersten/dritten/siebten)
-  corregidos (1 clip test regenerado y reevaluado).
-- Estado del corpus: automated-QA/provisional (sin escucha humana).
-- Revisión humana preparada: `python scripts/review_package.py build` genera
-  review/index.html (reproductor + texto objetivo, sin salidas ASR) y
-  review/review.csv; `apply --reviewer NOMBRE` valida veredictos
-  (accepted/wrong_synthesis/ambiguous/truncated, motivo obligatorio si no
-  accepted), escribe data/generated/human_review.jsonl y excluye del scoring
-  el clip limpio y su versión telefónica. «verified» sólo con 180/180.
+- 180 scenarios; validate without errors; input export without gold with
+  opaque ids and **order by input_id** (the audit found that ordering by
+  audio_id leaked split/difficulty; fixed, with a regression test).
+- Audit: duplicated dev/test frame in refs fixed (1 dev clip regenerated);
+  irregular German ordinals (ersten/dritten/siebten) fixed (1 test clip
+  regenerated and re-scored).
+- Corpus status: automated-QA/provisional (no human listening).
+- Human review prepared: `python scripts/review_package.py build` generates
+  review/index.html (player + target text, no ASR outputs) and
+  review/review.csv; `apply --reviewer NAME` validates verdicts
+  (accepted/wrong_synthesis/ambiguous/truncated, reason mandatory if not
+  accepted), writes data/generated/human_review.jsonl and excludes the clean
+  clip and its telephone version from scoring. «verified» only with 180/180.
 
-## P3 — Síntesis y QA: COMPLETADO
+## P3 — Synthesis and QA: COMPLETED
 
-- 180 masters Qwen3-TTS fp32/sdpa GTX 1080 (~9 s/clip), 0 fallos; voces
-  serena/dylan 8/7 por celda, alternadas por índice (no por dificultad).
-- 1 clip truncado por QA (0.96 s) regenerado con éxito (intento 2 registrado
-  en `synthesis_prev_attempts.jsonl`).
-- Extractor de referencia: `rex-1` congelado antes de inferir; tras la
-  regeneración del corpus se publicó `rex-2` (radicales de ordinales) y,
-  tras revisión, `rex-3` (forma escrita; ver «Retractación rex-2»).
-  Techo rex-3 sobre gold: synthesis_text 180/180; written_text dev 60/60,
-  test 109/120 (90.8%).
+- 180 Qwen3-TTS masters fp32/sdpa GTX 1080 (~9 s/clip), 0 failures; voices
+  serena/dylan 8/7 per cell, alternating by index (not by difficulty).
+- 1 clip truncated by QA (0.96 s) regenerated successfully (attempt 2 recorded
+  in `synthesis_prev_attempts.jsonl`).
+- Reference extractor: `rex-1` frozen before inference; after the corpus
+  regeneration `rex-2` was published (ordinal stems) and, after review,
+  `rex-3` (written form; see «rex-2 retraction»). Rex-3 ceiling over gold:
+  synthesis_text 180/180; written_text dev 60/60, test 109/120 (90.8%).
 
-## P4 — Canal: COMPLETADO
+## P4 — Channel: COMPLETED
 
-- 360/360 archivos aceptados por QA automática (180 clean 16 kHz + 180
-  telephone 8 kHz); receta tel-1 con hashes por archivo.
+- 360/360 files accepted by automated QA (180 clean 16 kHz + 180 telephone
+  8 kHz); recipe tel-1 with per-file hashes.
 
-## P5 — Baselines y runner: COMPLETADO
+## P5 — Baselines and runner: COMPLETED
 
-- Whisper large-v3-turbo (fp16, GTX 1080): 360/360 sintéticos completos, 0
-  fallos; además 200/200 del control humano. Se corrigió el mapeo de idioma
-  (Whisper espera 'german'/'french'); caché invalidada y re-ejecutada.
-- Voxtral Mini 3B (bf16, Kaggle T4, kernel autocontenido con paquete
-  embebido): **360/360 completos, 0 fallos**. Se corrigió la ruta de API
-  (transcripción vía `apply_transcription_request`, no chat template) y el
-  layout nuevo de mounts (`/kaggle/input/datasets/gjusev/...`); las
-  iteraciones fallidas del kernel quedan versionadas en Kaggle (v1-v8).
-- Manifiestos de run con hashes reales (o gaps de procedencia explícitos).
+- Whisper large-v3-turbo (fp16, GTX 1080): 360/360 synthetic complete, 0
+  failures; plus 200/200 of the human control. Fixed the language mapping
+  (Whisper expects 'german'/'french'); cache invalidated and re-run.
+- Voxtral Mini 3B (bf16, Kaggle T4, self-contained kernel with embedded
+  package): **360/360 complete, 0 failures**. Fixed the API route
+  (transcription via `apply_transcription_request`, not chat template) and the
+  new mount layout (`/kaggle/input/datasets/gjusev/...`); the failed kernel
+  iterations stay versioned in Kaggle (v1-v8).
+- Run manifests with real hashes (or explicit provenance gaps).
 
-## P6 — Agente y voice-evals: COMPLETADO
+## P6 — Agent and voice-evals: COMPLETED
 
-- Agente de referencia sobre 360 inputs (transcripciones Whisper
-  congeladas): 360/360 con estado final observable; tests de stale-value y
-  dice-pero-no-guarda en verde.
-- Exportador voice-evals con rechazo de duplicados; contract test contra el
-  checkout local fijado (commit 3f6f9dd).
+- Reference agent over 360 inputs (frozen Whisper transcripts): 360/360 with
+  observable final state; stale-value and says-but-does-not-store tests green.
+- voice-evals exporter with duplicate rejection; contract test against the
+  pinned local checkout (commit 3f6f9dd).
 
-## P7 — Control humano: COMPLETADO
+## P7 — Human control: COMPLETED
 
-- FLEURS vía exportación oficial parquet (commit resuelto y registrado; sin
-  ejecutar scripts del dataset). 50+50 filas únicas por hash de path;
-  300 archivos (originales preservados + clean + telephone); atribución
-  CC-BY-4.0 con modificaciones señaladas.
-- Whisper sobre control humano: WER clean 0.115 vs telephone 0.221
-  (el canal telefónico casi duplica el WER en habla humana; denominadores
-  2172 palabras, 100 utterances por condición).
+- FLEURS via official parquet export (commit resolved and recorded; no dataset
+  scripts executed). 50+50 unique rows by path hash; 300 files (originals
+  preserved + clean + telephone); CC-BY-4.0 attribution with modifications
+  indicated.
+- Whisper over human control: WER clean 0.115 vs telephone 0.221 (the
+  telephone channel nearly doubles WER on human speech; denominators 2172
+  words, 100 utterances per condition).
 
-## P8 — Informes y demo: COMPLETADO (con resultados medidos, rex-3)
+## P8 — Reports and demo: COMPLETED (measured results, rex-3)
 
-Ver `reports/report.md` (regenerable offline: `python scripts/run_tracks.py`
+See `reports/report.md` (regenerable offline: `python scripts/run_tracks.py`
 → `python scripts/score_all.py` → `voxentity compare …` → `voxentity report`).
-Números medidos actuales (test split, n=240 escenario×condición por sistema,
+Current measured numbers (test split, n=240 scenario×condition per system,
 extractor rex-3, norm-2):
 
-| sistema | exactitud slots | IC 95% | macro12 clean / tel |
+| system | slot accuracy | 95% CI | macro12 clean / tel |
 | --- | --- | --- | --- |
-| gold hablado→extractor (sanity) | 100% | [100, 100] | 100 / 100 |
-| gold escrito→extractor (techo relevante) | 90.8% | [87.5, 94.2] | 90.8 / 90.8 |
+| gold spoken→extractor (sanity) | 100% | [100, 100] | 100 / 100 |
+| gold written→extractor (relevant ceiling) | 90.8% | [87.5, 94.2] | 90.8 / 90.8 |
 | voxtral-mini→slots | 37.1% | [30.0, 43.8] | 39.2 / 35.0 |
 | whisper-turbo→slots | 34.2% | [28.3, 40.4] | 36.7 / 31.7 |
-| reference-agent (estado final) | 34.2% | [28.3, 40.4] | 36.7 / 31.7 |
+| reference-agent (final state) | 34.2% | [28.3, 40.4] | 36.7 / 31.7 |
 
-El agente reprocesa las transcripciones Whisper congeladas, así que coincide
-con whisper→slots por construcción; mide persistencia de estado, no ASR.
+The agent re-processes the frozen Whisper transcripts, so it matches
+whisper→slots by construction; it measures state persistence, not ASR.
 
-Comparación pareada whisper − voxtral (n=240, bootstrap estratificado, 2000
-réplicas): −2.9 pp, IC 95% [−7.1, +1.3]; voxtral mejor en 17 pares, whisper
-en 10 — **sin diferencia concluyente**; resultado nulo publicado como tal.
+Paired comparison whisper − voxtral (n=240, stratified bootstrap, 2000
+replicas): −2.9 pp, 95% CI [−7.1, +1.3]; voxtral better in 17 pairs, whisper
+in 10 — **no conclusive difference**; null result published as such.
 
-Canal telefónico pareado por escenario (clean − telephone, bootstrap 95%):
-whisper +5.0 pp [+0.8, +10.0] (degradación detectable), voxtral +4.2 pp
-[−0.8, +9.2] (no concluyente). Figuras SVG en reports/figures/ (precisión
-por celda con techo escrito; diferencias pareadas con IC).
+Paired telephone channel by scenario (clean − telephone, bootstrap 95%):
+whisper +5.0 pp [+0.8, +10.0] (detectable degradation), voxtral +4.2 pp
+[−0.8, +9.2] (not conclusive). SVG figures in reports/figures/ (accuracy per
+cell with written ceiling; paired differences with CIs).
 
-Space (space/app.py) verificado en navegador con gradio 6.17: se corrigieron
-4 fallos que impedían su uso (audio limpio sobrescrito por el telefónico,
-rutas de audio inexistentes, case_id duplicados entre condiciones,
-transcripciones ausentes) y se cablearon los botones de ejemplo
-determinista de docs/08. No desplegado.
+Space (space/app.py) verified in browser with gradio 6.17: fixed 4 failures
+that blocked its use (clean audio overwritten by the telephone one, missing
+audio paths, case_id duplicates across conditions, missing transcripts) and
+wired the deterministic example buttons from docs/08. Not deployed.
 
-Lectura: con el techo escrito en ~91%, ambas familias ASR quedan en ~34–37%;
-el hueco restante sí es mayoritariamente ASR (emails dictados/deletreados,
-teléfonos, nombres, códigos). Celdas más débiles: email (0–20%), teléfono
-(10–25%), direcciones DE en whisper (0%). Excepción: FR postal_address tiene
-techo escrito de solo 20% en test (familias de plantilla de test no cubiertas
-por reglas afinadas en dev); esa celda sigue limitada por el extractor y no
-debe leerse como fallo ASR. Canal telefónico: −4 a −5 pp en sintético; en
-habla humana el WER casi se duplica (0.115 → 0.221). Corpus provisional
-(QA automática, sin escucha humana).
+Reading: with the written ceiling at ~91%, both ASR families land at ~34–37%;
+the remaining gap is mostly ASR (dictated/spelled emails, phones, names,
+codes). Weakest cells: email (0–20%), phone (10–25%), DE addresses in whisper
+(0%). Exception: FR postal_address has a written ceiling of only 20% on test
+(test template families not covered by rules tuned on dev); that cell is
+still extractor-limited and must not be read as an ASR failure. Telephone
+channel: −4 to −5 pp on synthetic; on human speech WER nearly doubles
+(0.115 → 0.221). Provisional corpus (automated QA, no human listening).
 
-WER sintético (0.706 whisper / 0.644 voxtral) se calcula contra la forma
-hablada (synthesis_text) y cuenta sobre todo diferencias de formato
-(«einhundertdreiundvierzig» vs «143»); contra la forma escrita falla al
-revés (un deletreo = 1 token). No es métrica de reconocimiento ni comparable
-con el WER del control humano; no se usa como hallazgo.
+Synthetic WER (0.706 whisper / 0.644 voxtral) is computed against the spoken
+form (synthesis_text) and counts mostly formatting differences
+(«einhundertdreiundvierzig» vs «143»); against the written form it fails the
+other way (one spelling = 1 token). It is not a recognition metric and is not
+comparable with the human-control WER; not used as a finding.
 
-### Retractación rex-2
+### rex-2 retraction
 
-La versión anterior de este documento afirmaba «el cuello de botella está en
-la capa ASR» con ~21% (whisper 20.8%, voxtral 21.2%) frente a un techo del
-100%. Era incorrecto: el techo se medía sólo sobre synthesis_text (forma
-hablada), mientras que los ASR emiten forma escrita. rex-2 sobre written_text
-de test daba 26/120 (21.7%), igual que los ASR: se medía la cobertura del
-extractor (tokenizer que descartaba `+` y `@`, fechas numéricas,
-«11. Dezember», códigos «MMJ-0105», «55a», orden FR calle-número). rex-3 lo
-corrige; los números rex-2 quedan en el historial git.
+The previous version of this document claimed «the bottleneck is the ASR
+layer» with ~21% (whisper 20.8%, voxtral 21.2%) against a 100% ceiling. It
+was wrong: the ceiling was measured only over synthesis_text (spoken form),
+while ASRs emit written form. rex-2 over test written_text gave 26/120
+(21.7%), the same as the ASRs: it was measuring extractor coverage (tokenizer
+that dropped `+` and `@`, numeric dates, «11. Dezember», codes «MMJ-0105»,
+«55a», FR street-number order). rex-3 fixes it; rex-2 numbers remain in git
+history.
 
-Disciplina dev/test: las reglas rex-3 se derivaron de fallos de dev
-(written_text y transcripciones ASR dev). Durante el diagnóstico se
-inspeccionaron ~15 transcripciones Whisper de test; dos reglas se vieron allí
-primero (código postal sin coma «Weg 61 37672 Ort» y puntos junto a «at»),
-aunque son convenciones generales de escritura. Los números test de rex-3
-tienen por tanto exposición limitada a test y así se declaran.
+Dev/test discipline: the rex-3 rules were derived from dev failures
+(written_text and dev ASR transcripts). During diagnosis ~15 Whisper test
+transcripts were inspected; two rules were seen there first (postal code
+without comma «Weg 61 37672 Ort» and dots next to «at»), though they are
+general writing conventions. The rex-3 test numbers therefore have limited
+test exposure and are declared as such.
 
-## P9 — Entrega: ESTRUCTURA COMPLETADA
+## P9 — Delivery: STRUCTURE COMPLETED
 
-- PUBLISHING.md: gates previos, comandos `gh`/`hf` (sintaxis verificada contra
-  la CLI instalada) y borradores de comunicación; nada ejecutado ni enviado.
-- Gate de reproducción: run_tracks → score_all → compare → report deja
-  reports/ idéntico al commit.
-- Segundo sintetizador: research/second-tts-gate.md (Piper, condicional).
+- PUBLISHING.md: prior gates, `gh`/`hf` commands (syntax verified against the
+  installed CLI) and communication drafts; nothing executed or sent.
+- Reproduction gate: run_tracks → score_all → compare → report leaves
+  reports/ identical to the commit.
+- Second synthesizer: research/second-tts-gate.md (Piper, conditional).
 
-- LICENSE Apache-2.0 oficial, DATA_LICENSE, THIRD_PARTY_NOTICES, dataset
-  card, CONTRIBUTING, validador de bundle (secretos + checksums + derechos).
-- Publicación externa NO ejecutada (pendiente de autorización): comandos
-  preparados en PUBLISHING.md (tier 1 sin audio sintético / tier 2 bloqueado
-  por decisión de derechos) y plan en docs/launch/LAUNCH.md.
+- Official LICENSE Apache-2.0, DATA_LICENSE, THIRD_PARTY_NOTICES, dataset
+  card, CONTRIBUTING, bundle validator (secrets + checksums + rights).
+- External publication NOT executed (pending authorization): commands prepared
+  in PUBLISHING.md (tier 1 without synthetic audio / tier 2 blocked by rights
+  decision) and plan in docs/launch/LAUNCH.md.
 
-### Gates de entrega (docs/10), ejecutados sobre el commit final
+### Delivery gates (docs/10), executed on the final commit
 
-| gate | estado | evidencia |
+| gate | status | evidence |
 | --- | --- | --- |
-| G1 contratos | OK | pytest (todos verdes, incl. import de todos los módulos), ruff, check_links |
-| G2 derechos | OK con audio sintético bloqueado | registro: S04/S05/S06/S16 verified; S03 (salida Qwen) y piper conditional con evidencia; bundle sin audio |
-| G3 corpus | OK | `corpus validate`: núcleo 180, codeswitch 56, multiturn 96, voices 240, piper 120, es 90; 0 errores |
-| G4 evaluación | OK | `scripts/release_gates.py`: 5 runs del núcleo 240/240, completos, cobertura 100% |
-| G5 honestidad | OK | barrido de afirmaciones prohibidas; sintético/simulado/provisional/N en README, card, informes, Space y figura |
-| G6 reproducción | OK | regeneración offline de núcleo + 5 extensiones byte-idéntica (`reports/release_gates.md`) |
-| G7 producto | OK | Space probado en navegador en modo completo y tier 1 (sin audio) |
-| G8 publicación | PENDIENTE por diseño | no hay URLs reales hasta publicar; notices y dataset card coinciden con el bundle |
+| G1 contracts | OK | pytest (all green, incl. importing every module), ruff, check_links |
+| G2 rights | OK with synthetic audio blocked | registry: S04/S05/S06/S16 verified; S03 (Qwen output) and piper conditional with evidence; bundle without audio |
+| G3 corpus | OK | `corpus validate`: core 180, codeswitch 56, multiturn 96, voices 240, piper 120, es 90; 0 errors |
+| G4 evaluation | OK | `scripts/release_gates.py`: 5 core runs 240/240, complete, coverage 100% |
+| G5 honesty | OK | scan for prohibited claims; synthetic/simulated/provisional/N in README, card, reports, Space and figure |
+| G6 reproduction | OK | offline regeneration of core + 5 extensions byte-identical (`reports/release_gates.md`) |
+| G7 product | OK | Space tested in browser in full and tier 1 (no audio) mode |
+| G8 publication | PENDING by design | no real URLs until publishing; notices and dataset card match the bundle |
 
-Hallazgos de esta pasada, corregidos: 4 suites de extensión fallaban la
-validación (validador asumía el layout del núcleo) y 40 etiquetas de turno
-multi-turn eran incorrectas; `ext/codeswitch.py` roto desde el refactor ES
-(nadie lo importaba; nuevo test de imports); `license_url` de S03 apuntaba a
-un LICENSE inexistente; PUBLISHING.md subía audio sintético en contra del
-registro de derechos; borradores de lanzamiento con afirmaciones excesivas.
+Findings from this pass, fixed: 4 extension suites failed validation
+(validator assumed the core layout) and 40 multi-turn turn labels were wrong;
+`ext/codeswitch.py` broken since the ES refactor (nothing imported it; new
+import test); S03 `license_url` pointed to a nonexistent LICENSE; PUBLISHING.md
+uploaded synthetic audio against the rights registry; launch drafts with
+excessive claims.
 
-## Auditoría adversa
+## Adversarial audit
 
-Workflow de 26 agentes (4 dimensiones × verificación de refutación): 22
-hallazgos confirmados, todos corregidos en commits etiquetados «audit fixes»
-y «rex-2». Una revisión posterior detectó que el techo rex-2 era circular
-(ver «Retractación rex-2»); corregido en rex-3. Los hallazgos y su resolución están en el historial git.
+26-agent workflow (4 dimensions × refutation verification): 22 confirmed
+findings, all fixed in commits labeled «audit fixes» and «rex-2». A later
+review found the rex-2 ceiling circular (see «rex-2 retraction»); fixed in
+rex-3. Findings and their resolution are in git history.
 
-## Bloqueos y limitaciones
+## Blockages and limitations
 
-- Escucha humana del corpus: pendiente → corpus «provisional», no «verified».
-- Derechos del audio sintético: condicionales (ver DATA_LICENSE.md).
-- Transcripciones totalmente ajenas al texto (p.ej. emails FR convertidos en
-  frases sin relación) no permiten distinguir fallo TTS de fallo ASR sin
-  escucha; se requiere escucha humana de una muestra.
-- Voxtral: completado y puntuado; el bundle local `release_bundle/` pasa
-  `release validate` (sin credenciales, checksums verificados).
-- Space y dataset HF: artefactos locales listos; publicación externa
-  requiere autorización explícita.
+- Human listening of the corpus: pending → corpus «provisional», not «verified».
+- Synthetic audio rights: conditional (see DATA_LICENSE.md).
+- Transcripts entirely unrelated to the text (e.g. FR emails turned into
+  unrelated sentences) do not allow distinguishing TTS failure from ASR
+  failure without listening; listening of a sample is required.
+- Voxtral: completed and scored; the local bundle `release_bundle/` passes
+  `release validate` (no credentials, checksums verified).
+- HF Space and dataset: local artifacts ready; external publication requires
+  explicit authorization.
 
+## Extensions (separate suites; never mixed with the core tables)
 
-## Extensiones (suites separadas; nunca mezcladas con las tablas del núcleo)
+All of them: synthetic speech, simulated telephone channel, automated QA only,
+Whisper large-v3-turbo → extractor rex-4 (frozen before scoring ASR in each
+suite; its rules come from dev). Data in `data/ext/<suite>/`, reports in
+`reports/ext-<suite>/`, CPU scoring with `python scripts/ext_suites.py <suite>`.
 
-Todas: habla sintética, canal telefónico simulado, sólo QA automática,
-Whisper large-v3-turbo → extractor rex-4 (congelado antes de puntuar ASR en
-cada suite; sus reglas salen de dev). Datos en `data/ext/<suite>/`, informes
-en `reports/ext-<suite>/`, scoring CPU con `python scripts/ext_suites.py <suite>`.
+### Code-switching (`codeswitch`): COMPLETED
 
-### Code-switching (`codeswitch`): COMPLETADO
+- 56 DE/FR scenarios (16 dev / 40 test) with English separators and digits,
+  NATO alphabet in German and non-DE/FR names; values disjoint from the core.
+- rex-3 frozen failed 16/56 on the correct written text; rex-4 fixes the dev
+  failures (whole-word correction markers: «manon» was being cut to «non»;
+  dot/underscore/dash and English digits; O' surnames;
+  «double vé»/«i grec»). Core: 0 changes in 720 predictions.
+- Test: whisper 31.2% [22.5, 38.8] against a written ceiling 65.0% [55.0, 75.0];
+  phones with English digits 70%; email and names extractor-limited
+  (ceiling 20-40%).
 
-- 56 escenarios DE/FR (16 dev / 40 test) con separadores y dígitos en inglés,
-  alfabeto OTAN en alemán y nombres no DE/FR; valores disjuntos del núcleo.
-- rex-3 congelado fallaba 16/56 sobre el texto escrito correcto; rex-4 corrige
-  los fallos de dev (marcadores de corrección por palabra completa: «manon»
-  se cortaba en «non»; dot/underscore/dash y dígitos en inglés; apellidos O';
-  «double vé»/«i grec»). Núcleo: 0 cambios en 720 predicciones.
-- Test: whisper 31.2% [22.5, 38.8] frente a techo escrito 65.0% [55.0, 75.0];
-  teléfonos con dígitos en inglés 70%; email y nombres limitados por el
-  extractor (techo 20-40%).
+### Cross-turn corrections (`multiturn`): COMPLETED
 
-### Correcciones entre turnos (`multiturn`): COMPLETADO
+- 48 DE/FR cases × 2 turns (same voice): correction (near-identical value),
+  confirmation, repetition; 96 clips, 0 failures; whisper 192/192.
+- Test (n=64): final state 42.2% [29.7, 54.7]; gold-text ceiling 100%.
+  0 stale values; 19/19 correct when both turns extract well: persistence
+  works and the loss is perception. 2 real spurious changes (a misheard
+  repetition overwrote a correct value).
+- Outcome rule corrected before publishing: a misheard turn 1 that turn 2
+  does not touch is a wrong value, not a spurious change (the first pass
+  mislabeled 8); test pins the rule.
 
-- 48 casos DE/FR x 2 turnos (misma voz): corrección (valor casi idéntico),
-  confirmación, repetición; 96 clips, 0 fallos; whisper 192/192.
-- Test (n=64): estado final 42.2% [29.7, 54.7]; techo con texto gold 100%.
-  0 valores obsoletos; 19/19 correcto cuando ambos turnos se extraen bien:
-  la persistencia funciona y la pérdida es percepción. 2 cambios espurios
-  reales (una repetición mal oída sobrescribió un valor correcto).
-- Regla de resultado corregida antes de publicar: un turno 1 mal oído que el
-  turno 2 no toca es valor erróneo, no cambio espurio (la primera pasada
-  etiquetó 8 mal); test que fija la regla.
+### More voices (`voices`): COMPLETED
 
-### Más voces (`voices`): COMPLETADO
+- Motivation (coverage analysis): in the core dylan beats serena by ~10 pp
+  with both ASRs, but voice and scenario were confounded.
+- All 120 test scenarios with vivian and ryan (240 clips, 0 failures, 480 QA
+  ok, whisper 480/480). vivian − ryan paired +0.8 pp [−3.3, +5.0]. The
+  serena/dylan gap splits into ~3 pp of scenario difficulty and ~7 pp of voice.
 
-- Motivo (análisis de cobertura): en el núcleo dylan supera a serena en ~10 pp
-  con ambos ASR, pero voz y escenario estaban confundidos.
-- Los 120 escenarios test con vivian y ryan (240 clips, 0 fallos, 480 QA ok,
-  whisper 480/480). vivian − ryan pareado +0.8 pp [−3.3, +5.0]. El hueco
-  serena/dylan se reparte en ~3 pp de dificultad de escenario y ~7 pp de voz.
+### Second TTS family (`piper`): COMPLETED
 
-### Segunda familia TTS (`piper`): COMPLETADO
-
-- Gate: research/second-tts-gate.md. Voces Piper fijadas (thorsten CC0,
-  siwis CC BY 4.0 verificada en la licencia del dataset); runtime GPL en venv
-  aislado, no dependencia del paquete. 120/120 sintetizados, 240 QA ok,
+- Gate: research/second-tts-gate.md. Piper voices pinned (thorsten CC0,
+  siwis CC BY 4.0 verified in the dataset license); GPL runtime in an isolated
+  venv, not a package dependency. 120/120 synthesized, 240 QA ok,
   whisper 240/240.
-- Qwen − Piper pareado −10.0 pp [−15.4, −4.2] (Piper 44.2% vs 34.2%);
-  teléfonos 15% → 70% (DE) y 55% (FR); emails ~0% con ambos. Las cifras
-  absolutas del núcleo dependen del sintetizador (advertido en README).
+- Qwen − Piper paired −10.0 pp [−15.4, −4.2] (Piper 44.2% vs 34.2%);
+  phones 15% → 70% (DE) and 55% (FR); emails ~0% with both. The absolute core
+  figures depend on the synthesizer (warned in README).
 
-### Español (`es`): COMPLETADO
+### Spanish (`es`): COMPLETED
 
-- Suite de 90 escenarios (30 dev / 60 test) en `data/ext/es/generated/`,
+- 90-scenario suite (30 dev / 60 test) in `data/ext/es/generated/`,
   hash `fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701`.
-  Fase texto hecha en rama ext-es por la otra instancia y verificada aquí de
-  forma independiente (suite verde; 0 cambios en 720 predicciones del núcleo
-  y 0/112 de code-switching con su extractor); fusionada fast-forward.
-- Smoke Qwen3-TTS español superado (serena y dylan; ida y vuelta Whisper
-  exacta). 90/90 sintetizados, 180 clips QA ok, whisper (language
-  'spanish') 180/180.
-- Test (60 escenarios x 2 condiciones): whisper 50.8% [41.7, 60.0] frente a
-  techo escrito 96.7% [91.7, 100.0] y hablado 95.0%. Celdas: fechas 90%,
-  códigos 75%, nombres 60%, teléfonos 60%, direcciones 20%, emails 0%.
-  Limpio − teléfono +8.3 pp. No comparable directamente con DE/FR (34.2%):
-  escenarios y plantillas distintos; sólo coincide el patrón (emails 0% en
-  los tres idiomas).
+  Text phase done on the ext-es branch by the other instance and verified
+  independently here (suite green; 0 changes in the 720 core predictions and
+  0/112 code-switching with its extractor); merged fast-forward.
+- Spanish Qwen3-TTS smoke passed (serena and dylan; exact Whisper round-trip).
+  90/90 synthesized, 180 clips QA ok, whisper (language 'spanish') 180/180.
+- Test (60 scenarios × 2 conditions): whisper 50.8% [41.7, 60.0] against a
+  written ceiling 96.7% [91.7, 100.0] and spoken 95.0%. Cells: dates 90%,
+  codes 75%, names 60%, phones 60%, addresses 20%, emails 0%. Clean −
+  telephone +8.3 pp. Not directly comparable with DE/FR (34.2%): different
+  scenarios and templates; only the pattern matches (emails 0% in all three
+  languages).
 
-### Proveedores comerciales: BLOQUEADO
+### Commercial providers: BLOCKED
 
-- Requiere proveedor y presupuesto explícitos (AGENTS.md: este encargo no
-  autoriza inferencia de pago). No iniciado.
+- Requires an explicit provider and budget (AGENTS.md: this brief does not
+  authorize paid inference). Not started.
 
-## Decisión de publicación (propietario) y consejo
+## Publication decision (owner) and advice
 
-- Propietario: "todo público". Registrado en el registro de derechos: S03 (audio
-  Qwen3-TTS) y S17 (voces Piper) `verified` como decisión del propietario sobre la
-  evidencia de licencia (Apache-2.0 sin términos de salida; CC0 / CC BY 4.0), con
-  vía de retirada por issues de GitHub. No es una opinión legal.
-- Consejo (perspectivas independientes): Munger, Taleb y Torvalds → publicar todo,
-  con decisión registrada, contacto de retirada y orden GitHub → CI verde → clon
-  limpio → HF; Kahneman → escuchar antes. Taleb y Kahneman: retener el anuncio
-  (post) hasta una escucha por muestreo.
-- Alerta automática de fallos de síntesis (`scripts/tts_alert.py`, alerta y no
-  filtro): 7/180 clips limpios con ambos ASR lejos del texto escrito y hablado
-  (email 2, teléfono 3, dirección 1, código 1); ninguno excluido del scoring.
-- Riesgos técnicos del consejo resueltos antes de publicar: `.gitattributes`
-  (LF), 8 logs de build retirados del índice, gradio fijado a la versión probada
-  (6.17.3) en requirements y frontmatter del Space, enlaces absolutos a GitHub en
-  la ficha del dataset y el README del Space, sin secretos ni rutas locales.
+- Owner: "everything public". Recorded in the rights registry: S03 (Qwen3-TTS
+  audio) and S17 (Piper voices) `verified` as an owner decision over the
+  license evidence (Apache-2.0 without output terms; CC0 / CC BY 4.0), with a
+  takedown path via GitHub issues. Not a legal opinion.
+- Advice (independent perspectives): Munger, Taleb and Torvalds → publish
+  everything, with the decision recorded, takedown contact and order
+  GitHub → CI green → clean clone → HF; Kahneman → listen first. Taleb and
+  Kahneman: hold the announcement (post) until a listening spot check.
+- Automated synthesis-failure alert (`scripts/tts_alert.py`, alert and not
+  filter): 7/180 clean clips with both ASRs far from the written and spoken
+  text (email 2, phone 3, address 1, code 1); none excluded from scoring.
+- Technical risks of the advice resolved before publishing: `.gitattributes`
+  (LF), 8 build logs removed from the index, gradio pinned to the tested
+  version (6.17.3) in requirements and Space frontmatter, absolute links to
+  GitHub in the dataset card and Space README, no secrets or local paths.

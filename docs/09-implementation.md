@@ -1,98 +1,98 @@
-# Backlog de implementación
+# Implementation backlog
 
-Orden por dependencias, sin calendario. Una casilla marcada cita su evidencia; escribir documentación no significa haber implementado funcionalidad.
+Order by dependencies, no calendar. A checked box cites its evidence; writing documentation does not mean having implemented functionality.
 
-## P0 — Fundaciones
+## P0 — Foundations
 
-- [x] Crear pyproject, paquete, CLI y extras separados; escoger lock tool y registrar decisión. — evidencia: pyproject + CLI `voxentity`, extras tts/asr-*/space; lock `uv-core.lock`.
-- [x] Implementar schemas y validar ejemplos. — evidencia: contracts.py; tests/unit/test_contracts.py.
-- [x] Crear tests de IDs, rutas, tipos, duplicados y aislamiento de gold. — evidencia: tests/unit/test_contracts.py, test_corpus.py.
-- [x] Añadir CI CPU offline, lint y validación de links internos. — evidencia: `.github/workflows/ci.yml` (ruff, scripts/check_links.py, pytest sobre uv-core.lock).
-Aceptación: instalación limpia, import sin torch/GPU/red; CLI help y ejemplos parseables; tests adversariales pasan.
+- [x] Create pyproject, package, CLI and separate extras; choose lock tool and record the decision. — evidence: pyproject + CLI `voxentity`, extras tts/asr-*/space; lock `uv-core.lock`.
+- [x] Implement schemas and validate examples. — evidence: contracts.py; tests/unit/test_contracts.py.
+- [x] Create tests for IDs, paths, types, duplicates and gold isolation. — evidence: tests/unit/test_contracts.py, test_corpus.py.
+- [x] Add offline CPU CI, lint and internal link validation. — evidence: `.github/workflows/ci.yml` (ruff, scripts/check_links.py, pytest over uv-core.lock).
+Acceptance: clean install, import without torch/GPU/network; CLI help and examples parseable; adversarial tests pass.
 
 ## P1 — Scorer
 
-Depende P0.
-- [x] Normalización por entidad con literal/canonical separados. — evidencia: scoring/normalize.py (norm-2); test_normalize.py.
-- [x] Scoring con fallos, omisión, sustitución, extras y correcciones. — evidencia: scoring/match.py; outcomes en runs/scored/*.json.
-- [x] Agregación, comparación pareada e intervalos por cluster. — evidencia: scoring/aggregate.py + bootstrap.py; `voxentity compare` (test_compare_cli.py).
-- [x] Fixtures con resultados calculados a mano y controles negativos. — evidencia: tests/unit/test_normalize.py.
-Aceptación: errores de un dígito/acento se detectan; tasa global mantiene denominadores; runs incompletos no rankeados; informe CPU repetible.
+Depends on P0.
+- [x] Per-entity normalization with literal/canonical separated. — evidence: scoring/normalize.py (norm-2); test_normalize.py.
+- [x] Scoring with failures, omission, substitution, extras and corrections. — evidence: scoring/match.py; outcomes in runs/scored/*.json.
+- [x] Aggregation, paired comparison and cluster intervals. — evidence: scoring/aggregate.py + bootstrap.py; `voxentity compare` (test_compare_cli.py).
+- [x] Fixtures with hand-calculated results and negative controls. — evidence: tests/unit/test_normalize.py.
+Acceptance: one-digit/accent errors are detected; global rates keep denominators; incomplete runs unranked; CPU-repeatable report.
 
-## P2 — Casos y derechos
+## P2 — Cases and rights
 
-Depende P0.
-- [x] Escribir pools y plantillas DE/FR originales, matriz 180 casos. — evidencia: corpus/pools.py; 180 escenarios.
-- [x] Split 60 dev/120 test sin overlap de familia/valores equivalentes. — evidencia: corpus validate sin errores; test_corpus.py.
-- [x] Manifest de fuentes y checklist de derechos por asset. — evidencia: rights_registry.jsonl.
-- [x] Export de inputs sin gold y IDs opacos. — evidencia: data/inputs (ids opacos, orden por input_id).
-Aceptación: counts exactos, equilibrio de dificultad y voz, validación semántica de correcciones, ninguna fecha de desarrollo añadida.
+Depends on P0.
+- [x] Write original DE/FR pools and templates, 180-case matrix. — evidence: corpus/pools.py; 180 scenarios.
+- [x] Split 60 dev/120 test without overlap of equivalent family/values. — evidence: corpus validate without errors; test_corpus.py.
+- [x] Manifest of sources and rights checklist per asset. — evidence: rights_registry.jsonl.
+- [x] Export of inputs without gold and opaque IDs. — evidence: data/inputs (opaque ids, order by input_id).
+Acceptance: exact counts, difficulty and voice balance, semantic validation of corrections, no development dates added.
 
-## P3 — Síntesis y QA
+## P3 — Synthesis and QA
 
-Depende P2.
-- [x] Resolver Qwen y speaker IDs; smoke test por idioma/voz. — evidencia: scripts/smoke_tts.py; data/smoke_tts/report*.json.
-- [x] Generador reanudable, provenance, hashes y registros de intentos. — evidencia: synthesis.jsonl + synthesis_prev_attempts.jsonl.
-- [ ] QA automática, revisión de audio disponible y flujo de exclusiones. — QA automática y flujo de exclusiones listos (`review_package.py apply`: veredicto con motivo, clip limpio + telefónico excluidos del scoring, gold intacto); falta la escucha humana en sí.
-- [x] Paquete de revisión para casos pending. — evidencia: `scripts/review_package.py build` (review/index.html + review.csv, 180 clips limpios, sin transcripciones ASR).
-Aceptación: 180 clean accepted para verified o estado provisional explícito; errores TTS no etiquetados como errores ASR; ningún filtro basado en resultados del modelo evaluado.
+Depends on P2.
+- [x] Resolve Qwen and speaker IDs; smoke test per language/voice. — evidence: scripts/smoke_tts.py; data/smoke_tts/report*.json.
+- [x] Resumable generator, provenance, hashes and attempt logs. — evidence: synthesis.jsonl + synthesis_prev_attempts.jsonl.
+- [ ] QA automation, available audio review flow and exclusion flow. — QA automation and exclusion flow ready (`review_package.py apply`: verdict with reason, clean + telephone clip excluded from scoring, gold intact); the human listening itself is missing.
+- [x] Review package for pending cases. — evidence: `scripts/review_package.py build` (review/index.html + review.csv, 180 clean clips, no ASR outputs).
+Acceptance: 180 clean accepted for verified or explicit provisional state; TTS errors not labeled as ASR errors; no filter based on evaluated-model results.
 
-## P4 — Canal
+## P4 — Channel
 
-Depende P3.
-- [x] Implementar recipe fija, ruido seed, codec y checks de audio. — evidencia: audio/channel.py tel-1; test_channel.py.
-- [x] Generar 180 pares y verificar relaciones. — evidencia: 360/360 QA accepted (qa.jsonl).
-Aceptación: 360 archivos válidos cuando P3 completo; sample rates y hashes coinciden; test de banda/SNR sin asumir latencia real.
+Depends on P3.
+- [x] Implement pinned recipe, seeded noise, codec and audio checks. — evidence: audio/channel.py tel-1; test_channel.py.
+- [x] Generate 180 pairs and verify relations. — evidence: 360/360 QA accepted (qa.jsonl).
+Acceptance: 360 valid files when P3 complete; sample rates and hashes match; band/SNR test without assuming real latency.
 
-## P5 — Baselines y runner
+## P5 — Baselines and runner
 
-Depende P1/P4.
-- [x] Doctor Kaggle/HF; locks y smoke tests por backend. — evidencia: doctor.py perfiles hf/kaggle.
-- [x] Adaptadores Whisper y Voxtral; resume, timeouts y cache. — evidencia: adapters/whisper.py, voxtral.py.
-- [x] Extractor común y control gold→extractor. — evidencia: rex-3; techo hablado 100% y escrito 90.8% (test).
-- [x] Corridas completas con inputs aislados. — evidencia: whisper 360/360, voxtral 360/360.
-Aceptación: al menos dos familias ASR realmente ejecutadas; artefactos por clip; comparación con misma cohorte; OOM/error no oculto.
+Depends on P1/P4.
+- [x] Doctor Kaggle/HF; locks and smoke tests per backend. — evidence: doctor.py profiles hf/kaggle.
+- [x] Whisper and Voxtral adapters, resume, timeouts and cache. — evidence: adapters/whisper.py, voxtral.py.
+- [x] Common extractor and gold→extractor control. — evidence: rex-3; spoken ceiling 100% and written 90.8% (test).
+- [x] Full runs with isolated inputs. — evidence: whisper 360/360, voxtral 360/360.
+Acceptance: at least two ASR families actually run; per-clip artifacts; comparison with same cohort; OOM/error not hidden.
 
-## P6 — Slots persistidos y voice-evals
+## P6 — Persisted slots and voice-evals
 
-Depende P5.
-- [x] Agente de referencia y storage instrumentado. — evidencia: adapters/agent.py; tests/integration/test_agent.py.
-- [x] Corrección dentro del turno; control negativo stale-value. — evidencia: tests/integration/test_agent.py.
-- [x] Export fixtures separados por voz/condición y conversión explícita 8→16 kHz. — evidencia: adapters/voice_evals_export.py (8→16 kHz explícito).
-- [x] Contract test con versión fijada de voice-evals. — evidencia: tests/contract/test_voice_evals.py (commit 3f6f9dd).
-Aceptación: scorer lee estado final real; replay no inventa timings; texto duplicado no sobrescribe audio; core funciona sin voice-evals instalado.
+Depends on P5.
+- [x] Reference agent and instrumented storage. — evidence: adapters/agent.py; tests/integration/test_agent.py.
+- [x] Correction within the turn; stale-value negative control. — evidence: tests/integration/test_agent.py.
+- [x] Export fixtures separated by voice/condition and explicit 8→16 kHz conversion. — evidence: adapters/voice_evals_export.py (8→16 kHz explicit).
+- [x] Contract test against pinned voice-evals version. — evidence: tests/contract/test_voice_evals.py (commit 3f6f9dd).
+Acceptance: scorer reads real final state; replay does not fabricate timings; duplicated text does not overwrite audio; core works without voice-evals installed.
 
-## P7 — Control humano y sensibilidad
+## P7 — Human control and sensitivity
 
-Depende P1/P5.
-- [x] Descarga FLEURS selectiva por revisión, IDs y atribución. — evidencia: data/human_control/attribution.json.
-- [x] Muestreo determinista 50 por idioma y versiones acústicas. — evidencia: human_control_manifest.jsonl.
-- [x] Evaluación WER/CER separada. — evidencia: runs/scored/human_control_wer.json.
-- [x] Investigar/implementar segundo sintetizador solo si derechos resueltos; reportar gate. — evidencia: research/second-tts-gate.md (Piper thorsten CC0 + siwis CC-BY 4.0, revisión fijada; estado condicional, no ejecutado).
-Aceptación: control humano ejecutado o bloqueo verificable sin falso reclutamiento; todas las tablas distinguen corpus; alternativa TTS no bloquea release core.
+Depends on P1/P5.
+- [x] Selective FLEURS download by revision, IDs and attribution. — evidence: data/human_control/attribution.json.
+- [x] Deterministic sampling 50 per language and acoustic versions. — evidence: human_control_manifest.jsonl.
+- [x] Separate WER/CER evaluation. — evidence: runs/scored/human_control_wer.json.
+- [x] Investigate/implement second synthesizer only if rights resolved; report the gate. — evidence: research/second-tts-gate.md (Piper thorsten CC0 + siwis CC-BY 4.0, pinned revision; conditional state, not executed).
+Acceptance: human control executed or verifiable blockage without false recruitment; all tables distinguish corpus; TTS alternative does not block the core release.
 
-## P8 — Informes y demo
+## P8 — Reports and demo
 
-Depende P5/P6; integrar P7 cuando disponible.
-- [x] Tablas, bootstrap, taxonomía de errores y reporte en inglés. — evidencia: reports/report.md.
-- [x] Space CPU de resultados precalculados. — evidencia: space/app.py + scripts/build_space_data.py (no desplegado).
-- [x] Notebooks de generación, evaluación y reproducción. — evidencia: notebooks/*; reproduce verificado idéntico al bundle.
-Aceptación: demo reproduce números del reporte, audio correcto por ID, ningún placeholder numérico presentado como hallazgo.
+Depends on P5/P6; integrate P7 when available.
+- [x] Tables, bootstrap, error taxonomy and report in English. — evidence: reports/report.md.
+- [x] CPU Space of precomputed results. — evidence: space/app.py + scripts/build_space_data.py (not deployed).
+- [x] Generation, evaluation and reproduction notebooks. — evidence: notebooks/*; reproduce verified identical to the bundle.
+Acceptance: demo reproduces report numbers, correct audio per ID, no numeric placeholder presented as a finding.
 
-## P9 — Entrega publicable
+## P9 — Publishable delivery
 
-Depende P8.
-- [x] Licencias oficiales, notices, dataset card, README y CONTRIBUTING. — evidencia: LICENSE, DATA_LICENSE.md, THIRD_PARTY_NOTICES.md, dataset_card/, CONTRIBUTING.md.
-- [x] Bundle con checksums, manifiesto y controles de release. — evidencia: release.py build_bundle; `release validate` ok; test_release.py.
-- [x] Comandos de publicación y borradores de comunicación. — evidencia: PUBLISHING.md (gates, comandos `gh`/`hf` verificados contra la CLI instalada, borradores; nada ejecutado) y space/README.md (metadatos HF).
-- [x] Actualizar IMPLEMENTATION_STATUS con comandos ejecutados/evidencias. — evidencia: IMPLEMENTATION_STATUS.md.
-Aceptación: fresh-environment scoring offline idéntico, ninguna credencial, derechos resueltos para assets publicados, nombres y claims coherentes.
+Depends on P8.
+- [x] Official licenses, notices, dataset card, README and CONTRIBUTING. — evidence: LICENSE, DATA_LICENSE.md, THIRD_PARTY_NOTICES.md, dataset_card/, CONTRIBUTING.md.
+- [x] Bundle with checksums, manifest and release controls. — evidence: release.py build_bundle; `release validate` ok; test_release.py.
+- [x] Publication commands and communication drafts. — evidence: PUBLISHING.md (gates, `gh`/`hf` commands verified against the installed CLI, drafts; nothing executed) and space/README.md (HF metadata).
+- [x] Update IMPLEMENTATION_STATUS with executed commands/evidence. — evidence: IMPLEMENTATION_STATUS.md.
+Acceptance: fresh-environment offline scoring identical, no credentials, rights resolved for published assets, names and claims coherent.
 
-## Extensiones después del núcleo
+## Extensions after the core
 
-- [ ] Dos proveedores de voz con acceso y presupuesto, estado final verificable. — bloqueado: requiere proveedor y presupuesto explícitos.
-- [x] Correcciones entre turnos y code-switching. — evidencia: reports/ext-multiturn/report.md, reports/ext-codeswitch/report.md (suites propias en data/ext/).
-- [x] Español y nueva versión de corpus. — evidencia: suite es (90 escenarios, data/ext/es/generated) y reports/ext-es/report.md; corpus DE/FR intacto.
-- [x] Más voces/casos si análisis revela cobertura insuficiente. — evidencia: análisis de cobertura (efecto voz confundido con escenario) → reports/ext-voices/report.md; además segunda familia TTS en reports/ext-piper/report.md.
+- [ ] Two voice providers with access and budget, verifiable final state. — blocked: requires explicit provider and budget.
+- [x] Cross-turn corrections and code-switching. — evidence: reports/ext-multiturn/report.md, reports/ext-codeswitch/report.md (own suites in data/ext/).
+- [x] Spanish and new corpus version. — evidence: es suite (90 scenarios, data/ext/es/generated) and reports/ext-es/report.md; DE/FR corpus intact.
+- [x] More voices/cases if analysis shows insufficient coverage. — evidence: coverage analysis (voice effect confused with scenario) → reports/ext-voices/report.md; also second TTS family in reports/ext-piper/report.md.
 
-Cada extensión tiene suite propia. No inflar tamaño del corpus principal ni completar casillas con mocks.
+Each extension has its own suite. Do not inflate main corpus size nor complete checkboxes with mocks.

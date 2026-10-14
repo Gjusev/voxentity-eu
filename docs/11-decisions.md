@@ -1,31 +1,31 @@
-# Decisiones y límites
+# Decisions and limits
 
-## Fijas
+## Fixed
 
-D01 Repo independiente voxentity-eu, sin ELO.
-D02 Núcleo sintético DE/FR y control humano público separado.
-D03 No reclutamiento, clonación personalizada ni scraping de audio sin licencia.
-D04 Qwen CustomVoice como candidato principal; revisión registrada, ejecución pendiente.
-D05 Whisper turbo y Voxtral Mini como baselines candidatos concretos.
-D06 Evaluar persistencia final además de texto.
-D07 CPU Space y scoring offline; Kaggle para batch GPU.
-D08 Gold aislado de sistemas evaluados.
-D09 180 escenarios/360 archivos como alcance inicial; diferencias por QA se informan.
-D10 Fechas y estimaciones de desarrollo ausentes; se permiten magnitudes técnicas de audio y referencias a modelos cuyo nombre contiene números.
+D01 Independent repo voxentity-eu, no ELO.
+D02 Synthetic DE/FR core and public human control kept separate.
+D03 No recruitment, personal cloning or scraping of unlicensed audio.
+D04 Qwen CustomVoice as primary candidate; revision recorded, execution pending.
+D05 Whisper turbo and Voxtral Mini as concrete candidate baselines.
+D06 Evaluate final persistence in addition to text.
+D07 CPU Space and offline scoring; Kaggle for GPU batch.
+D08 Gold isolated from evaluated systems.
+D09 180 scenarios/360 files as initial scope; QA-driven differences are reported.
+D10 Dates and development estimates absent; technical audio magnitudes and references to models whose names contain numbers are allowed.
 
-## Condicionales ya resueltas por política
+## Conditionals already resolved by policy
 
-Sin voz válida: seleccionar otra voz predefinida del mismo modelo y repetir QA, sin clonación.
-Sin derechos resueltos: bloquear redistribución del asset, continuar implementación.
-Sin FLEURS accesible: dejar control humano pendiente con evidencia, no sustituir por TTS etiquetado humano.
-Sin segundo modelo ejecutable: reportar baseline único parcial, no declarar comparación completa.
-Sin acceso a proveedor: reference agent y baselines abiertos; adaptador preparado desactivado.
-Sin revisión auditiva: corpus provisional claramente etiquetado.
-Sin segunda familia TTS: análisis principal permitido con limitación explícita.
-Sin permiso de publicación externa en encargo siguiente: bundle y comandos preparados localmente.
+No valid voice: select another predefined voice of the same model and repeat QA, no cloning.
+No resolved rights: block redistribution of the asset, continue implementation.
+No accessible FLEURS: leave human control pending with evidence, do not substitute TTS labeled as human.
+No executable second model: report a partial single baseline, do not declare a complete comparison.
+No provider access: reference agent and open baselines; adapter prepared and disabled.
+No listening review: corpus clearly labeled provisional.
+No second TTS family: main analysis allowed with an explicit limitation.
+No external publication permission in the next brief: bundle and commands prepared locally.
 
-## Aspectos que el implementador debe resolver mediante pruebas
+## Aspects the implementer must resolve through testing
 
-Versiones exactas de dependencias; speaker IDs; memoria GPU y precisión; backend Voxtral; hash de voces alternativas; formato físico más compatible de FLEURS; calidad efectiva de pronunciación DE/FR.
+Exact dependency versions; speaker IDs; GPU memory and precision; Voxtral backend; hashes of alternative voices; most compatible physical format of FLEURS; effective DE/FR pronunciation quality.
 
-No requieren volver a preguntar preferencias: ejecutar smoke tests, documentar decisión y continuar. Solo los límites de cuenta, acceso, presupuesto o derechos que no se puedan resolver localmente justifican bloqueo externo.
+These do not require asking preferences again: run smoke tests, document the decision and continue. Only account, access, budget or rights limits that cannot be resolved locally justify an external blockage.

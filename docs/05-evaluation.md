@@ -1,56 +1,56 @@
-# Evaluación y metodología
+# Evaluation and methodology
 
-## Tracks separados
+## Separate tracks
 
-A. ASR: Whisper turbo y Voxtral Mini sobre audio idéntico; transcripción sin hints de entidades. Idioma explícito para ambos. Reportar WER de corpus (suma errores / suma palabras) y CER, incluyendo variantes verbales conservadoras. No confundir con promedio por clip de voice-evals.
+A. ASR: Whisper turbo and Voxtral Mini over identical audio; transcription without entity hints. Explicit language for both. Report corpus WER (sum of errors / sum of words) and CER, including conservative verbal variants. Do not confuse with the per-clip average of voice-evals.
 
-B. ASR → slots: mismo extractor fijo para ambas transcripciones. Ejecutarlo además sobre la transcripción gold: estima techo del extractor. Un extractor fallido sobre gold es fallo del sistema de evaluación, no del ASR.
+B. ASR → slots: same fixed extractor for both transcripts. Also run it over the gold transcript: it estimates the extractor ceiling. An extractor failure on gold is a failure of the evaluation system, not of the ASR.
 
-C. Audio → slots: opcional, modelo capaz de recibir audio e instrucciones; no compararlo como si fuera ASR idéntico.
+C. Audio → slots: optional, a model able to take audio plus instructions; not compared as if it were identical ASR.
 
-D. Agent slots: agente recibe audio y solicitud del campo, persiste valor mediante store_slot. Evaluar el estado final leído de su almacenamiento y eventos; palabras dichas por el agente no prueban persistencia.
+D. Agent slots: the agent receives audio and the field request, persists the value via store_slot. Evaluate the final state read from its storage and events; words spoken by the agent do not prove persistence.
 
-Implementar extractor de referencia basado en reglas limitadas y publicadas. Para nombres/direcciones usar gramática del dominio y límites de frase, sin lista gold. Añadir extractor LLM opcional con prompt/modelo fijo, temperatura y salida JSON controlada. Reportar cada sistema como combinación ASR+extractor, no atribuir sus fallos solo a ASR.
+Implement a reference extractor based on limited and published rules. For names/addresses use domain grammar and phrase boundaries, without a gold list. Add an optional LLM extractor with fixed prompt/model, temperature and controlled JSON output. Report each system as the combination ASR+extractor, not attributing its failures only to ASR.
 
-## Métricas primarias
+## Primary metrics
 
-Para N ejemplos elegibles con una entidad:
-- Exactitud de slot = ejemplos con valor correcto / N. error/timeout/vacío/no persistido cuentan incorrectos.
-- Cobertura operacional = inferencias completadas / N.
-- Exactitud condicional = correctos / completados, secundaria junto a cobertura.
-- Omisión = objetivo sin predicción / N.
-- Sustitución = objetivo presente con valor equivocado / N.
-- Salida extra = ejemplos con slots no solicitados o duplicados / N.
-- En casos de corrección, stale-value rate = estado final conserva valor previo / casos con corrección.
+For N eligible examples with one entity:
+- Slot accuracy = examples with correct value / N. error/timeout/empty/not persisted count as incorrect.
+- Operational coverage = completed inferences / N.
+- Conditional accuracy = correct / completed, secondary alongside coverage.
+- Omission = target without prediction / N.
+- Substitution = target present with wrong value / N.
+- Extra output = examples with unsolicited or duplicated slots / N.
+- In correction cases, stale-value rate = final state keeps the previous value / cases with correction.
 
-Para suites multi-slot futuras: TP con matching uno-a-uno, FP extras y valores erróneos, FN objetivos no recuperados; publicar precision/recall/F1 y exactitud de todos los slots por caso. No llamar 'alucinación' a toda sustitución: la fuente del error no se conoce solo por mismatch.
+For future multi-slot suites: TP with one-to-one matching, FP extras and wrong values, FN targets not recovered; publish precision/recall/F1 and all-slots accuracy per case. Do not call every substitution a 'hallucination': the source of the error is not known from the mismatch alone.
 
-## Resúmenes
+## Summaries
 
-Publicar conteos y scores por idioma, entidad, condición, voz, sintetizador y tipo de dificultad. Macro principal: promedio de las 12 celdas idioma×entidad, por condición. Micro y pesos disponibles. No ranking agregado entre suites o tracks incompatibles.
+Publish counts and scores by language, entity, condition, voice, synthesizer and difficulty type. Main macro: average of the 12 language×entity cells, per condition. Micro and weighting available. No aggregate ranking between incompatible suites or tracks.
 
-Degradación pareada = accuracy_clean - accuracy_telephone, en puntos porcentuales. Mostrar pares fail→pass, pass→fail, pass→pass y fail→fail. Usar misma lista de escenarios para cada comparación.
+Paired degradation = accuracy_clean − accuracy_telephone, in percentage points. Show fail→pass, pass→fail, pass→pass and fail→fail pair transitions. Use the same scenario list for each comparison.
 
-Intervalos bootstrap percentil 95%, 2000 réplicas con seed, remuestreo por scenario_id incluyendo sus variantes y modelos; estratificado por idioma×entidad. Para diferencias entre sistemas, remuestrear los mismos clusters. En control humano, cluster por speaker si disponible y avisar si solo puede hacerse por utterance.
+95% percentile bootstrap intervals, 2000 replicas with seed, resampling by scenario_id including its variants and models; stratified by language×entity. For between-system differences, resample the same clusters. In human control, cluster by speaker if available and flag if it can only be done by utterance.
 
-El CI refleja variación entre casos del corpus, no diversidad de hablantes humanos ni incertidumbre de generación. No afirmar diferencias significativas por rankings mínimos o celdas pequeñas. Reportar ausencia de diferencia concluyente.
+The CI reflects variation between corpus cases, not human speaker diversity nor generation uncertainty. Do not claim significant differences from minimal rankings or small cells. Report absence of a conclusive difference.
 
-## Fallos y QA
+## Failures and QA
 
-Elegibilidad se congela antes de inferencia. No excluir casos basándose en desempeño. Publicar generated/accepted/excluded y motivos QA. Mismos audios elegibles para todos los modelos; unsupported cuenta como fallo en suite requerida y se muestra como tal.
+Eligibility freezes before inference. Do not exclude cases based on performance. Publish generated/accepted/excluded and QA reasons. Same eligible audios for all models; unsupported counts as a failure in a required suite and is shown as such.
 
-Reportes de runs incompletos deben llevar incomplete=true y no participar del ranking de ejecución completa. Reintentos guardan resultados previos; política máximo 2 reintentos de errores transitorios, nunca buscar una respuesta correcta por ensayo repetido.
+Reports of incomplete runs must carry incomplete=true and not participate in full-run ranking. Retries preserve previous results; policy of at most 2 retries of transient errors, never hunting for a correct answer through repeated trials.
 
-## Experimentos obligatorios
+## Mandatory experiments
 
-E1 dos baselines ASR en corpus principal.
-E2 ambos ASR con extractor compartido y baseline gold→extractor.
-E3 agente de referencia con captura final, incluyendo correcciones y control negativo que retiene valor previo.
-E4 control FLEURS: WER/CER limpio vs canal, separado de entidad.
-E5 segundo TTS sobre subconjunto estratificado de 60 casos (5 por celda), si cadena de derechos/ejecución resuelta. Si no, limitación explícita de familia única y perfil preparado.
+E1 two ASR baselines on the main corpus.
+E2 both ASR with shared extractor and the gold→extractor baseline.
+E3 reference agent with captured final state, including corrections and the negative control that retains the previous value.
+E4 FLEURS control: WER/CER clean vs channel, separate from entity.
+E5 second TTS over a stratified subset of 60 cases (5 per cell), if the rights/execution chain is resolved. If not, explicit single-family limitation and prepared profile.
 
-Para agentes de proveedores reales: adaptadores condicionales con mismo contrato final, audio, preguntas y políticas. Dos configuraciones del mismo reference agent no se presentan como dos proveedores.
+For real provider agents: conditional adapters with the same final contract, audio, questions and policies. Two configurations of the same reference agent are not presented as two providers.
 
-## Informe de errores
+## Error report
 
-Clasificar digit_swap, missing_prefix, spelling_loss, accent_loss, correction_ignored, address_component_loss, format_only, extra_slot, timeout, synthesis_issue. Clasificación automática es heurística y revisable. Publicar todos los casos, con selección determinista para demo, sin escoger solo errores que favorezcan el titular.
+Classify digit_swap, missing_prefix, spelling_loss, accent_loss, correction_ignored, address_component_loss, format_only, extra_slot, timeout, synthesis_issue. Automatic classification is heuristic and revisable. Publish all cases, with deterministic selection for demo, without choosing only errors that favor the headline.

@@ -1,8 +1,8 @@
-# Arquitectura y contratos de ejecución
+# Architecture and execution contracts
 
-Python 3.11 como entorno base propuesto. Paquete src/voxentity_eu, CLI voxentity. Core: Pydantic, NumPy, SciPy, soundfile, jiwer; visualización/Parquet/HF en extras. PyTorch y cada backend en entornos separados si sus versiones chocan. Resolver locks reales durante implementación.
+Python 3.11 as the proposed base environment. Package src/voxentity_eu, CLI voxentity. Core: Pydantic, NumPy, SciPy, soundfile, jiwer; visualization/Parquet/HF in extras. PyTorch and each backend in separate environments if versions clash. Resolve real locks during implementation.
 
-## Árbol objetivo
+## Target tree
 
 - src/voxentity_eu/contracts.py, provenance.py, cli.py
 - corpus/{generate,split,validate,rights}.py
@@ -15,20 +15,20 @@ Python 3.11 como entorno base propuesto. Paquete src/voxentity_eu, CLI voxentity
 - notebooks/{generate,evaluate,reproduce}/
 - space/app.py, space/requirements.txt
 - scripts/, dataset_card/, reports/, licenses/
-- data/manifest y gold pequeños versionados; audio y resultados grandes fuera de Git.
+- data/manifest and small versioned gold; large audio and results outside Git.
 
 ## Interfaces
 
 Synthesizer.generate(text, locale, voice_id, config) → master audio + provenance.
-ASR.transcribe(audio, locale, config) → transcript/status; sin parámetros de gold.
+ASR.transcribe(audio, locale, config) → transcript/status; no gold parameters.
 SlotExtractor.extract(transcript, requested_type, locale) → slots/status.
-Agent.evaluate(audio, requested_type, locale) → transcript, eventos y estado final observable.
-Scorer.score(gold, predictions, policy) → detalles deterministas.
-Runner no importa scorer ni monta gold. Scorer no llama red.
+Agent.evaluate(audio, requested_type, locale) → transcript, events and observable final state.
+Scorer.score(gold, predictions, policy) → deterministic details.
+Runner does not import the scorer nor mount gold. Scorer does not call the network.
 
-## CLI a implementar
+## CLI to implement
 
-Estos comandos son especificación futura; todavía no funcionan:
+These commands are future specification; they do not work yet:
 
 - voxentity doctor --profile local|kaggle|hf
 - voxentity corpus build --config configs/corpus.yaml --out data/generated
@@ -45,32 +45,32 @@ Estos comandos son especificación futura; todavía no funcionan:
 - voxentity report --results PATH --out PATH
 - voxentity release validate --bundle PATH
 
-Exit: 0 operación completada, 1 gate de calidad fallido, 2 entrada/config inválida, 3 dependencia o recurso ausente. Runs parciales con errores producen reporte pero exit no cero. stdout JSON con --json; logs en stderr.
+Exit codes: 0 completed operation, 1 failed quality gate, 2 invalid input/config, 3 missing dependency or resource. Partial runs with errors produce a report but nonzero exit. stdout JSON with --json; logs on stderr.
 
-## Reanudación y caché
+## Resume and cache
 
-Clave incluye hash audio, sistema, prompt, modelo, normalización aplicable y entorno. Escribir atomicamente por clip; verificar checksum antes de reutilizar. Cambios en política invalidan caché relevante. No sobrescribir corridas distintas con mismo ID. Guardar índice de éxitos/fallos y parámetros, no solo tabla final.
+The cache key includes audio hash, system, prompt, model, applicable normalization and environment. Write atomically per clip; verify checksum before reuse. Policy changes invalidate the relevant cache. Do not overwrite different runs with the same ID. Save an index of successes/failures and parameters, not only the final table.
 
-## Agente de referencia
+## Reference agent
 
-Servidor/proceso local con interfaz audio, transcripción, extractor y sqlite o JSONL de eventos store_slot. session_id por caso, reset estricto; finalizar, leer estado mediante API independiente y exportarlo. Corrección reemplaza valor anterior. Test negativo conserva primero, test positivo conserva último. No necesita llamadas de teléfono ni cuentas externas.
+Local server/process with audio interface, transcript, extractor and sqlite or JSONL of store_slot events. session_id per case, strict reset; finish, read state via an independent API and export it. A correction replaces the previous value. Negative test keeps the first, positive test keeps the last. No phone calls or external accounts needed.
 
-Una sesión grabada prueba la persistencia observada; no implica comportamiento de otro proveedor. Adaptadores externos tienen que proporcionar observación equivalente o usar track separado de respuesta declarada.
+One recorded session proves observed persistence; it does not imply behavior of another provider. External adapters must provide equivalent observation or use a separate declared-response track.
 
-## Extractor determinista de referencia
+## Deterministic reference extractor
 
-Crear parsers DE/FR por tipo solicitado: números cardinales y secuencias de dígitos; palabras de símbolos de email; meses y componentes de calendario; alfabeto deletreado y bloques de referencia. Separar extracción de texto de canonicalización de valores. Para nombres y direcciones, admitir las construcciones lingüísticas documentadas y devolver unsupported_parse si no son interpretables, sin recurrir a lookup del gold.
+Create DE/FR parsers per requested type: cardinal numbers and digit sequences; email symbol words; months and calendar components; spelled alphabet and reference blocks. Separate text extraction from value canonicalization. For names and addresses, accept the documented linguistic constructions and return unsupported_parse if not interpretable, without resorting to gold lookup.
 
-Detectar marcadores de corrección ('pardon', 'je corrige', 'Entschuldigung', 'ich korrigiere') con reglas de ámbito: reemplazan la entidad correspondiente, no cualquier número anterior. Versionar reglas y testear negación, varias menciones y prefijos de cortesía. Estos son ejemplos de diseño, no una lista lingüística exhaustiva.
+Detect correction markers ('pardon', 'je corrige', 'Entschuldigung', 'ich korrigiere') with scope rules: they replace the corresponding entity, not any earlier number. Version the rules and test negation, multiple mentions and politeness prefixes. These are design examples, not an exhaustive linguistic list.
 
-La gramática puede conocer estructura de la tarea, pero no template_id ni entidades canónicas del caso. Templates de test pertenecen a familias reservadas; congelar parsers usando dev. Evaluar gold→parser por celda antes de las comparaciones y reportar su techo, incluso si es bajo. Una mejora basada en test exige una nueva versión y explicitar reutilización del test.
+The grammar may know task structure, but not template_id nor canonical entities of the case. Test templates belong to reserved families; freeze parsers using dev. Evaluate gold→parser per cell before comparisons and report its ceiling, even if low. A test-based improvement demands a new version and explicit statement of test reuse.
 
-## Integración voice-evals verificada
+## Verified voice-evals integration
 
-Código local inspeccionado: C:/Code Main/voice-evals, commit en research/artifacts.json. FixtureCallerVoice indexa clips por texto exacto: dos audios del mismo texto colisionarían. Crear un manifest separado por voz×condición y rechazar duplicados dentro de cada manifest.
+Local code inspected: C:/Code Main/voice-evals, commit in research/artifacts.json. FixtureCallerVoice indexes clips by exact text: two audios of the same text would collide. Create a separate manifest per voice×condition and reject duplicates within each manifest.
 
-Shape: format={sample_rate,channels,sample_width,encoding}, clips=[{text,file,sha256,provenance}], note. WAV/PCM admitidos; no hace resampling silencioso. Exportar audio telefónico derivado explícitamente a 16 kHz para transporte compatible, manteniendo original 8 kHz y ambos hashes. Upsampling no restaura banda ancha.
+Shape: format={sample_rate,channels,sample_width,encoding}, clips=[{text,file,sha256,provenance}], note. WAV/PCM supported; no silent resampling. Export the derived telephone audio explicitly at 16 kHz for compatible transport, keeping the original 8 kHz and both hashes. Upsampling does not restore bandwidth.
 
-Replay usa id, scenario{name,expected_outcome}, ground_truth_transcript y observaciones disponibles. Exportar outcome solo cuando se leyó estado; no fabricar timings. required_facts por substring no sustituye nuestro scorer de entidades. Entregar resultados de VoxEntity en sidecar.
+Replay uses id, scenario{name,expected_outcome}, ground_truth_transcript and available observations. Export outcome only when state was read; do not fabricate timings. required_facts by substring does not replace our entity scorer. Deliver VoxEntity results in a sidecar.
 
-El repo nuevo conserva independencia; voice-evals es integración opcional, con versión fijada y contract test real.
+The new repo keeps independence; voice-evals is an optional integration, with pinned version and a real contract test.
