@@ -171,7 +171,56 @@ real scoring bug, someone adding a system to `runs/`.
 > WER on human speech too. Code, reports, dataset card and a CPU
 > demo: https://huggingface.co/datasets/Gjusev/voxentity-eu.
 
-### Short social post (X/LinkedIn, same body)
+### LinkedIn post (link in first comment; X uses the shorter body below)
+
+> A transcript can read perfectly and still carry the wrong phone number.
+>
+> +33 6 05 36 23 71 came back as +33 6 75 36 23 71. The text looked fine.
+> The number was wrong, and every downstream form inherited it.
+>
+> That failure is what VoxEntity-EU measures: exact spoken-entity capture in
+> German and French. Names, phone numbers, emails, dates, addresses,
+> reference codes. One wrong character fails the slot.
+>
+> Setup: 180 synthetic scenarios (Qwen3-TTS), each recorded clean and
+> through a simulated 8 kHz telephone channel. 120 independent test
+> scenarios per system, n=240 scored items each, same extractor for every
+> system.
+>
+> Exact capture, 95% CI:
+>
+> Whisper large-v3-turbo: 34.2% [28.3, 40.4]
+> Voxtral Mini 3B: 37.1% [30.0, 43.8]
+> Written-text ceiling: 90.8% [87.5, 94.2]
+>
+> The two ASR families are statistically indistinguishable. That is a null
+> result and it is published as one.
+>
+> Where it breaks: emails reach 0 to 20% per language and system. The
+> simulated phone line alone costs Whisper 5 points [+0.8, +10.0]. When a
+> second TTS family (Piper) voices the same scenarios, scores move +10
+> points [+4.2, +15.4], so every absolute number here is
+> synthesizer-conditional and published per family.
+>
+> One honest scar: my first extractor version produced a wrong headline
+> conclusion. I retracted it publicly and the changelog documents what was
+> measured wrong.
+>
+> Status: synthetic speech, simulated channel, automated QA only. No human
+> listening review yet, so the corpus is provisional. Everything rescores on
+> a CPU with no network.
+>
+> Link in the first comment.
+>
+> #ASR #SpeechRecognition
+
+First comment:
+
+> Repo: https://github.com/Gjusev/voxentity-eu
+> Dataset (audio included): https://huggingface.co/datasets/Gjusev/voxentity-eu
+> Listen to real failures: https://huggingface.co/spaces/Gjusev/voxentity-eu-results
+
+### Short social post (X, same substance)
 
 > A transcript can read fine and still get your phone number wrong. VoxEntity-EU:
 > open DE/FR benchmark for exact entity capture (names, phones, emails,
