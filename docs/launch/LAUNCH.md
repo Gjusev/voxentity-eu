@@ -223,6 +223,73 @@ First comment:
 > Dataset (audio included): https://huggingface.co/datasets/Gjusev/voxentity-eu
 > Listen to real failures: https://huggingface.co/spaces/Gjusev/voxentity-eu-results
 
+### LinkedIn post, short version (preferred; same first comment)
+
+> A transcript can read fine and still carry the wrong phone number.
+>
+> The caller said +33 6 05 36 23 71. On a simulated phone line, Whisper wrote
+> +33 6 75 36 23 71. One digit, and any form that stores it now holds a wrong
+> number.
+>
+> VoxEntity-EU measures that failure. Does a speech model capture a dictated
+> name, phone number, email, date, address or reference code exactly, in
+> German and French? One wrong character fails the slot.
+>
+> 120 synthetic test scenarios, each clean and through a simulated phone
+> line, 240 scored items per model:
+>
+> Whisper large-v3-turbo: 34.2% [28.3, 40.4]
+> Voxtral Mini 3B: 37.1% [30.0, 43.8]
+> Same extractor on the correct text: 90.8%
+>
+> Emails land at 0 to 20%.
+>
+> Read the numbers with one caveat: the speech is synthetic (Qwen3-TTS), and
+> a second TTS scores 10 points higher, so absolute values depend on the
+> synthesizer. Review so far is automated QA plus my own listening spot
+> check, so the corpus stays provisional.
+>
+> Code, data with audio and a results browser where you can hear each
+> failure are open. Links in the first comment.
+>
+> Which entity breaks your voice pipeline first?
+>
+> #SpeechRecognition #ASR
+
+### Hugging Face post (huggingface.co/posts; links allowed in the body)
+
+> Released VoxEntity-EU v0.1.0, an open benchmark for exact spoken-entity
+> capture in German and French: names, phone numbers, emails, dates, postal
+> addresses, reference codes.
+>
+> The metric is exact slot match, not WER. A phone number with one wrong digit
+> counts as a failure.
+>
+> Test split: 120 synthetic scenarios × (clean 16 kHz + simulated 8 kHz
+> telephone) = 240 items per system, same extractor for every system,
+> stratified bootstrap 95% CIs.
+>
+> - openai/whisper-large-v3-turbo: 34.2% [28.3, 40.4]
+> - mistralai/Voxtral-Mini-3B-2507: 37.1% [30.0, 43.8]
+> - correct text through the same extractor (ceiling): 90.8% [87.5, 94.2]
+> - the phone line costs Whisper +5.0 pp [+0.8, +10.0]
+> - emails: 0 to 20% per language and system
+> - the same scenarios voiced by Piper instead of Qwen3-TTS: +10.0 pp
+>   [+4.2, +15.4], so absolute numbers depend on the synthesizer
+>
+> Status: provisional. Synthetic speech (Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice),
+> simulated channel, automated QA plus a maintainer listening spot check; no
+> systematic per-clip review yet.
+>
+> Dataset (1,864 WAVs, gold, frozen predictions, checksums):
+> https://huggingface.co/datasets/Gjusev/voxentity-eu
+> Listen to every scored case:
+> https://huggingface.co/spaces/Gjusev/voxentity-eu-results
+> Code, CPU-only rescoring: https://github.com/Gjusev/voxentity-eu
+>
+> To add your model: run it on the exported inputs (no gold), score with
+> `voxentity score`, open an issue with the template. Scorer criticism welcome.
+
 ### Short social post (X, same substance)
 
 > A transcript can read fine and still get your phone number wrong. VoxEntity-EU:
