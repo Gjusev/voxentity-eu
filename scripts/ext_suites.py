@@ -41,10 +41,30 @@ def _transcripts(p: dict[str, Path]) -> dict[str, str | None]:
 
 
 def codeswitch() -> int:
+    return _single_audio_suite("codeswitch", (
+        "# Extension: code-switching (DE/FR with English pieces)\n\n"
+        "Separate suite, not part of the core 180 scenarios: 56 scenarios (16 dev / 40 test), "
+        "emails with English separators, phone digits in English, NATO spelling in German, "
+        "non-DE/FR names. Synthetic speech (Qwen3-TTS), clean + simulated telephone, automated QA only. "
+        f"Whisper large-v3-turbo through extractor {EXTRACTOR_VERSION} (frozen before this suite's ASR "
+        "scoring; its rules come from this suite's dev split only). Test N = 40 scenarios x 2 conditions.\n\n"))
+
+
+def es() -> int:
+    return _single_audio_suite("es", (
+        "# Extension: Spanish (es-ES)\n\n"
+        "Separate suite, not part of the core DE/FR corpus: 90 scenarios (30 dev / 60 test), same six "
+        "entity types and difficulty mix as the core. Synthetic speech (Qwen3-TTS voices serena/dylan, "
+        "language 'spanish'), clean + simulated telephone, automated QA only. Whisper large-v3-turbo "
+        f"(language 'spanish') through extractor {EXTRACTOR_VERSION}, whose Spanish rules were tuned on "
+        "the Spanish dev split only, before any Spanish audio existed. Test N = 60 scenarios x 2 conditions.\n\n"))
+
+
+def _single_audio_suite(suite: str, intro: str) -> int:
     from voxentity_eu.cli import main as cli_main
     from voxentity_eu.reporting.render import render_report
 
-    p = _paths("codeswitch")
+    p = _paths(suite)
     scored = p["runs"] / "scored"
     build_asr_slots_run(p["runs"] / "whisper-turbo", p["inputs"], p["runs"] / "whisper-turbo-slots")
     build_gold_extractor_run(p["gold"], p["manifest"], p["inputs"], p["runs"] / "gold-extractor")
@@ -56,14 +76,6 @@ def codeswitch() -> int:
             return rc
     out = p["report"] / "report.md"
     render_report(scored, p["gold"], out)
-    intro = (
-        "# Extension: code-switching (DE/FR with English pieces)\n\n"
-        "Separate suite, not part of the core 180 scenarios: 56 scenarios (16 dev / 40 test), "
-        "emails with English separators, phone digits in English, NATO spelling in German, "
-        "non-DE/FR names. Synthetic speech (Qwen3-TTS), clean + simulated telephone, automated QA only. "
-        f"Whisper large-v3-turbo through extractor {EXTRACTOR_VERSION} (frozen before this suite's ASR "
-        "scoring; its rules come from this suite's dev split only). Test N = 40 scenarios x 2 conditions.\n\n"
-    )
     body = out.read_text(encoding="utf-8").split("\n", 1)[1]
     write_text_atomic(out, intro + body)
     print(out)
@@ -255,5 +267,5 @@ def piper() -> int:
 
 
 if __name__ == "__main__":
-    suites = {"codeswitch": codeswitch, "multiturn": multiturn, "voices": voices, "piper": piper}
+    suites = {"codeswitch": codeswitch, "es": es, "multiturn": multiturn, "voices": voices, "piper": piper}
     sys.exit(suites[sys.argv[1]]())

@@ -1,0 +1,17 @@
+{
+ "text": "Mi número de teléfono es más tres cuatro seis uno dos, tres cuatro cinco, seis siete ocho.",
+ "trials": [
+  {
+   "voice": "serena",
+   "file": "es_serena.wav",
+   "seconds": 6.88,
+   "whisper": "Mi número de teléfono es más 34612-345678."
+  },
+  {
+   "voice": "dylan",
+   "file": "es_dylan.wav",
+   "seconds": 9.28,
+   "whisper": "Mi número de teléfono es más 34612345678."
+  }
+ ]
+}
