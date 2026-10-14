@@ -6,21 +6,33 @@ semantics and that no pair leaks between dev and test.
 
 from __future__ import annotations
 
+import json
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 from ..contracts import AudioRecord, Scenario
 from ..scoring.normalize import canonical_form
 
 
-def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
+def validate_corpus(
+    scenarios: list[Scenario], *, expected_total: int | None = None, mention_exempt: frozenset[str] = frozenset()
+) -> dict[str, Any]:
+    """expected_total: an extension suite's own declared size, replacing the core
+    layout checks (cells of 15, 5/10 split, difficulty mix); content checks always run.
+    mention_exempt: scenario ids that legitimately restate no value (multi-turn confirmations)."""
+
     errors: list[str] = []
     warnings: list[str] = []
+    locales_present = sorted({s.locale for s in scenarios})
+    if expected_total is not None:
+        if len(scenarios) != expected_total:
+            errors.append(f"suite declares {expected_total} scenarios, found {len(scenarios)}")
+        return _content_checks(scenarios, locales_present, errors, warnings, mention_exempt)
 
     # --- counts
     # suite layout: main = 180 (de+fr), es = 90; every locale contributes
     # 6 cells x 15 cases
-    locales_present = sorted({s.locale for s in scenarios})
     expected_total = 15 * 6 * len(locales_present)
     if len(scenarios) != expected_total:
         errors.append(f"expected {expected_total} scenarios for locales {locales_present}, found {len(scenarios)}")
@@ -64,7 +76,10 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
             expected = {"direct": 5, "tricky": 4, "segmented": 3, "correction": 3}
             if dict(buckets) != expected:
                 errors.append(f"{locale}/{entity}: difficulty mix {dict(buckets)} != {expected}")
+    return _content_checks(scenarios, locales_present, errors, warnings, mention_exempt)
 
+
+def _content_checks(scenarios, locales_present, errors, warnings, mention_exempt) -> dict[str, Any]:
     # --- unique scenario ids
     ids = [s.scenario_id for s in scenarios]
     if len(set(ids)) != len(ids):
@@ -117,7 +132,7 @@ def validate_corpus(scenarios: list[Scenario]) -> dict[str, Any]:
         else:
             if s.previous_mentions:
                 errors.append(f"{s.scenario_id}: previous_mentions only allowed for corrections")
-            if s.entities[0].mention_text not in s.written_text:
+            if s.scenario_id not in mention_exempt and s.entities[0].mention_text not in s.written_text:
                 errors.append(f"{s.scenario_id}: mention_text not part of written_text")
 
     # --- synthesis text must be fully verbalized: phones say 'Plus', never '+'
@@ -133,7 +148,14 @@ def cli_validate(manifest_path: str, gold_path: str) -> dict[str, Any]:
     from ..contracts import read_jsonl
 
     scenarios = list(read_jsonl(gold_path, Scenario))
-    report = validate_corpus(scenarios)
+    suite_manifest = Path(gold_path).parent.parent / "corpus_manifest.json"
+    declared = json.loads(suite_manifest.read_text(encoding="utf-8")) if suite_manifest.exists() else {}
+    if declared.get("suite") in (None, "es"):  # core layout (es mirrors it per locale)
+        report = validate_corpus(scenarios)
+    else:
+        expected = declared.get("total_scenarios") or declared.get("scenarios") or declared.get("turn_audios_clean")
+        exempt = frozenset(s.scenario_id for s in scenarios if "_confirmation_" in s.template_family and "-t2-" in s.scenario_id)
+        report = validate_corpus(scenarios, expected_total=expected, mention_exempt=exempt)
 
     try:
         audio = list(read_jsonl(manifest_path, AudioRecord))

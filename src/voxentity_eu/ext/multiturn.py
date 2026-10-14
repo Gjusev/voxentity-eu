@@ -109,14 +109,14 @@ def vehicle_scenarios(cases: list[MultiTurnCase]) -> list[Scenario]:
 
     out = []
     for c in cases:
-        for t in c.turns:
+        for t, label in zip(c.turns, (c.first, c.final), strict=True):  # value each turn carries
             out.append(Scenario.model_validate({
                 "schema_version": SCHEMA_VERSION, "scenario_id": t.scenario_id, "split": c.split,
                 "locale": c.locale, "entity_type": c.entity_type,
                 "template_family": f"mt_{c.locale[:2]}_{c.kind}_{c.split}",
                 "difficulty_tags": ["direct"], "written_text": t.written_text,
                 "synthesis_text": t.synthesis_text,
-                "entities": [c.final.model_dump()], "previous_mentions": [],
+                "entities": [label.model_dump()], "previous_mentions": [],
                 "seed": int(sha256_text(t.scenario_id)[:8], 16),
             }))
     return out

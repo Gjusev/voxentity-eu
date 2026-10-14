@@ -221,3 +221,13 @@ def test_summary_counts(corpus):
     assert summary["total_scenarios"] == 180
     assert summary["splits"] == {"dev": 60, "test": 120}
     assert set(summary["per_cell"].values()) == {15}
+
+
+def test_extension_suite_validation_uses_declared_size():
+    from voxentity_eu.corpus.validate import validate_corpus
+    from voxentity_eu.ext.codeswitch import build_scenarios
+
+    cs = build_scenarios()
+    assert validate_corpus(cs, expected_total=len(cs))["errors"] == []
+    assert any("declares" in e for e in validate_corpus(cs[:-1], expected_total=len(cs))["errors"])
+    assert validate_corpus(cs)["errors"]  # the strict core layout still rejects a non-core suite
