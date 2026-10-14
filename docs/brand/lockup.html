@@ -6,10 +6,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500;600&family=IBM+Plex+Mono:wght@500&display=block" rel="stylesheet">
 <style>
-  :root { --ground:#fcfcfb; --ink:#0b0b0b; --muted:#898781; --err:#eb6834; }
+  :root { --ground:#fcfcfb; --ink:#0b0b0b; --muted:#76746f; --err:#eb6834; } /* muted darkened for AA on light */
   body { margin:0; background:transparent; font-family:"IBM Plex Sans", sans-serif; }
   .theme-dark { --ground:#1a1a19; --ink:#f0efec; --muted:#a3a19a; --err:#d95926; }
-  .lockup { display:inline-flex; align-items:center; gap:22px; padding:28px 40px; background:var(--ground); }
+  .lockup { display:inline-flex; align-items:center; gap:22px; padding:28px 40px; background:transparent; } /* transparent: sits on GitHub light or dark */
   .lockup svg { width:84px; height:84px; display:block; }
   .ink { fill:none; stroke:var(--ink); stroke-width:5; stroke-linecap:square; }
   .bar { fill:var(--ink); } .err { fill:var(--err); }
