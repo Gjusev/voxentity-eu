@@ -170,7 +170,28 @@ tienen por tanto exposición limitada a test y así se declaran.
 - LICENSE Apache-2.0 oficial, DATA_LICENSE, THIRD_PARTY_NOTICES, dataset
   card, CONTRIBUTING, validador de bundle (secretos + checksums + derechos).
 - Publicación externa NO ejecutada (pendiente de autorización): comandos
-  preparados en README y scripts.
+  preparados en PUBLISHING.md (tier 1 sin audio sintético / tier 2 bloqueado
+  por decisión de derechos) y plan en docs/launch/LAUNCH.md.
+
+### Gates de entrega (docs/10), ejecutados sobre el commit final
+
+| gate | estado | evidencia |
+| --- | --- | --- |
+| G1 contratos | OK | pytest (todos verdes, incl. import de todos los módulos), ruff, check_links |
+| G2 derechos | OK con audio sintético bloqueado | registro: S04/S05/S06/S16 verified; S03 (salida Qwen) y piper conditional con evidencia; bundle sin audio |
+| G3 corpus | OK | `corpus validate`: núcleo 180, codeswitch 56, multiturn 96, voices 240, piper 120, es 90; 0 errores |
+| G4 evaluación | OK | `scripts/release_gates.py`: 5 runs del núcleo 240/240, completos, cobertura 100% |
+| G5 honestidad | OK | barrido de afirmaciones prohibidas; sintético/simulado/provisional/N en README, card, informes, Space y figura |
+| G6 reproducción | OK | regeneración offline de núcleo + 5 extensiones byte-idéntica (`reports/release_gates.md`) |
+| G7 producto | OK | Space probado en navegador en modo completo y tier 1 (sin audio) |
+| G8 publicación | PENDIENTE por diseño | no hay URLs reales hasta publicar; notices y dataset card coinciden con el bundle |
+
+Hallazgos de esta pasada, corregidos: 4 suites de extensión fallaban la
+validación (validador asumía el layout del núcleo) y 40 etiquetas de turno
+multi-turn eran incorrectas; `ext/codeswitch.py` roto desde el refactor ES
+(nadie lo importaba; nuevo test de imports); `license_url` de S03 apuntaba a
+un LICENSE inexistente; PUBLISHING.md subía audio sintético en contra del
+registro de derechos; borradores de lanzamiento con afirmaciones excesivas.
 
 ## Auditoría adversa
 
