@@ -192,25 +192,66 @@ y «rex-2». Una revisión posterior detectó que el techo rex-2 era circular
   requiere autorización explícita.
 
 
-## Extensión es-ES (rama ext-es, fase texto completada)
+## Extensiones (suites separadas; nunca mezcladas con las tablas del núcleo)
 
-- Suite separada de 90 escenarios (6 celdas x 15; 5/4/3/3; 30 dev / 60 test)
-  en `data/ext/es/` con manifiesto propio. Hash del corpus ES:
-  `fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701`.
-- Corpus principal DE/FR verificado byte-idéntico tras el rebase sobre main
-  (test de regresión compara cada fila; hash b7513367... intacto).
-- rex-4 extendido con reglas ES (techo dev 30/30 en forma hablada Y escrita);
-  comportamiento de/fr sin cambios (suite completa del par en verde).
-- Verbalización/pools/plantillas ES con diccionarios por locale (sin caer
-  silenciosamente en la rama francesa); alfabeto radiotelefónico español
-  documentado; teléfonos +34 de 9 dígitos sin cero troncal; direcciones
-  calle-primero con sufijo bis.
-- Tests: 4 ficheros ES (verbalize/normalize/slots/corpus) + regresión de
-  bytes del corpus principal.
+Todas: habla sintética, canal telefónico simulado, sólo QA automática,
+Whisper large-v3-turbo → extractor rex-4 (congelado antes de puntuar ASR en
+cada suite; sus reglas salen de dev). Datos en `data/ext/<suite>/`, informes
+en `reports/ext-<suite>/`, scoring CPU con `python scripts/ext_suites.py <suite>`.
 
-### Pendiente (bloqueo coordinado)
+### Code-switching (`codeswitch`): COMPLETADO
 
-- GPU ocupada con las otras suites: síntesis Qwen3-TTS de los 90 escenarios,
-  canal telefónico, Whisper y scoring quedan a la espera. Qwen3-TTS
-  anuncia español; verificar con smoke de 1 clip por voz (serena/dylan)
-  antes de la corrida completa.
+- 56 escenarios DE/FR (16 dev / 40 test) con separadores y dígitos en inglés,
+  alfabeto OTAN en alemán y nombres no DE/FR; valores disjuntos del núcleo.
+- rex-3 congelado fallaba 16/56 sobre el texto escrito correcto; rex-4 corrige
+  los fallos de dev (marcadores de corrección por palabra completa: «manon»
+  se cortaba en «non»; dot/underscore/dash y dígitos en inglés; apellidos O';
+  «double vé»/«i grec»). Núcleo: 0 cambios en 720 predicciones.
+- Test: whisper 31.2% [22.5, 38.8] frente a techo escrito 65.0% [55.0, 75.0];
+  teléfonos con dígitos en inglés 70%; email y nombres limitados por el
+  extractor (techo 20-40%).
+
+### Correcciones entre turnos (`multiturn`): COMPLETADO
+
+- 48 casos DE/FR x 2 turnos (misma voz): corrección (valor casi idéntico),
+  confirmación, repetición; 96 clips, 0 fallos; whisper 192/192.
+- Test (n=64): estado final 42.2% [29.7, 54.7]; techo con texto gold 100%.
+  0 valores obsoletos; 19/19 correcto cuando ambos turnos se extraen bien:
+  la persistencia funciona y la pérdida es percepción. 2 cambios espurios
+  reales (una repetición mal oída sobrescribió un valor correcto).
+- Regla de resultado corregida antes de publicar: un turno 1 mal oído que el
+  turno 2 no toca es valor erróneo, no cambio espurio (la primera pasada
+  etiquetó 8 mal); test que fija la regla.
+
+### Más voces (`voices`): COMPLETADO
+
+- Motivo (análisis de cobertura): en el núcleo dylan supera a serena en ~10 pp
+  con ambos ASR, pero voz y escenario estaban confundidos.
+- Los 120 escenarios test con vivian y ryan (240 clips, 0 fallos, 480 QA ok,
+  whisper 480/480). vivian − ryan pareado +0.8 pp [−3.3, +5.0]. El hueco
+  serena/dylan se reparte en ~3 pp de dificultad de escenario y ~7 pp de voz.
+
+### Segunda familia TTS (`piper`): COMPLETADO
+
+- Gate: research/second-tts-gate.md. Voces Piper fijadas (thorsten CC0,
+  siwis CC BY 4.0 verificada en la licencia del dataset); runtime GPL en venv
+  aislado, no dependencia del paquete. 120/120 sintetizados, 240 QA ok,
+  whisper 240/240.
+- Qwen − Piper pareado −10.0 pp [−15.4, −4.2] (Piper 44.2% vs 34.2%);
+  teléfonos 15% → 70% (DE) y 55% (FR); emails ~0% con ambos. Las cifras
+  absolutas del núcleo dependen del sintetizador (advertido en README).
+
+### Español (`es`): EN CURSO
+
+- Suite de 90 escenarios (30 dev / 60 test) en `data/ext/es/generated/`,
+  hash `fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701`.
+  Fase texto hecha en rama ext-es por la otra instancia y verificada aquí de
+  forma independiente (suite verde; 0 cambios en 720 predicciones del núcleo
+  y 0/112 de code-switching con su extractor); fusionada fast-forward.
+- Smoke Qwen3-TTS español superado (serena y dylan; ida y vuelta Whisper
+  exacta). Síntesis, canal, QA y Whisper en ejecución.
+
+### Proveedores comerciales: BLOQUEADO
+
+- Requiere proveedor y presupuesto explícitos (AGENTS.md: este encargo no
+  autoriza inferencia de pago). No iniciado.
