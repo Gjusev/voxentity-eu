@@ -16,6 +16,7 @@ from typing import Any
 import gradio as gr
 
 ROOT = Path(__file__).resolve().parent  # audio paths in results.json are relative to here
+AUDIO_PUBLISHED = (ROOT / "audio").is_dir()  # tier-1 deploys exclude audio/ (PUBLISHING.md)
 RESULTS = ROOT / "results.json"
 PER_PAGE = 10
 ENTITIES = ["person_name", "phone", "email", "calendar_value", "postal_address", "reference_code"]
@@ -71,7 +72,8 @@ def case_view(case_id: str | None) -> tuple[str, str | None, str | None]:
 - **Captured slot:** `{c.get('predicted_value') or '(none)'}` ({'correct' if c['correct'] else 'INCORRECT: ' + (c.get('error_taxonomy') or 'error')})
 - **{'Gold text fed to the extractor (control, no ASR)' if c['system'].startswith('gold-') else 'System transcript'}:** {c.get('transcript') or '(none)'}
 - **Difficulty:** {', '.join(c.get('difficulty_tags', []))}"""
-    if (c["audio_clean"] and not _audio(c["audio_clean"])) or (c["audio_telephone"] and not _audio(c["audio_telephone"])):
+    if AUDIO_PUBLISHED and ((c["audio_clean"] and not _audio(c["audio_clean"]))
+                            or (c["audio_telephone"] and not _audio(c["audio_telephone"]))):
         details += "\n\n**Audio file missing from this bundle.**"
     return details, _audio(c["audio_clean"]), _audio(c["audio_telephone"])
 
@@ -115,10 +117,17 @@ def build_ui() -> gr.Blocks:
     with gr.Blocks(title="VoxEntity-EU results") as demo:
         gr.Markdown(
             "# VoxEntity-EU: measured spoken-entity capture (DE/FR)\n"
-            "Synthetic speech corpus with a simulated telephone channel; a separate "
+            "Synthetic speech corpus (automated QA only, no human listening review yet) with a "
+            "simulated telephone channel; a separate "
             "human-speech control is reported in the technical report. All numbers are "
             "precalculated from frozen runs; nothing is generated or inferred here."
         )
+        if not AUDIO_PUBLISHED:
+            gr.Markdown(
+                "**Audio is not part of this deployment:** redistribution of the synthetic clips "
+                "awaits a rights decision. Gold values, transcripts and scores are complete; the "
+                "audio can be regenerated locally from the published text and pinned models."
+            )
         if not CASES:
             gr.Markdown(f"**Empty state:** {DATA.get('empty_reason', 'no results')}. "
                         "This Space shows measured results only and refuses placeholders.")

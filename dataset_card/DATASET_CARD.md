@@ -98,5 +98,8 @@ audio CC-BY-4.0 with modifications flagged.
   production readiness, or generalization to unseen human accents. The corpus
   is small by design (a diagnostic, not a leaderboard); null results are
   published as results.
+- Absolute accuracies depend on the synthesizer: the same test scenarios
+  synthesized by a second TTS family (Piper) scored +10 pp higher with the same
+  ASR. Treat numbers as conditional on Qwen3-TTS, not as properties of speech.
 - The 360 files are 180 paired observations, not independent samples;
   uncertainty is reported with cluster bootstrap over scenario ids.

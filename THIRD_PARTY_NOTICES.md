@@ -60,9 +60,11 @@ cards / repositories at the revisions pinned below (rights registry:
 
 - Source: https://github.com/Gjusev/voice-evals
 - Commit inspected: 3f6f9dd6412cbbaf8842405d6444fb2d74b8790e (local checkout)
+- License: Apache-2.0 (LICENSE at the pinned commit, confirmed against the raw
+  file and the GitHub license API).
 - Integration: optional export adapter producing `FixtureCallerVoice`-compatible
-  manifests; the upstream repository is never modified. License text to be
-  confirmed in the pinned contract test; the integration stays optional and
+  manifests; the upstream repository is never modified and nothing from it is
+  redistributed in the release bundle. The integration stays optional and
   isolated (core scoring works without it).
 
 ## Python dependencies

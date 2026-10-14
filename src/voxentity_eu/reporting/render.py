@@ -56,7 +56,9 @@ def render_report(results_dir: Path, scenarios_path: Path, out_path: Path) -> di
     lines.append(
         "Synthetic speech, simulated telephone channel. All numbers come from "
         "frozen prediction files; corpus-level provisional status is tracked in "
-        "IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files."
+        "IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files. Absolute accuracies "
+        "depend on the synthesizer: on the same core test scenarios a second TTS family (Piper) "
+        "scored +10 pp higher (reports/ext-piper/report.md)."
     )
     lines.append("")
 
