@@ -27,9 +27,19 @@ Implement an `Asr` adapter (see `adapters/base.py`), pin the model revision in
 `SYSTEMS`, and run through the exported inputs. Smoke-test one clip per
 locale before a full run. Report the run as system+extractor, never ASR alone.
 
+## Submitting a system's predictions (no code needed)
+
+Run your system over the exported inputs only (`data/inputs/inputs.jsonl` plus
+audio; opaque ids, no gold), write one `predictions.jsonl` row per input in the
+contract of `docs/04-contracts.md`, and score it with
+`voxentity score --gold data/generated/gold/scenarios.jsonl --predictions <file>
+--manifest data/generated/audio_manifest.jsonl --out <scored.json>`. Open a
+"Submit a system" issue with the predictions, the scored file and the exact
+model id + revision. Missing or failed rows stay in the denominator.
+
 ## Corrections and policies
 
-Normalization and extractor rules are versioned (`norm-1`, `rex-1`). Changes
+Normalization and extractor rules are versioned (currently `norm-2`, `rex-4`; history in CHANGELOG.md). Changes
 require a new version and re-freezing on dev before test comparisons. Gold is
 never edited to match a prediction.
 
@@ -37,5 +47,7 @@ never edited to match a prediction.
 
 ```
 python -m pytest          # offline CPU suite, no torch/network needed
-python -m ruff check src tests scripts
+python -m ruff check .
+python scripts/check_links.py
+python scripts/release_gates.py   # G4 run integrity + G6 offline regeneration
 ```

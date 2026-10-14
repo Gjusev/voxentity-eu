@@ -29,8 +29,9 @@ simulated-telephone audio.*
 The hook that travels: **both ASR families tested capture barely a third of
 entities exactly (34.2% / 37.1%, overlapping CIs) against a 91% written-text
 ceiling, and emails fail almost completely (0–20% in all three languages
-tested)**. Voice agents that "sound fine" still lose the address. That is a
-concrete, honest, verifiable claim from `reports/report.md`.
+tested)**. A transcript that reads fine can still carry the wrong digit. That is
+a concrete, verifiable claim from `reports/report.md`; it is about the two ASR
+systems measured, not about any commercial voice agent.
 
 Secondary hooks, each its own future announcement (see Ongoing):
 
@@ -39,7 +40,7 @@ Secondary hooks, each its own future announcement (see Ongoing):
 - Multi-turn corrections: state persistence works (19/19 when both turns are
   heard); the loss is perception, not memory.
 - Same scenarios, second TTS family: +10 pp. Corpus numbers are synthesizer-
-  conditional — a caution the field under-reports.
+  conditional; we publish both families side by side.
 
 ## Audiences (in priority order)
 
@@ -69,6 +70,12 @@ Secondary hooks, each its own future announcement (see Ongoing):
 - **P0 Internal (done).** Gates G1–G6 green with evidence
   (`reports/release_gates.md`); adversarial audit closed; bundle validates;
   notebook reproduces byte-identical numbers from the bundle.
+- **P0.5 Private reproduction (alpha).** Entry: P0. The owner shares the repo
+  privately with 2–3 people who know speech evaluation and asks one thing: run
+  `notebooks/reproduce/reproduce.ipynb` from a clean checkout and try to break
+  the scorer. Exit: at least one independent reproduction reports identical
+  numbers, and every reported problem is fixed or documented. (Invitations are
+  the owner's; nothing is sent from this repository's tooling.)
 - **P1 Repo public.** Entry: tier-1 gates re-run green on the exact commit to
   be pushed. Action: `gh repo create` (PUBLISHING.md §Tier 1). Verify the
   clone builds and tests pass from a clean checkout.
@@ -92,6 +99,36 @@ Secondary hooks, each its own future announcement (see Ongoing):
 
 Tier-2 (synthetic audio) is not a launch phase; it unlocks only by the
 owner's recorded rights decision (PUBLISHING.md §Tier 2).
+
+## Owned capture (what a visit turns into)
+
+No email list or blog, by choice. For a benchmark the conversion is a contribution:
+
+- GitHub Discussions on, with a pinned "Reproductions" thread (post your numbers,
+  matching or not) and a "Submit a system" issue template that points to
+  CONTRIBUTING.md (predictions only, never gold; same scorer).
+- HF dataset "Community" tab for data questions; the Space links back to both.
+- Every rented/borrowed post ends with one link: the repo README.
+
+## Launch assets
+
+- `reports/figures/cell_accuracy.svg` rendered to PNG for social cards (the SVG
+  is the source; re-render if numbers change).
+- One Space screenshot in the no-audio configuration, showing a real error case.
+- The README results table as the single source of quoted numbers.
+
+## Deliberately not used
+
+- Product Hunt: consumer/SaaS audience, launch-day ranking dynamics; a research
+  benchmark gains nothing from it.
+- Paid promotion, cold outreach, influencer pitches: out of scope (AGENTS.md).
+
+## Ongoing cadence
+
+Scale the announcement to the change (skill matrix): a new measured suite or
+system = its own short post (P5); scorer/extractor versions (rex-N, norm-N) =
+CHANGELOG.md entry plus a note in the report; fixes = CHANGELOG only. Each
+announcement re-runs the gates first.
 
 ## Metrics (no targets, no dates)
 
@@ -124,20 +161,21 @@ real scoring bug, someone adding a system to `runs/`.
 >
 > Everything is CPU-reproducible from frozen predictions (checksums in the
 > release bundle; a notebook regenerates every table offline). Human-speech
-> control (FLEURS, CC-BY) reported separately: telephone simulation nearly
-> doubles WER on human speech too. Code, reports, dataset card and a CPU
+> control (FLEURS, CC-BY; likely seen in ASR training, so a channel check, not a
+> generalization test) reported separately: telephone simulation nearly doubles
+> WER on human speech too. Code, reports, dataset card and a CPU
 > demo: <links after P2 verification>.
 
 ### Short social post (X/LinkedIn, same body)
 
-> Voice agents sound fluent — and still lose your phone number. VoxEntity-EU:
+> A transcript can read fine and still get your phone number wrong. VoxEntity-EU:
 > open DE/FR benchmark for exact entity capture (names, phones, emails,
 > dates, addresses, codes). 120 independent synthetic test scenarios × clean
 > + simulated telephone. Result: Whisper 34%, Voxtral 37% exact capture vs a
 > 91% ceiling; emails ≈ 0–20% in all 3 languages we tested. Provisional
 > (automated QA). CPU-reproducible, data + demo: <links>.
 
-### Reddit (r/MachineLearning, flair: Project/Finder) — opening text
+### Reddit (r/MachineLearning, title prefixed `[P]`) — opening text
 
 > We built a benchmark for the boring but decisive part of voice interfaces:
 > whether the system captures exact values (phone numbers, emails, names,
@@ -170,7 +208,9 @@ real scoring bug, someone adding a system to `runs/`.
 
 - [ ] All PUBLISHING.md gates green on the exact commit to be pushed.
 - [ ] `hf` / `gh` namespaces confirmed (`voxentity doctor --profile hf`,
-      `gh auth status` — done 2026-10: gh=Gjusev, hf=Gjusev).
+      `gh auth status`): verified read-only in this session: GitHub `Gjusev`
+      (scopes repo, workflow; `Gjusev/voxentity-eu` free), HF `Gjusev` (dataset and
+      Space names return 404-equivalent 401 = not existing).
 - [ ] Drafts re-checked against the final published numbers (regenerate
       reports and re-quote; do not carry numbers across report changes).
 - [ ] Guardrails section above re-read immediately before posting anything.
