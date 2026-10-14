@@ -123,6 +123,9 @@ No email list or blog, by choice. For a benchmark the conversion is a contributi
   is the source; re-render if numbers change).
 - One Space screenshot in the no-audio configuration, showing a real error case.
 - The README results table as the single source of quoted numbers.
+- `docs/media/voxentity-eu-social-4x5.mp4`: 18.5 s, 1080×1350 social cut for the
+  LinkedIn feed (upload natively; use `voxentity-eu-social-4x5-thumb.jpg` as the
+  thumbnail). Source: `brag-output/social-4x5/`. Status line stays on screen throughout.
 
 ## Deliberately not used
 

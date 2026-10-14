@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1350" />
+<title>VoxEntity-EU: reads fine, wrong number (social 4:5)</title>
+<script src="assets/vendor/gsap.min.js"></script>
+<style>
+  @font-face { font-family: "Plex Sans"; src: url("assets/fonts/IBMPlexSans-var.woff2") format("woff2"); font-weight: 100 700; }
+  @font-face { font-family: "Plex Mono"; src: url("assets/fonts/IBMPlexMono-500.woff2") format("woff2"); font-weight: 500; }
+  @font-face { font-family: "Plex Mono"; src: url("assets/fonts/IBMPlexMono-600.woff2") format("woff2"); font-weight: 600; }
+  /* brand dark variant (docs/brand/lockup.html); orange stays reserved for errors */
+  :root { --ground:#1a1a19; --ink:#f0efec; --ink2:#cfcdc6; --muted:#a3a19a; --line:#3a3936; --err:#eb6834; --sig:#2a78d6; --sig2:#7fb0ee; }
+  html, body { margin:0; width:1080px; height:1350px; overflow:hidden; background:var(--ground); }
+  body { color:var(--ink); font-family:"Plex Sans", sans-serif; }
+  #root { position:relative; width:100%; height:100%; overflow:hidden; background:var(--ground); }
+  .clip { position:absolute; inset:0; }
+  .pad { position:absolute; left:84px; right:84px; top:0; bottom:0; }
+  .label { font:500 28px/1.2 "Plex Mono", monospace; color:var(--muted); }
+  .mono { font-family:"Plex Mono", monospace; font-weight:600; font-variant-numeric:tabular-nums; }
+  .err { color:var(--err); }
+
+  /* background: the slot brackets from the mark, oversized */
+  #ghost { position:absolute; left:-60px; top:95px; width:1200px; height:1160px; opacity:0.12; }
+  #ghost path { fill:none; stroke:var(--ink); stroke-width:1.6; stroke-linecap:square; }
+
+  /* persistent chrome */
+  #brand { position:absolute; top:62px; left:84px; display:flex; align-items:center; gap:16px; font-size:30px; font-weight:600; letter-spacing:-0.02em; }
+  #brand svg { width:46px; height:46px; display:block; }
+  #brand span { color:var(--muted); font-weight:500; }
+  #langs { position:absolute; top:72px; right:84px; font:500 26px/1 "Plex Mono", monospace; color:var(--muted); }
+  #status { position:absolute; left:84px; right:84px; bottom:62px; font:500 24px/1.3 "Plex Sans", sans-serif; color:var(--muted); }
+  #progress { position:absolute; left:0; bottom:0; width:1080px; height:6px; background:var(--ink); opacity:0.3; transform-origin:left center; }
+  .mk-ink { fill:none; stroke:var(--ink); stroke-width:5; stroke-linecap:square; }
+  .mk-bar { fill:var(--ink); } .mk-err { fill:var(--err); }
+
+  /* scene 1: the hook */
+  #s1-glow { position:absolute; left:-80px; top:360px; width:1080px; height:520px; background:radial-gradient(closest-side, rgba(235,104,52,0.55), rgba(235,104,52,0)); opacity:0; }
+  #s1-said-label { position:absolute; top:250px; left:0; }
+  #s1-said { position:absolute; top:296px; left:0; font-size:78px; line-height:1; }
+  #s1-under { position:absolute; top:384px; left:0; width:47px; height:8px; background:var(--err); transform-origin:left center; }
+  #s1-cap-label { position:absolute; top:470px; left:0; }
+  #s1-slot { position:absolute; top:516px; left:0; display:flex; align-items:center; font-size:78px; line-height:1; }
+  #s1-slot .br { font-weight:500; }
+  #s1-slot .ch { display:inline-block; white-space:pre; }
+  #s1-slot .gstack { display:inline-grid; }
+  #s1-slot { white-space:nowrap; }
+  .gstack > span { grid-area:1 / 1; }
+  .gbase { z-index:2; }
+  .gcopy { z-index:1; opacity:0; mix-blend-mode:screen; }
+  .gcopy.warm { color:var(--err); } .gcopy.cool { color:var(--sig); }
+  #s1-h1 { position:absolute; top:740px; left:0; font-size:116px; font-weight:600; letter-spacing:-0.035em; line-height:1; }
+  #s1-h2 { position:absolute; top:872px; left:0; font-size:116px; font-weight:600; letter-spacing:-0.035em; line-height:1; color:var(--err); }
+
+  /* scene 2: three captures */
+  #s2-title { position:absolute; top:230px; left:0; font-size:64px; font-weight:600; letter-spacing:-0.03em; line-height:1.1; }
+  #s2-sub { position:absolute; top:318px; left:0; font:500 26px/1.2 "Plex Mono", monospace; color:var(--muted); }
+  .row { position:absolute; left:0; right:0; border-top:2px solid var(--line); padding-top:22px; }
+  .row .val { margin-top:18px; font-size:66px; line-height:1; }
+  .row .none { margin-top:18px; font:500 50px/1 "Plex Mono", monospace; color:var(--muted); }
+  #r1 { top:430px; } #r2 { top:640px; } #r3 { top:850px; }
+  .gap { display:inline-block; width:0.6em; height:0.78em; border:5px solid var(--err); box-sizing:border-box; vertical-align:-0.06em; }
+
+  /* scene 3: bars */
+  #s3-title { position:absolute; top:220px; left:0; font-size:76px; font-weight:600; letter-spacing:-0.035em; line-height:1; }
+  #s3-sub { position:absolute; top:316px; left:0; font:500 30px/1.25 "Plex Sans", sans-serif; color:var(--ink2); }
+  .col { position:absolute; top:0; width:240px; height:100%; }
+  #c1 { left:0; } #c2 { left:336px; } #c3 { left:672px; }
+  .bar { position:absolute; left:35px; width:170px; bottom:270px; transform-origin:50% 100%; }
+  #c1 .bar { height:212px; background:var(--sig); }
+  #c2 .bar { height:230px; background:var(--sig2); }
+  #c3 .bar { height:563px; background:var(--ink); }
+  .num { position:absolute; left:0; width:240px; text-align:center; font-size:60px; line-height:1; }
+  #c1 .num { top:788px; } #c2 .num { top:770px; } #c3 .num { top:437px; }
+  .cname { position:absolute; top:1100px; left:0; width:240px; text-align:center; font-size:30px; font-weight:600; line-height:1.1; }
+  .cci { position:absolute; top:1142px; left:0; width:240px; text-align:center; font:500 24px/1 "Plex Mono", monospace; color:var(--muted); }
+  #s3-base { position:absolute; top:1080px; left:0; right:0; height:3px; background:var(--line); transform-origin:left center; }
+
+  /* scene 4: emails */
+  #s4-label { position:absolute; top:330px; left:0; font:500 34px/1.2 "Plex Mono", monospace; color:var(--muted); }
+  #s4-big { position:absolute; top:400px; left:0; font-size:190px; font-weight:600; letter-spacing:-0.045em; line-height:1; color:var(--err); }
+  #s4-sub, #s4-sub2 { position:absolute; left:0; right:0; font-size:44px; font-weight:500; line-height:1.25; letter-spacing:-0.015em; }
+  #s4-sub { top:640px; } #s4-sub2 { top:710px; color:var(--ink2); }
+
+  /* scene 5: another synthetic voice */
+  #s5-label { position:absolute; top:260px; left:0; right:0; font-size:52px; font-weight:600; letter-spacing:-0.03em; line-height:1.12; }
+  .vrow { position:absolute; left:0; right:0; display:flex; align-items:baseline; justify-content:space-between; border-top:2px solid var(--line); padding-top:24px; }
+  .vrow .vname { font-size:44px; font-weight:600; letter-spacing:-0.02em; }
+  .vrow .vname small { display:block; margin-top:6px; font:500 24px/1 "Plex Mono", monospace; color:var(--muted); }
+  .vrow .vnum { font-size:110px; line-height:1; }
+  #v1 { top:450px; } #v2 { top:640px; }
+  #s5-delta { position:absolute; top:850px; left:0; font-size:76px; line-height:1; }
+  #s5-delta small { font:500 30px/1 "Plex Mono", monospace; color:var(--muted); margin-left:14px; }
+  #s5-sub2 { position:absolute; top:1008px; left:0; right:0; font-size:36px; font-weight:600; line-height:1.3; }
+  #s5-sub { position:absolute; top:960px; left:0; right:0; font-size:36px; font-weight:500; line-height:1.3; color:var(--ink2); }
+
+  /* scene 6: lockup */
+  #s6-center { position:absolute; left:0; right:0; top:0; bottom:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #s6-lockup { display:flex; align-items:center; gap:30px; }
+  #s6-mark { width:150px; height:150px; display:block; }
+  #s6-word { font-size:92px; font-weight:600; letter-spacing:-0.04em; line-height:1; }
+  #s6-word span { color:var(--muted); font-weight:500; }
+  #s6-line { margin-top:60px; font-size:48px; font-weight:500; letter-spacing:-0.02em; }
+  #s6-url { margin-top:24px; font:500 32px/1 "Plex Mono", monospace; color:var(--ink2); }
+  #s6-open { margin-top:18px; font-size:30px; color:var(--muted); }
+  #s6-credit { position:absolute; left:0; right:0; bottom:118px; text-align:center; font:500 24px/1 "Plex Sans", sans-serif; color:var(--muted); }
+</style>
+</head>
+<body>
+<div data-hf-id="hf-he95" id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1350" data-duration="18.5">
+
+  <!-- background + persistent chrome -->
+  <div data-hf-id="hf-ohwh" id="bg" class="clip" data-start="0" data-duration="18.5" data-track-index="0">
+    <svg data-hf-id="hf-cmyp" id="ghost" viewBox="0 0 64 64" preserveAspectRatio="none" aria-hidden="true"><path data-hf-id="hf-vfp9" d="M17 9.5H9.5V54.5H17"/><path data-hf-id="hf-qv5f" d="M47 9.5H54.5V54.5H47"/></svg>
+    <div data-hf-id="hf-w4z1" id="status">Synthetic speech (Qwen3-TTS) · simulated phone line · provisional</div>
+    <div data-hf-id="hf-o6ww" id="progress"></div>
+  </div>
+  <div data-hf-id="hf-m4wy" id="chrome" class="clip" data-start="0" data-duration="15.27" data-track-index="5">
+    <div data-hf-id="hf-nv54" id="brand"><svg data-hf-id="hf-ha7k" viewBox="0 0 64 64" aria-hidden="true"><path data-hf-id="hf-k149" class="mk-ink" d="M17 9.5H9.5V54.5H17"/><path data-hf-id="hf-po1j" class="mk-ink" d="M47 9.5H54.5V54.5H47"/><rect data-hf-id="hf-n2nl" class="mk-bar" x="19.5" y="24" width="4" height="16"/><rect data-hf-id="hf-gavx" class="mk-bar" x="26.5" y="17" width="4" height="30"/><rect data-hf-id="hf-lyqx" class="mk-err" x="33.5" y="27" width="4" height="22"/><rect data-hf-id="hf-f3ep" class="mk-bar" x="40.5" y="26" width="4" height="12"/></svg><div data-hf-id="hf-pko2">VoxEntity<span data-hf-id="hf-7ope">-EU</span></div></div>
+    <div data-hf-id="hf-19t6" id="langs">DE · FR</div>
+  </div>
+
+  <section data-hf-id="hf-lsze" id="s1" class="clip" data-start="0" data-duration="4.364" data-track-index="1">
+    <div data-hf-id="hf-1xgy" id="s1-wrap" class="pad">
+      <div data-hf-id="hf-4z5d" id="s1-glow"></div>
+      <div data-hf-id="hf-jej6" id="s1-said-label" class="label">The caller said</div>
+      <div data-hf-id="hf-mj2t" id="s1-said" class="mono">+33 6 <span data-hf-id="hf-adjn" class="d0">0</span>5 36 23 71</div>
+      <div data-hf-id="hf-uoy8" id="s1-under"></div>
+      <div data-hf-id="hf-k4f7" id="s1-cap-label" class="label">Whisper heard (simulated phone line)</div>
+      <div data-hf-id="hf-obi0" id="s1-slot" class="mono"><span data-hf-id="hf-rxlz" class="br" id="s1-bl">[</span><span data-hf-id="hf-6pey" id="s1-chars"></span><span data-hf-id="hf-vttz" class="br" id="s1-br">]</span></div>
+      <div data-hf-id="hf-5jo6" id="s1-h1">Reads fine.</div>
+      <div data-hf-id="hf-eiz4" id="s1-h2">Wrong number.</div>
+    </div>
+  </section>
+
+  <section data-hf-id="hf-9rrk" id="s2" class="clip" data-start="4.364" data-duration="2.182" data-track-index="1">
+    <div data-hf-id="hf-y7d7" id="s2-wrap" class="pad">
+      <div data-hf-id="hf-f2r4" id="s2-title">Same call. Three captures.</div>
+      <div data-hf-id="hf-p8jc" id="s2-sub">test-fr-phone-010 · real outputs</div>
+      <div data-hf-id="hf-ilt9" id="r1" class="row"><div data-hf-id="hf-z1ki" class="label">Whisper · clean audio</div><div data-hf-id="hf-jovr" class="none">nothing captured</div></div>
+      <div data-hf-id="hf-mjxa" id="r2" class="row"><div data-hf-id="hf-phsp" class="label">Whisper · phone line</div><div data-hf-id="hf-n4yk" class="val mono">+33 6 <span data-hf-id="hf-9ewj" class="err">7</span>5 36 23 71</div></div>
+      <div data-hf-id="hf-qi1b" id="r3" class="row"><div data-hf-id="hf-j13w" class="label">Voxtral Mini · clean and phone line</div><div data-hf-id="hf-7z6c" class="val mono">+33 6 <span data-hf-id="hf-p0yb" class="gap"></span>5 36 23 71</div></div>
+    </div>
+  </section>
+
+  <section data-hf-id="hf-6hhx" id="s3" class="clip" data-start="6.546" data-duration="4.364" data-track-index="1">
+    <div data-hf-id="hf-ilw8" id="s3-wrap" class="pad">
+      <div data-hf-id="hf-vqd3" id="s3-title">Exact capture</div>
+      <div data-hf-id="hf-5bsg" id="s3-sub">240 scored items per model · German and French</div>
+      <div data-hf-id="hf-m03o" id="c1" class="col"><div data-hf-id="hf-ufsv" class="bar"></div><div data-hf-id="hf-wlm9" class="num mono" id="n1">0.0%</div><div data-hf-id="hf-vgos" class="cname">Whisper turbo</div><div data-hf-id="hf-98q2" class="cci">[28.3, 40.4]</div></div>
+      <div data-hf-id="hf-unzj" id="c2" class="col"><div data-hf-id="hf-c51b" class="bar"></div><div data-hf-id="hf-57ja" class="num mono" id="n2">0.0%</div><div data-hf-id="hf-9r0z" class="cname">Voxtral Mini</div><div data-hf-id="hf-j3wh" class="cci">[30.0, 43.8]</div></div>
+      <div data-hf-id="hf-qpvi" id="c3" class="col"><div data-hf-id="hf-bqqa" class="bar"></div><div data-hf-id="hf-yggf" class="num mono" id="n3">0.0%</div><div data-hf-id="hf-67y3" class="cname">Correct text</div><div data-hf-id="hf-kwa2" class="cci">ceiling</div></div>
+      <div data-hf-id="hf-dfcf" id="s3-base"></div>
+    </div>
+  </section>
+
+  <section data-hf-id="hf-7qb4" id="s4" class="clip" data-start="10.91" data-duration="2.182" data-track-index="1">
+    <div data-hf-id="hf-vyu9" id="s4-wrap" class="pad">
+      <div data-hf-id="hf-pdgm" id="s4-label">Emails captured exactly</div>
+      <div data-hf-id="hf-nxrb" id="s4-big" class="mono">0 to 20%</div>
+      <div data-hf-id="hf-bsp8" id="s4-sub">per language and model.</div>
+      <div data-hf-id="hf-mrer" id="s4-sub2">Phone numbers: 10 to 25%.</div>
+    </div>
+  </section>
+
+  <section data-hf-id="hf-d419" id="s5" class="clip" data-start="13.092" data-duration="2.182" data-track-index="1">
+    <div data-hf-id="hf-m4ni" id="s5-wrap" class="pad">
+      <div data-hf-id="hf-xpw1" id="s5-label">Same scenarios, another synthetic voice</div>
+      <div data-hf-id="hf-fe5n" id="v1" class="vrow"><div data-hf-id="hf-49ex" class="vname">Qwen3-TTS<small data-hf-id="hf-phta">Whisper turbo</small></div><div data-hf-id="hf-mgsj" class="vnum mono">34.2%</div></div>
+      <div data-hf-id="hf-4io0" id="v2" class="vrow"><div data-hf-id="hf-y63r" class="vname">Piper<small data-hf-id="hf-ltv6">Whisper turbo</small></div><div data-hf-id="hf-pdlc" class="vnum mono" id="n5">34.2%</div></div>
+      <div data-hf-id="hf-jcyk" id="s5-delta" class="mono">+10.0 pp<small data-hf-id="hf-49ry">[+4.2, +15.4]</small></div>
+      <div data-hf-id="hf-byvt" id="s5-sub">Absolute numbers depend on the synthesizer.</div>
+      <div data-hf-id="hf-pa5m" id="s5-sub2">We publish both.</div>
+    </div>
+  </section>
+
+  <section data-hf-id="hf-rd5q" id="s6" class="clip" data-start="15.274" data-duration="3.226" data-track-index="1">
+    <div data-hf-id="hf-smio" id="s6-center">
+      <div data-hf-id="hf-w38x" id="s6-lockup">
+        <svg data-hf-id="hf-xj4r" id="s6-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <path data-hf-id="hf-pxtz" id="m-bl" class="mk-ink" d="M17 9.5H9.5V54.5H17"/>
+          <path data-hf-id="hf-9ghb" id="m-br" class="mk-ink" d="M47 9.5H54.5V54.5H47"/>
+          <rect data-hf-id="hf-j69e" id="m-b1" class="mk-bar" x="19.5" y="24" width="4" height="16"/>
+          <rect data-hf-id="hf-qqg9" id="m-b2" class="mk-bar" x="26.5" y="17" width="4" height="30"/>
+          <rect data-hf-id="hf-nmds" id="m-b3" class="mk-err" x="33.5" y="27" width="4" height="22"/>
+          <rect data-hf-id="hf-vw47" id="m-b4" class="mk-bar" x="40.5" y="26" width="4" height="12"/>
+        </svg>
+        <div data-hf-id="hf-y0pn" id="s6-word">VoxEntity<span data-hf-id="hf-pmom">-EU</span></div>
+      </div>
+      <div data-hf-id="hf-sz8c" id="s6-line">Scores the slot, not the words.</div>
+      <div data-hf-id="hf-d995" id="s6-url">github.com/Gjusev/voxentity-eu</div>
+      <div data-hf-id="hf-z4hd" id="s6-open">Open data, audio and code</div>
+    </div>
+    <div data-hf-id="hf-mhjw" id="s6-credit">Music: ende.app (CC BY 4.0)</div>
+  </section>
+
+  <audio data-hf-id="hf-sgmh" id="music" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3" data-start="0" data-duration="18.5" data-track-index="2" data-volume="0.4"
+    data-automation='{"version":1,"lanes":[{"target":"volume","points":[{"t":0,"v":0},{"t":0.3,"v":0.4},{"t":17.2,"v":0.4},{"t":18.45,"v":0}]}]}'></audio>
+  <audio data-hf-id="hf-1b0t" id="sfx-k1" src="assets/sfx/keypress-001.wav" data-start="1.00" data-duration="0.19" data-track-index="3" data-volume="0.35"></audio>
+  <audio data-hf-id="hf-uda7" id="sfx-k2" src="assets/sfx/keypress-002.wav" data-start="1.20" data-duration="0.19" data-track-index="3" data-volume="0.35"></audio>
+  <audio data-hf-id="hf-ukel" id="sfx-k3" src="assets/sfx/keypress-003.wav" data-start="1.40" data-duration="0.19" data-track-index="3" data-volume="0.35"></audio>
+  <audio data-hf-id="hf-gmia" id="sfx-k4" src="assets/sfx/keypress-001.wav" data-start="1.60" data-duration="0.19" data-track-index="3" data-volume="0.35"></audio>
+  <audio data-hf-id="hf-v9iz" id="sfx-err" src="assets/sfx/error_005.ogg" data-start="2.18" data-duration="0.5" data-track-index="4" data-volume="0.6"></audio>
+  <audio data-hf-id="hf-3h5y" id="sfx-h1" src="assets/sfx/click_003.ogg" data-start="2.73" data-duration="0.01" data-track-index="3" data-volume="0.5"></audio>
+  <audio data-hf-id="hf-lkxe" id="sfx-h2" src="assets/sfx/click_003.ogg" data-start="3.27" data-duration="0.01" data-track-index="3" data-volume="0.55"></audio>
+  <audio data-hf-id="hf-cwri" id="sfx-r1" src="assets/sfx/click_003.ogg" data-start="4.46" data-duration="0.01" data-track-index="3" data-volume="0.45"></audio>
+  <audio data-hf-id="hf-vrv7" id="sfx-r2" src="assets/sfx/click_003.ogg" data-start="4.91" data-duration="0.01" data-track-index="3" data-volume="0.45"></audio>
+  <audio data-hf-id="hf-fk0t" id="sfx-r3" src="assets/sfx/click_003.ogg" data-start="5.37" data-duration="0.01" data-track-index="3" data-volume="0.45"></audio>
+  <audio data-hf-id="hf-i5sb" id="sfx-ceil" src="assets/sfx/click_003.ogg" data-start="8.73" data-duration="0.01" data-track-index="3" data-volume="0.55"></audio>
+  <audio data-hf-id="hf-11pk" id="sfx-mail" src="assets/sfx/click_003.ogg" data-start="10.95" data-duration="0.01" data-track-index="3" data-volume="0.55"></audio>
+  <audio data-hf-id="hf-gsva" id="sfx-delta" src="assets/sfx/click_003.ogg" data-start="14.18" data-duration="0.01" data-track-index="3" data-volume="0.55"></audio>
+  <audio data-hf-id="hf-iqha" id="sfx-drop" src="assets/sfx/drop_001.ogg" data-start="15.82" data-duration="0.11" data-track-index="4" data-volume="0.55"></audio>
+</div>
+
+<script>
+document.fonts.ready.then(() => {
+  // underline the dictated digit that was misheard, measured from the real glyph
+  const d0 = document.querySelector("#s1-said .d0");
+  const under = document.getElementById("s1-under");
+  under.style.left = d0.offsetLeft + "px";
+  under.style.width = d0.offsetWidth + "px";
+
+  // real Whisper capture on the phone-line audio; index 6 is the 0 heard as 7
+  const captured = "+33 6 75 36 23 71";
+  const host = document.getElementById("s1-chars");
+  captured.split("").forEach((c, i) => {
+    if (i === 6) {
+      const g = document.createElement("span");
+      g.className = "ch gstack"; g.id = "wrong";
+      g.innerHTML = '<span class="gcopy warm" aria-hidden="true">7</span><span class="gcopy cool" aria-hidden="true">7</span><span class="gbase">7</span>';
+      host.appendChild(g);
+      return;
+    }
+    const s = document.createElement("span");
+    s.className = "ch";
+    s.textContent = c;
+    host.appendChild(s);
+  });
+
+  const tl = gsap.timeline({ paused: true });
+  const E = "power4.out";
+  const B = 0.5455; // one beat of the music bed (110 BPM); scene cuts sit on bar lines
+
+  // background: slow drift + progress line
+  tl.fromTo("#ghost", { scale: 1, rotation: 0 }, { scale: 1.06, rotation: 1.5, duration: 18.5, ease: "none" }, 0);
+  tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 18.5, ease: "none" }, 0);
+  tl.fromTo(["#brand", "#langs", "#status"], { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.05);
+
+  // scene 1: the number, the capture, the one wrong digit
+  tl.fromTo("#s1-said-label", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.35, ease: E }, 0.08);
+  tl.fromTo("#s1-said", { opacity: 0, scale: 1.3, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.45, ease: E }, 0.16);
+  tl.fromTo("#s1-cap-label", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.35, ease: E }, 0.72);
+  tl.fromTo("#s1-slot .br", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 0.82);
+  tl.fromTo("#s1-chars .ch", { opacity: 0, y: -26 }, { opacity: 1, y: 0, duration: 0.1, stagger: 0.045, ease: E }, 0.95);
+
+  // the wrong digit lands on the downbeat: glitch burst, brackets and source digit turn orange
+  const T = 4 * B; // 2.182
+  const glitchHash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const copies = gsap.utils.toArray("#wrong .gcopy");
+  [[T, 0.22], [T + 0.42, 0.14]].forEach(([start, dur]) => {
+    const amp = { a: 0 };
+    tl.set(copies, { opacity: 0.9 }, start);
+    tl.fromTo(amp, { a: 1 }, { a: 0, duration: dur, ease: "power3.in", onUpdate: () => {
+      const step = Math.floor(tl.time() / 0.033);
+      copies.forEach((el, layer) => {
+        gsap.set(el, { x: (glitchHash(step * 13 + layer * 7) * 2 - 1) * 16 * amp.a, y: (glitchHash(step * 29 + layer * 11) * 2 - 1) * 6 * amp.a });
+      });
+    } }, start);
+    tl.set(copies, { x: 0, y: 0, opacity: 0 }, start + dur);
+  });
+  tl.fromTo("#wrong .gbase", { color: "#f0efec" }, { color: "#eb6834", duration: 0.05 }, T);
+  tl.fromTo(["#s1-bl", "#s1-br", "#s1-said .d0"], { color: "#f0efec" }, { color: "#eb6834", duration: 0.12 }, T);
+  tl.fromTo("#s1-under", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.25, ease: E }, T + 0.05);
+  tl.fromTo("#s1-glow", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.3, ease: E }, T);
+  tl.to("#s1-glow", { opacity: 0.45, duration: 1.4, ease: "sine.inOut" }, T + 0.3);
+  tl.fromTo("#s1-slot", { x: 0 }, { keyframes: [{ x: -12, duration: 0.04 }, { x: 10, duration: 0.05 }, { x: -6, duration: 0.05 }, { x: 0, duration: 0.06 }] }, T);
+
+  // kinetic slams on the next two beats
+  tl.fromTo("#s1-h1", { opacity: 0, scale: 1.5, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 5 * B);
+  tl.fromTo("#s1-h2", { opacity: 0, x: 140 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, 6 * B);
+  tl.to("#s1-wrap", { opacity: 0, y: -70, duration: 0.18, ease: "power2.in" }, 8 * B - 0.18);
+
+  // scene 2: three captures, one per beat
+  const S2 = 8 * B;
+  tl.fromTo("#s2-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: E }, S2);
+  tl.fromTo("#s2-sub", { opacity: 0 }, { opacity: 1, duration: 0.25 }, S2 + 0.1);
+  ["#r1", "#r2", "#r3"].forEach((r, i) => {
+    tl.fromTo(r, { opacity: 0, x: 160 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, S2 + 0.1 + i * 0.455);
+  });
+  tl.to("#s2-wrap", { opacity: 0, x: -90, duration: 0.18, ease: "power2.in" }, 12 * B - 0.18);
+
+  // scene 3: bars grow from the baseline, ceiling lands on the bar line
+  const S3 = 12 * B;
+  tl.fromTo("#s3-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.35, ease: E }, S3);
+  tl.fromTo("#s3-sub", { opacity: 0 }, { opacity: 1, duration: 0.3 }, S3 + 0.15);
+  tl.fromTo("#s3-base", { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: E }, S3 + 0.1);
+  tl.fromTo(".cname, .cci", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.04, ease: E }, S3 + 0.3);
+  const grow = (col, num, value, at) => {
+    tl.fromTo(col + " .bar", { scaleY: 0 }, { scaleY: 1, duration: 0.9, ease: E }, at);
+    tl.fromTo(col + " .num", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: E }, at + 0.1);
+    const c = { v: 0 };
+    tl.fromTo(c, { v: 0 }, { v: value, duration: 0.9, ease: E, onUpdate: () => { document.getElementById(num).textContent = c.v.toFixed(1) + "%"; } }, at);
+  };
+  grow("#c1", "n1", 34.2, S3 + 0.55);
+  grow("#c2", "n2", 37.1, S3 + 0.75);
+  grow("#c3", "n3", 90.8, 16 * B);
+  tl.fromTo("#c3 .num", { scale: 1 }, { keyframes: [{ scale: 1.15, duration: 0.12 }, { scale: 1, duration: 0.25, ease: "back.out(2)" }] }, 16 * B + 0.9);
+  tl.to("#s3-wrap", { opacity: 0, y: -70, duration: 0.18, ease: "power2.in" }, 20 * B - 0.18);
+
+  // scene 4: emails
+  const S4 = 20 * B;
+  tl.fromTo("#s4-label", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: E }, S4);
+  tl.fromTo("#s4-big", { opacity: 0, scale: 1.6, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, S4 + 0.05);
+  tl.fromTo(["#s4-sub", "#s4-sub2"], { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.35, ease: E }, S4 + 2 * B);
+  tl.to("#s4-wrap", { opacity: 0, x: -90, duration: 0.18, ease: "power2.in" }, 24 * B - 0.18);
+
+  // scene 5: same scenarios, another synthesizer
+  const S5 = 24 * B;
+  tl.fromTo("#s5-label", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, ease: E }, S5);
+  tl.fromTo("#v1", { opacity: 0, x: 140 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, S5 + 0.15);
+  tl.fromTo("#v2", { opacity: 0, x: 140 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, S5 + 0.5);
+  const p = { v: 34.2 };
+  tl.fromTo(p, { v: 34.2 }, { v: 44.2, duration: 0.7, ease: E, onUpdate: () => { document.getElementById("n5").textContent = p.v.toFixed(1) + "%"; } }, S5 + 0.7);
+  tl.fromTo("#s5-delta", { opacity: 0, scale: 1.4, transformOrigin: "0% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 26 * B);
+  tl.fromTo(["#s5-sub", "#s5-sub2"], { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: E }, 26 * B + 0.25);
+  tl.to("#s5-wrap", { opacity: 0, y: -70, duration: 0.18, ease: "power2.in" }, 28 * B - 0.18);
+
+  // scene 6: the mark assembles; the orange bar drops on the beat
+  const S6 = 28 * B;
+  tl.fromTo(["#m-bl", "#m-br"], { strokeDasharray: 60, strokeDashoffset: 60 }, { strokeDashoffset: 0, duration: 0.45, ease: E }, S6 + 0.02);
+  tl.fromTo(["#m-b1", "#m-b2", "#m-b4"], { scaleY: 0, transformOrigin: "50% 100%" }, { scaleY: 1, duration: 0.3, stagger: 0.06, ease: E }, S6 + 0.2);
+  tl.fromTo("#m-b3", { y: -46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: "back.out(2.4)" }, S6 + B);
+  tl.fromTo("#s6-word", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.4, ease: E }, S6 + 0.65);
+  tl.fromTo("#s6-line", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: E }, S6 + 2 * B);
+  tl.fromTo("#s6-url", { opacity: 0 }, { opacity: 1, duration: 0.35 }, S6 + 3 * B);
+  tl.fromTo(["#s6-open", "#s6-credit"], { opacity: 0 }, { opacity: 1, duration: 0.35 }, S6 + 3 * B + 0.2);
+
+  window.__timelines["main"] = tl;
+});
+</script>
+</body>
+</html>

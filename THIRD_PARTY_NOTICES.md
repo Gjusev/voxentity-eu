@@ -69,7 +69,7 @@ cards / repositories at the revisions pinned below (rights registry:
 
 ## Demo video and brand assets
 
-Used in `brag-output/composition/` (the demo source) and `docs/brand/`, `docs/media/`:
+Used in `brag-output/composition/` and `brag-output/social-4x5/` (the demo sources) and `docs/brand/`, `docs/media/`:
 
 - IBM Plex Sans and IBM Plex Mono (IBM), SIL Open Font License 1.1, from Google
   Fonts; bundled as woff2 for the offline render.

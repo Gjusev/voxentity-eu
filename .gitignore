@@ -43,9 +43,14 @@ runs_ext_*.log
 .venv-piper/
 *.log
 brag-output/composition/.hyperframes/
+brag-output/social-4x5/.hyperframes/
 brag-output/*.mp4
 brag-output/*.jpg
 .playwright-mcp/
 # demo composition assets are small, licensed (CC BY 4.0 / CC0) and needed to re-render
 !brag-output/composition/assets/music/*.mp3
 !brag-output/composition/assets/sfx/*.wav
+!brag-output/social-4x5/assets/music/*.mp3
+!brag-output/social-4x5/assets/sfx/*.wav
+brag-output/*/.thumbnails/
+brag-output/*/.waveform-cache/
