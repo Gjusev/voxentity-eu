@@ -2,6 +2,7 @@
 language:
   - de
   - fr
+  - es
 license:
   - apache-2.0
   - cc-by-4.0
@@ -67,6 +68,21 @@ per-audio provenance (synthesis and transform records with hashes).
 `dev` exists to freeze extractors and policies; `test` is the reporting split.
 Public availability of test references may contaminate future ASR models.
 
+## Extension suites (separate configs, never merged into the core tables)
+
+Under `ext/<suite>/` (gold, manifests, provenance) with their own reports:
+
+- `codeswitch`: 56 DE/FR scenarios with English separators/digits, NATO
+  spelling in German and non-DE/FR names.
+- `multiturn`: 48 DE/FR two-turn cases (correction, confirmation, repeat);
+  scored on the agent's persisted final state.
+- `voices`: the 120 core test scenarios re-voiced by two more Qwen3-TTS voices.
+- `piper`: the 120 core test scenarios synthesized by a second TTS family
+  (Piper; French voice trained on CC BY 4.0 SIWIS data, attribution required).
+- `es`: 90 Spanish scenarios with the core entity types and difficulty mix.
+
+All are synthetic, with the simulated telephone channel and automated QA only.
+
 ## Licenses and attribution
 
 See DATA_LICENSE.md and THIRD_PARTY_NOTICES.md: annotations CC-BY-4.0;
@@ -76,7 +92,8 @@ audio CC-BY-4.0 with modifications flagged.
 ## Intended use and limitations
 
 - Intended: evaluation of exact spoken-entity capture (transcription,
-  extraction, and persisted-slot perspectives) in German and French.
+  extraction, and persisted-slot perspectives) in German and French; Spanish
+  as a separate extension suite.
 - NOT intended: claims about real caller populations, causal hiring impact,
   production readiness, or generalization to unseen human accents. The corpus
   is small by design (a diagnostic, not a leaderboard); null results are
