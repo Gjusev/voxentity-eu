@@ -11,7 +11,7 @@
   "hf_dataset": {
    "url": "https://huggingface.co/datasets/Gjusev/voxentity-eu",
    "visibility": "public, not gated",
-   "revision": "d1c7727129d0d83bfe204436eee6cf1cf65accca",
+   "revision": "57e448b146fc18ba48a3bd426ee8c91018548381",
    "contents": "release bundle (gold, manifests, predictions, reports, checksums) + 1864 WAV: core 360, human control 300, codeswitch 112, multiturn 192, voices 480, piper 240, es 180",
    "integrity": "anonymous download: 25 random bundle files and 12 audio files (clean + telephone per suite) match recorded SHA-256"
   },

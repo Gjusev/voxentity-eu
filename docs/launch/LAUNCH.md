@@ -70,21 +70,26 @@ Secondary hooks, each its own future announcement (see Ongoing):
 - **P0 Internal (done).** Gates G1–G6 green with evidence
   (`reports/release_gates.md`); adversarial audit closed; bundle validates;
   notebook reproduces byte-identical numbers from the bundle.
-- **P0.5 Private reproduction (alpha).** Entry: P0. The owner shares the repo
+- **P0.5 Private reproduction (alpha): skipped by owner decision** (went public
+  directly). Its goal moves to P4: ask early readers for reproductions.
+  Original plan: Entry: P0. The owner shares the repo
   privately with 2–3 people who know speech evaluation and asks one thing: run
   `notebooks/reproduce/reproduce.ipynb` from a clean checkout and try to break
   the scorer. Exit: at least one independent reproduction reports identical
   numbers, and every reported problem is fixed or documented. (Invitations are
   the owner's; nothing is sent from this repository's tooling.)
-- **P1 Repo public.** Entry: tier-1 gates re-run green on the exact commit to
+- **P1 Repo public (done; CI green on first run).** Entry: tier-1 gates re-run green on the exact commit to
   be pushed. Action: `gh repo create` (PUBLISHING.md §Tier 1). Verify the
   clone builds and tests pass from a clean checkout.
-- **P2 Dataset + Space public.** Entry: P1 verified; dataset card matches the
+- **P2 Dataset + Space public (done, with audio; verified logged out, see
+  RELEASE_MANIFEST.json).** Entry: P1 verified; dataset card matches the
   bundle; Space runs in the no-audio configuration. Actions: HF upload
   commands in PUBLISHING.md §Tier 1; then open both URLs logged out and
   confirm files load; record URLs + SHAs in `RELEASE_MANIFEST.json`; replace
   "not yet published" wording in README and dataset card.
-- **P3 Announcements.** Entry: P2 URLs live and verified. Order: Show HN
+- **P3 Announcements (held).** Entry: P2 URLs live and verified (met) **and** a
+  listening spot check of the synthetic clips (council condition: Taleb,
+  Kahneman), reported in the post either way. Order: Show HN
   (morning-neutral, author available all day to answer), maintainer's stronger
   social platform, then the subreddit, then the HF forum thread. One platform
   per working session so questions get real answers.
@@ -164,7 +169,7 @@ real scoring bug, someone adding a system to `runs/`.
 > control (FLEURS, CC-BY; likely seen in ASR training, so a channel check, not a
 > generalization test) reported separately: telephone simulation nearly doubles
 > WER on human speech too. Code, reports, dataset card and a CPU
-> demo: <links after P2 verification>.
+> demo: https://huggingface.co/datasets/Gjusev/voxentity-eu.
 
 ### Short social post (X/LinkedIn, same body)
 
@@ -173,7 +178,7 @@ real scoring bug, someone adding a system to `runs/`.
 > dates, addresses, codes). 120 independent synthetic test scenarios × clean
 > + simulated telephone. Result: Whisper 34%, Voxtral 37% exact capture vs a
 > 91% ceiling; emails ≈ 0–20% in all 3 languages we tested. Provisional
-> (automated QA). CPU-reproducible, data + demo: <links>.
+> (automated QA). CPU-reproducible, data + demo: https://github.com/Gjusev/voxentity-eu
 
 ### Reddit (r/MachineLearning, title prefixed `[P]`) — opening text
 
