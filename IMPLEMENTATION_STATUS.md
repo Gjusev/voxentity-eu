@@ -283,3 +283,21 @@ en `reports/ext-<suite>/`, scoring CPU con `python scripts/ext_suites.py <suite>
 
 - Requiere proveedor y presupuesto explícitos (AGENTS.md: este encargo no
   autoriza inferencia de pago). No iniciado.
+
+## Decisión de publicación (propietario) y consejo
+
+- Propietario: "todo público". Registrado en el registro de derechos: S03 (audio
+  Qwen3-TTS) y S17 (voces Piper) `verified` como decisión del propietario sobre la
+  evidencia de licencia (Apache-2.0 sin términos de salida; CC0 / CC BY 4.0), con
+  vía de retirada por issues de GitHub. No es una opinión legal.
+- Consejo (perspectivas independientes): Munger, Taleb y Torvalds → publicar todo,
+  con decisión registrada, contacto de retirada y orden GitHub → CI verde → clon
+  limpio → HF; Kahneman → escuchar antes. Taleb y Kahneman: retener el anuncio
+  (post) hasta una escucha por muestreo.
+- Alerta automática de fallos de síntesis (`scripts/tts_alert.py`, alerta y no
+  filtro): 7/180 clips limpios con ambos ASR lejos del texto escrito y hablado
+  (email 2, teléfono 3, dirección 1, código 1); ninguno excluido del scoring.
+- Riesgos técnicos del consejo resueltos antes de publicar: `.gitattributes`
+  (LF), 8 logs de build retirados del índice, gradio fijado a la versión probada
+  (6.17.3) en requirements y frontmatter del Space, enlaces absolutos a GitHub en
+  la ficha del dataset y el README del Space, sin secretos ni rutas locales.

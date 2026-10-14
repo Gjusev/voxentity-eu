@@ -17,26 +17,32 @@ where each entry carries URL, revision, license text URL and review status.
 - Generator: Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice, revision
   `85e237c12c027371202489a0ec509ded67b5e4b5`, declared model license Apache-2.0
   (S03 in the rights registry).
-- Status: **provisional / conditional**. A model license alone does not prove
-  unrestricted rights over all generated audio. Until the voice-output terms of
-  the served model revision are verified end-to-end, synthetic WAV files are
-  distributed as part of the public dataset **only after** the corresponding
-  rights-registry entry moves to `verified`; otherwise this repository ships
-  the generation pipeline, text corpus and metadata so anyone can regenerate
-  audio locally under their own acceptance of the model terms.
+- Status: **distributed by owner decision** (registry S03 `verified`). Basis:
+  Apache-2.0 at the pinned revision on both the model card and the code
+  repository, with no usage or output-ownership terms found; predefined voices
+  only; invented values. This records the project owner's decision on that
+  evidence and is **not a legal opinion**; a model license alone does not prove
+  rights over every generated output. Audio is released under CC-BY-4.0 as part
+  of the dataset, to the extent the project can grant it. Takedown or rights
+  concerns: open an issue on GitHub `Gjusev/voxentity-eu`; affected files are
+  removed and the release notes record the removal.
+- Quality: automated QA only, no human listening review. An automated alert
+  (both independent ASR systems far from both the written and the spoken text)
+  flags 7 of 180 clean core clips as likely synthesis failures; unverified by
+  ear (`scripts/tts_alert.py`).
 - Voices: predefined speakers `serena` and `dylan` selected via the official
   API; no cloned or personally recorded voices (decision D03).
 
 ## Extension-suite audio (data/ext/*)
 
-- `codeswitch`, `multiturn`, `voices`: Qwen3-TTS, same terms and the same
-  provisional / conditional status as the core synthetic audio above (voices
-  serena, dylan, vivian, ryan; predefined speakers only).
-- `piper`: Piper voices (THIRD_PARTY_NOTICES.md). The French voice's training
-  data is CC-BY 4.0 (SIWIS): any redistributed `piper` French audio carries that
-  attribution. Status: **conditional**, same rule as above: audio ships only
-  after the rights-registry entry is verified; otherwise the pipeline and text
-  are the distributed artifacts.
+- `codeswitch`, `multiturn`, `voices`, `es`: Qwen3-TTS, same terms and the same
+  owner-decision status as the core synthetic audio above (voices serena,
+  dylan, vivian, ryan; predefined speakers only).
+- `piper`: Piper voices (THIRD_PARTY_NOTICES.md; registry S17). The French
+  voice's training data is CC BY 4.0 (SIWIS): the French `piper` audio carries
+  that attribution (Yamagishi, Honnet, Garner, Lazaridis 2017,
+  doi:10.7488/ds/1705). Distributed by owner decision, same terms and takedown
+  route as above.
 
 ## Human-control audio (FLEURS)
 

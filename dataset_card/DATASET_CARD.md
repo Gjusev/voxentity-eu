@@ -47,7 +47,7 @@ cases additionally record the superseded previous mention.
 - The telephone condition is a **simulation**, not a PSTN call, and does not
   represent every codec.
 - Human control: FLEURS de_de / fr_fr test split at the pinned revision,
-  transformed as flagged in DATA_LICENSE.md.
+  transformed as flagged in [DATA_LICENSE.md](https://github.com/Gjusev/voxentity-eu/blob/main/DATA_LICENSE.md).
 
 ## Labels
 
@@ -60,7 +60,7 @@ per-audio provenance (synthesis and transform records with hashes).
 - Automated QA: decodability, mono, clipping fraction < 0.1%, energy, duration
   1–45 s, abrupt-ending alerts. ASR disagreement produces alerts only, never
   exclusions.
-- Human listening review status is tracked in IMPLEMENTATION_STATUS.md; until
+- Human listening review status is tracked in [IMPLEMENTATION_STATUS.md](https://github.com/Gjusev/voxentity-eu/blob/main/IMPLEMENTATION_STATUS.md); until
   completed, the corpus is labeled `automated-QA/provisional`, not `verified`.
 
 ## Splits
@@ -83,11 +83,28 @@ Under `ext/<suite>/` (gold, manifests, provenance) with their own reports:
 
 All are synthetic, with the simulated telephone channel and automated QA only.
 
+## Rights decision and takedown
+
+Synthetic audio (Qwen3-TTS and Piper) is published by the project owner's
+recorded decision: Apache-2.0 at the pinned model revision with no usage or
+output terms found, predefined voices only, invented values; Piper voice data
+CC0 (thorsten) and CC BY 4.0 (SIWIS, attribution below). This is not a legal
+opinion. Rights or takedown requests: open an issue at
+https://github.com/Gjusev/voxentity-eu/issues; affected files are removed and the
+removal is recorded in the changelog.
+
+Automated synthesis-failure alert (not a listening review): 7 of 180 clean core
+clips have both ASR systems far from both the written and the spoken text
+(`scripts/tts_alert.py`); they remain in the scored set.
+
 ## Licenses and attribution
 
-See DATA_LICENSE.md and THIRD_PARTY_NOTICES.md: annotations CC-BY-4.0;
-synthetic audio rights conditional on the generator's output terms; FLEURS
-audio CC-BY-4.0 with modifications flagged.
+See [DATA_LICENSE.md](https://github.com/Gjusev/voxentity-eu/blob/main/DATA_LICENSE.md) and [THIRD_PARTY_NOTICES.md](https://github.com/Gjusev/voxentity-eu/blob/main/THIRD_PARTY_NOTICES.md): annotations CC-BY-4.0;
+synthetic audio published by owner decision (section above); FLEURS audio
+CC-BY-4.0 with modifications flagged; French Piper audio carries the SIWIS
+attribution: Yamagishi, J.; Honnet, P.-E.; Garner, P.; Lazaridis, A. (2017). The
+SIWIS French Speech Synthesis Database. University of Edinburgh, CSTR.
+https://doi.org/10.7488/ds/1705
 
 ## Intended use and limitations
 

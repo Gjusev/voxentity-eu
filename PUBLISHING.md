@@ -47,15 +47,15 @@ Anyone can regenerate the synthetic audio locally from the published text,
 pinned model revisions and `voxentity synthesize`, under their own acceptance of
 the model terms.
 
-## Tier 2: synthetic audio (blocked until an explicit owner decision)
+## Tier 2: synthetic audio (unblocked by the owner's recorded decision)
 
-Rights registry S03 (Qwen3-TTS outputs) and the Piper suite are `conditional`.
-Evidence recorded in the registry: Apache-2.0 at the pinned revision, no usage or
-output terms on the model card or in the code repository. AGENTS.md: a model
-license alone is not proof of rights over all generated audio, so this tier needs
-the project owner's recorded decision (registry entry to `verified`, reason and
-date-free justification in `notes`), plus SIWIS CC BY 4.0 attribution for any
-French Piper audio.
+The owner decided to publish everything. Recorded in the rights registry: S03
+(Qwen3-TTS outputs) and S17 (Piper voices) `verified` as an owner decision on the
+license evidence, explicitly not a legal opinion, with a takedown route (GitHub
+issues). Council review (Munger, Taleb, Torvalds: publish all; Kahneman: listen
+first) and the automated synthesis alert (7/180 clean clips flagged) are summarized
+in IMPLEMENTATION_STATUS.md. French Piper audio carries the SIWIS CC BY 4.0
+attribution. Hold the announcement post until a listening spot check is done.
 
 ```bash
 hf upload <hf-user>/voxentity-eu data/audio/synthetic audio/synthetic --repo-type dataset
