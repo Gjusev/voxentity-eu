@@ -22,7 +22,7 @@ from pathlib import Path
 
 from ..contracts import SCHEMA_VERSION, Scenario
 from ..corpus import pools
-from ..corpus.verbalize import SPELL_FR, number_word
+from ..corpus.verbalize import SPELL, number_word
 from ..provenance import sha256_text, write_text_atomic
 
 SUITE = "codeswitch"
@@ -76,7 +76,7 @@ def _phone_en(number: str) -> str:
 
 def _ref_switch(code: str, locale: str) -> str:
     letters, _, digits = code.partition("-")
-    nato = " ".join(SPELL_FR[c.lower()] for c in letters)
+    nato = " ".join(SPELL["fr-FR"][c.lower()] for c in letters)
     if locale == "de-DE":
         chunks = [digits[i : i + 2] for i in range(0, len(digits), 2)]
         nums = " ".join(" ".join(number_word(int(d), locale) for d in c) if c.startswith("0") else number_word(int(c), locale)
