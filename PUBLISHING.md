@@ -1,7 +1,9 @@
-# Publishing (prepared, not run)
+# Publishing (runbook)
 
-Nothing here has been executed. Each step publishes content externally and needs
-explicit approval. Replace `<hf-user>` / `<gh-user>` with namespaces verified
+Executed once for v0.1.0: repo, dataset (with all audio, per the recorded owner
+decision) and Space are public and verified logged out
+(`RELEASE_MANIFEST.json`); announcements were not sent. This runbook stays for
+re-publishing and future suites; each step publishes content externally. Replace `<hf-user>` / `<gh-user>` with namespaces verified
 during preflight (`voxentity doctor --profile hf`, `gh auth status`).
 Release-gate evidence: [reports/release_gates.md](reports/release_gates.md).
 Launch plan and drafts: [docs/launch/LAUNCH.md](docs/launch/LAUNCH.md).

@@ -31,6 +31,11 @@ character fails the slot.
 > the corpus is labelled provisional. Absolute numbers depend on the synthesizer;
 > see the Piper result below.
 
+**Try it:** browse and listen to every scored case in the
+[results browser](https://huggingface.co/spaces/Gjusev/voxentity-eu-results) (HF
+Space), or download the full corpus from the
+[dataset](https://huggingface.co/datasets/Gjusev/voxentity-eu) on Hugging Face.
+
 ## Results
 
 120 test scenarios × 2 conditions (clean 16 kHz, simulated telephone 8 kHz) =

@@ -155,32 +155,35 @@ without comma «Weg 61 37672 Ort» and dots next to «at»), though they are
 general writing conventions. The rex-3 test numbers therefore have limited
 test exposure and are declared as such.
 
-## P9 — Delivery: STRUCTURE COMPLETED
+## P9 — Delivery: COMPLETED
 
-- PUBLISHING.md: prior gates, `gh`/`hf` commands (syntax verified against the
-  installed CLI) and communication drafts; nothing executed or sent.
+- PUBLISHING.md: gates, `gh`/`hf` commands (syntax verified against the
+  installed CLI) and communication drafts; the publication steps were executed,
+  the announcements were not sent.
 - Reproduction gate: run_tracks → score_all → compare → report leaves
   reports/ identical to the commit.
 - Second synthesizer: research/second-tts-gate.md (Piper, conditional).
 
 - Official LICENSE Apache-2.0, DATA_LICENSE, THIRD_PARTY_NOTICES, dataset
   card, CONTRIBUTING, bundle validator (secrets + checksums + rights).
-- External publication NOT executed (pending authorization): commands prepared
-  in PUBLISHING.md (tier 1 without synthetic audio / tier 2 blocked by rights
-  decision) and plan in docs/launch/LAUNCH.md.
+- External publication EXECUTED: GitHub repo public at tag `v0.1.0` (release
+  with the demo video and poster); HF dataset and Space public with all audio
+  per the recorded owner decision, verified logged out; URLs and revisions in
+  `RELEASE_MANIFEST.json`. Announcements held pending a listening spot check
+  (docs/launch/LAUNCH.md P3).
 
 ### Delivery gates (docs/10), executed on the final commit
 
 | gate | status | evidence |
 | --- | --- | --- |
 | G1 contracts | OK | pytest (all green, incl. importing every module), ruff, check_links |
-| G2 rights | OK with synthetic audio blocked | registry: S04/S05/S06/S16 verified; S03 (Qwen output) and piper conditional with evidence; bundle without audio |
+| G2 rights | OK | registry: S04/S05/S06/S16 verified; S03 (Qwen3-TTS output) and S17 (Piper voices) verified by the recorded owner decision, takedown via issues; synthetic audio published |
 | G3 corpus | OK | `corpus validate`: core 180, codeswitch 56, multiturn 96, voices 240, piper 120, es 90; 0 errors |
 | G4 evaluation | OK | `scripts/release_gates.py`: 5 core runs 240/240, complete, coverage 100% |
 | G5 honesty | OK | scan for prohibited claims; synthetic/simulated/provisional/N in README, card, reports, Space and figure |
 | G6 reproduction | OK | offline regeneration of core + 5 extensions byte-identical (`reports/release_gates.md`) |
 | G7 product | OK | Space tested in browser in full and tier 1 (no audio) mode |
-| G8 publication | PENDING by design | no real URLs until publishing; notices and dataset card match the bundle |
+| G8 publication | OK | GitHub repo + release `v0.1.0`, HF dataset and Space public; URLs and revisions verified logged out (`RELEASE_MANIFEST.json`) |
 
 Findings from this pass, fixed: 4 extension suites failed validation
 (validator assumed the core layout) and 40 multi-turn turn labels were wrong;
@@ -199,14 +202,15 @@ rex-3. Findings and their resolution are in git history.
 ## Blockages and limitations
 
 - Human listening of the corpus: pending → corpus «provisional», not «verified».
-- Synthetic audio rights: conditional (see DATA_LICENSE.md).
+- Synthetic audio rights: published by the recorded owner decision (S03, S17,
+  see DATA_LICENSE.md); not a legal opinion.
 - Transcripts entirely unrelated to the text (e.g. FR emails turned into
   unrelated sentences) do not allow distinguishing TTS failure from ASR
   failure without listening; listening of a sample is required.
 - Voxtral: completed and scored; the local bundle `release_bundle/` passes
   `release validate` (no credentials, checksums verified).
-- HF Space and dataset: local artifacts ready; external publication requires
-  explicit authorization.
+- HF Space and dataset: public and verified logged out
+  (`RELEASE_MANIFEST.json`).
 
 ## Extensions (separate suites; never mixed with the core tables)
 
