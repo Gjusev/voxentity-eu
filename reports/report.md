@@ -1,6 +1,6 @@
 # VoxEntity-EU measured results
 
-Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files.
+Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files. Absolute accuracies depend on the synthesizer: on the same core test scenarios a second TTS family (Piper) scored +10 pp higher (reports/ext-piper/report.md).
 
 ## Systems
 

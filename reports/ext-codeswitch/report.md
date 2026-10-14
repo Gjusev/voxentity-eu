@@ -3,7 +3,7 @@
 Separate suite, not part of the core 180 scenarios: 56 scenarios (16 dev / 40 test), emails with English separators, phone digits in English, NATO spelling in German, non-DE/FR names. Synthetic speech (Qwen3-TTS), clean + simulated telephone, automated QA only. Whisper large-v3-turbo through extractor rex-4 (frozen before this suite's ASR scoring; its rules come from this suite's dev split only). Test N = 40 scenarios x 2 conditions.
 
 
-Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files.
+Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files. Absolute accuracies depend on the synthesizer: on the same core test scenarios a second TTS family (Piper) scored +10 pp higher (reports/ext-piper/report.md).
 
 ## Systems
 

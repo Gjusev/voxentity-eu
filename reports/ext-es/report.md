@@ -3,7 +3,7 @@
 Separate suite, not part of the core DE/FR corpus: 90 scenarios (30 dev / 60 test), same six entity types and difficulty mix as the core. Synthetic speech (Qwen3-TTS voices serena/dylan, language 'spanish'), clean + simulated telephone, automated QA only. Whisper large-v3-turbo (language 'spanish') through extractor rex-4, whose Spanish rules were tuned on the Spanish dev split only, before any Spanish audio existed. Test N = 60 scenarios x 2 conditions.
 
 
-Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files.
+Synthetic speech, simulated telephone channel. All numbers come from frozen prediction files; corpus-level provisional status is tracked in IMPLEMENTATION_STATUS.md. N counts scenarios, not audio files. Absolute accuracies depend on the synthesizer: on the same core test scenarios a second TTS family (Piper) scored +10 pp higher (reports/ext-piper/report.md).
 
 ## Systems
 
