@@ -241,7 +241,7 @@ en `reports/ext-<suite>/`, scoring CPU con `python scripts/ext_suites.py <suite>
   teléfonos 15% → 70% (DE) y 55% (FR); emails ~0% con ambos. Las cifras
   absolutas del núcleo dependen del sintetizador (advertido en README).
 
-### Español (`es`): EN CURSO
+### Español (`es`): COMPLETADO
 
 - Suite de 90 escenarios (30 dev / 60 test) en `data/ext/es/generated/`,
   hash `fd8762328c78df8fe8aa5f598be7c9482f36c16a35fff6fad407c1bdaf345701`.
@@ -249,7 +249,14 @@ en `reports/ext-<suite>/`, scoring CPU con `python scripts/ext_suites.py <suite>
   forma independiente (suite verde; 0 cambios en 720 predicciones del núcleo
   y 0/112 de code-switching con su extractor); fusionada fast-forward.
 - Smoke Qwen3-TTS español superado (serena y dylan; ida y vuelta Whisper
-  exacta). Síntesis, canal, QA y Whisper en ejecución.
+  exacta). 90/90 sintetizados, 180 clips QA ok, whisper (language
+  'spanish') 180/180.
+- Test (60 escenarios x 2 condiciones): whisper 50.8% [41.7, 60.0] frente a
+  techo escrito 96.7% [91.7, 100.0] y hablado 95.0%. Celdas: fechas 90%,
+  códigos 75%, nombres 60%, teléfonos 60%, direcciones 20%, emails 0%.
+  Limpio − teléfono +8.3 pp. No comparable directamente con DE/FR (34.2%):
+  escenarios y plantillas distintos; sólo coincide el patrón (emails 0% en
+  los tres idiomas).
 
 ### Proveedores comerciales: BLOQUEADO
 

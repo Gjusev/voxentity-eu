@@ -92,7 +92,7 @@ Aceptación: fresh-environment scoring offline idéntico, ninguna credencial, de
 
 - [ ] Dos proveedores de voz con acceso y presupuesto, estado final verificable. — bloqueado: requiere proveedor y presupuesto explícitos.
 - [x] Correcciones entre turnos y code-switching. — evidencia: reports/ext-multiturn/report.md, reports/ext-codeswitch/report.md (suites propias en data/ext/).
-- [ ] Español y nueva versión de corpus.
+- [x] Español y nueva versión de corpus. — evidencia: suite es (90 escenarios, data/ext/es/generated) y reports/ext-es/report.md; corpus DE/FR intacto.
 - [x] Más voces/casos si análisis revela cobertura insuficiente. — evidencia: análisis de cobertura (efecto voz confundido con escenario) → reports/ext-voices/report.md; además segunda familia TTS en reports/ext-piper/report.md.
 
 Cada extensión tiene suite propia. No inflar tamaño del corpus principal ni completar casillas con mocks.

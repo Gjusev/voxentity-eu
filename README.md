@@ -44,6 +44,8 @@ Extension suites (separate data and reports; never merged into the core tables):
 | [Piper TTS](reports/ext-piper/report.md) | second TTS family, same scenarios | 44.2% vs 34.2% Qwen, paired +10.0 pp [+4.2, +15.4] |
 | [Multi-turn](reports/ext-multiturn/report.md) | correction / confirmation across two turns | final state 42.2% [29.7, 54.7]; 0 stale; 19/19 when both turns heard right |
 | [Code-switching](reports/ext-codeswitch/report.md) | English pieces in DE/FR speech | 31.2% [22.5, 38.8] vs 65.0% extractor ceiling |
+| [Voices](reports/ext-voices/report.md) | two more Qwen voices on the same scenarios | vivian − ryan +0.8 pp [−3.3, +5.0]; core voice gap ≈ 3 pp scenario + 7 pp voice |
+| [Spanish](reports/ext-es/report.md) | 90 es-ES scenarios, same entity types | 50.8% [41.7, 60.0] vs 96.7% extractor ceiling (different scenarios; not comparable to DE/FR) |
 An earlier extractor version (rex-2) supported a wrong "ASR bottleneck"
 conclusion; the retraction is documented in
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
