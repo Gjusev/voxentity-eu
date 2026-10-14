@@ -9,10 +9,9 @@ license:
 multilinguality:
   - multilingual
 size_categories:
-  - n<1K
+  - 1K<n<10K
 task_categories:
   - automatic-speech-recognition
-  - speech-processing
 tags:
   - spoken-entity-capture
   - telephone-channel

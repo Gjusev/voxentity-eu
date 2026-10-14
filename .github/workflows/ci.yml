@@ -7,8 +7,8 @@ jobs:
     # core scoring stays CPU-only and offline: no torch, no model downloads
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - run: pip install -r uv-core.lock && pip install --no-deps -e . && pip install pytest ruff

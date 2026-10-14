@@ -1,0 +1,29 @@
+{
+ "release": "0.1.0",
+ "verified_logged_out": true,
+ "artifacts": {
+  "github": {
+   "url": "https://github.com/Gjusev/voxentity-eu",
+   "visibility": "public",
+   "commit_published": "769e6e3986a5f822161e719cd0139e47cc01add4",
+   "ci_first_run": "green on ubuntu (lock install, ruff, link check, pytest)"
+  },
+  "hf_dataset": {
+   "url": "https://huggingface.co/datasets/Gjusev/voxentity-eu",
+   "visibility": "public, not gated",
+   "revision": "d1c7727129d0d83bfe204436eee6cf1cf65accca",
+   "contents": "release bundle (gold, manifests, predictions, reports, checksums) + 1864 WAV: core 360, human control 300, codeswitch 112, multiturn 192, voices 480, piper 240, es 180",
+   "integrity": "anonymous download: 25 random bundle files and 12 audio files (clean + telephone per suite) match recorded SHA-256"
+  },
+  "hf_space": {
+   "url": "https://huggingface.co/spaces/Gjusev/voxentity-eu-results",
+   "app": "https://gjusev-voxentity-eu-results.hf.space/",
+   "visibility": "public",
+   "revision": "c178d3e3f17c56513e85fae16ce427ec865eb629",
+   "check": "RUNNING; error example and clean/telephone WAV playback verified in a browser"
+  }
+ },
+ "rights": "synthetic audio published by owner decision recorded in data/generated/rights_registry.jsonl (S03, S17); not a legal opinion; takedown via GitHub issues",
+ "review_status": "automated QA only, no human listening review (provisional)",
+ "announcement": "not posted; LinkedIn draft held until a listening spot check (docs/launch/LAUNCH.md)"
+}

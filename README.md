@@ -2,7 +2,7 @@
 
 Open evaluation of German and French spoken entity capture.
 
-**Status: implemented and measured locally; not yet published externally.** The repository contains a working CPU/offline CLI, a 180-scenario synthetic corpus (360 paired audio files, automated-QA **provisional** — no human listening review yet), measured baselines (Whisper large-v3-turbo, Voxtral Mini via Kaggle), a reference agent with observable slot persistence, an independent FLEURS human-speech control, and reproducible scoring. No external site, dataset or Space has been published from this work yet; every public artifact referenced below exists only as a local file until the release gates pass.
+**Status: published, provisional.** Dataset with audio: [huggingface.co/datasets/Gjusev/voxentity-eu](https://huggingface.co/datasets/Gjusev/voxentity-eu) · results browser (CPU): [huggingface.co/spaces/Gjusev/voxentity-eu-results](https://huggingface.co/spaces/Gjusev/voxentity-eu-results) · verified URLs and revisions in [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json). The repository contains a working CPU/offline CLI, a 180-scenario synthetic corpus (360 paired audio files, automated-QA **provisional** — no human listening review yet), measured baselines (Whisper large-v3-turbo, Voxtral Mini via Kaggle), a reference agent with observable slot persistence, an independent FLEURS human-speech control, and reproducible scoring. Synthetic audio is published by the owner's recorded rights decision (not a legal opinion; see [DATA_LICENSE.md](DATA_LICENSE.md)); takedown requests via GitHub issues.
 
 The benchmark asks whether a system captures the exact name, telephone number, email address, calendar value, postal address or reference code spoken by a caller. Its main corpus is controlled synthetic speech. A separate, licensed human-speech control measures transfer limitations without requiring new speaker recruitment.
 
@@ -91,12 +91,12 @@ Measured results live in `reports/report.md` (regenerable offline from frozen pr
 
 The initial public target is 180 independent scenarios and 360 paired audio files. A second synthesis family, human control and real final-slot evaluation have separate gates. No ranking or production-reliability claim may be invented.
 
-## Proposed public artifacts
+## Public artifacts
 
-- This independent GitHub project.
-- A Hugging Face dataset with audio, labels and provenance.
-- A CPU-friendly Space for browsing measured failures.
-- Kaggle notebooks for generation and reproducible evaluation.
-- A technical report with paired degradation measurements and limitations.
+- This GitHub project (code, reports, manifests): public.
+- [Hugging Face dataset](https://huggingface.co/datasets/Gjusev/voxentity-eu) with audio, labels, provenance and the release bundle: public.
+- [CPU Space](https://huggingface.co/spaces/Gjusev/voxentity-eu-results) for browsing measured failures with audio: public.
+- Notebooks for generation, evaluation and reproduction: in `notebooks/` (not published on Kaggle).
+- Technical report with paired degradation measurements and limitations: [reports/report.md](reports/report.md) plus one report per extension suite.
 
-No remote has been created yet. Publication commands are prepared in [PUBLISHING.md](PUBLISHING.md) and have not been run.
+Published from the commands in [PUBLISHING.md](PUBLISHING.md); verified artifacts in [RELEASE_MANIFEST.json](RELEASE_MANIFEST.json). The launch announcement is a held draft ([docs/launch/LAUNCH.md](docs/launch/LAUNCH.md)).
