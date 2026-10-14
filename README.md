@@ -25,6 +25,10 @@ stratified bootstrap 95% CIs:
   Voxtral +4.2 pp [−0.8, +9.2], not conclusive.
 - Emails and phone numbers are the weakest cells. French postal addresses are
   limited by the extractor itself (written-gold ceiling 20%), not by ASR.
+- **The synthesizer matters.** The same test scenarios synthesized with a
+  second TTS family (Piper) score +10.0 pp higher with Whisper (paired
+  [+4.2, +15.4]); phone numbers rise from 15% to 55–70%. Absolute numbers
+  above are conditional on Qwen3-TTS; emails stay near 0% with both.
 - Human-speech control (FLEURS, 100 utterances per condition, likely seen in
   ASR training): Whisper WER 0.115 clean vs 0.221 telephone. Reported
   separately and not comparable with the synthetic numbers.
@@ -32,6 +36,14 @@ stratified bootstrap 95% CIs:
 ![Slot accuracy by cell](reports/figures/cell_accuracy.svg)
 
 Full tables, error taxonomy and caveats are in [reports/report.md](reports/report.md).
+
+Extension suites (separate data and reports; never merged into the core tables):
+
+| suite | what it tests | headline (test, Whisper turbo) |
+| --- | --- | --- |
+| [Piper TTS](reports/ext-piper/report.md) | second TTS family, same scenarios | 44.2% vs 34.2% Qwen, paired +10.0 pp [+4.2, +15.4] |
+| [Multi-turn](reports/ext-multiturn/report.md) | correction / confirmation across two turns | final state 42.2% [29.7, 54.7]; 0 stale; 19/19 when both turns heard right |
+| [Code-switching](reports/ext-codeswitch/report.md) | English pieces in DE/FR speech | 31.2% [22.5, 38.8] vs 65.0% extractor ceiling |
 An earlier extractor version (rex-2) supported a wrong "ASR bottleneck"
 conclusion; the retraction is documented in
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
