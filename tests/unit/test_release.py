@@ -23,3 +23,15 @@ def test_bundle_lists_runs_and_validates_them(tmp_path):
     (out / "predictions" / "sys-a" / "predictions.jsonl").unlink()
     with pytest.raises(QualityGateFailed, match="without predictions: sys-a"):
         cli_release_validate(str(out))
+
+
+def test_extension_gold_ships_but_audio_does_not(tmp_path):
+    src = tmp_path / "src"
+    (src / "data/ext/es/generated/gold").mkdir(parents=True)
+    (src / "data/ext/es/generated/gold/scenarios.jsonl").write_text("{}\n")
+    (src / "data/ext/es/audio/synthetic/clean").mkdir(parents=True)
+    (src / "data/ext/es/audio/synthetic/clean/x.wav").write_bytes(b"RIFF")
+    out = tmp_path / "bundle"
+    build_bundle(src, out)
+    assert (out / "ext/es/gold/scenarios.jsonl").exists()
+    assert not list(out.rglob("*.wav"))

@@ -134,11 +134,13 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
         ("DATA_LICENSE.md", "DATA_LICENSE.md"),
         ("THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.md"),
         ("dataset_card/DATASET_CARD.md", "dataset_card/DATASET_CARD.md"),
-        ("reports/report.md", "reports/report.md"),
-        ("reports/figures", "reports/figures"),
+        ("reports", "reports"),  # core report, figures and every reports/ext-* report
         ("uv-core.lock", "uv-core.lock"),
     ]:
         copy_if_exists(rel, dest)
+    # extension suites: only generated/ (gold, manifests, provenance); their audio stays out
+    for gen in sorted((source_dir / "data/ext").glob("*/generated")):
+        copy_if_exists(gen.relative_to(source_dir).as_posix(), f"ext/{gen.parent.name}")
     copy_if_exists("runs", "predictions")
 
     lines = []
