@@ -1,7 +1,7 @@
 """ES extension suite: structure, split separation, and the frozen main corpus.
 
 The ES suite is separate (docs/09 §Extensiones): 6 cells x 15 cases, its own
-manifest under data/ext/es, and the DE/FR corpus must stay byte-identical.
+manifest under data/ext/es/generated, and the DE/FR corpus must stay byte-identical.
 """
 
 import json

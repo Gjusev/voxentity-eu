@@ -37,7 +37,7 @@ def dispatch(args: argparse.Namespace) -> dict[str, Any]:
             suite = getattr(args, "suite", "main")
             out = args.out
             if suite == "es" and out == "data/generated":
-                out = "data/ext/es"
+                out = "data/ext/es/generated"  # same layout as every extension suite
             return cli_build(args.config, out, suite=suite)
         if args.corpus_command == "validate":
             return cli_validate(args.manifest, args.gold)

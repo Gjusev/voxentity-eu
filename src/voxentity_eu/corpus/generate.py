@@ -2,7 +2,7 @@
 
 Main suite (DE/FR): 180 scenarios, 12 cells × 15 cases — MUST stay
 byte-identical; its corpus_hash is referenced by published runs.
-Extension suite (ES): 90 scenarios, 6 cells × 15 cases under data/ext/es,
+Extension suite (ES): 90 scenarios, 6 cells × 15 cases under data/ext/es/generated,
 its own manifest and splits (docs/09 §Extensiones: each extension has its
 own suite; the main corpus is never inflated).
 
