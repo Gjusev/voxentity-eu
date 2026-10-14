@@ -151,9 +151,9 @@ def build_bundle(source_dir: Path, out_dir: Path) -> dict[str, Any]:
 
     manifest = {
         "bundle_version": "0.1.0",
-        "runs": sorted(p.name for p in (out_dir / "predictions").iterdir() if p.is_dir() and p.name != "scored")
-        if (out_dir / "predictions").exists()
-        else [],
+        # a run is any directory holding predictions.jsonl (extension runs nest: ext-es/whisper-turbo)
+        "runs": sorted(p.parent.relative_to(out_dir / "predictions").as_posix()
+                       for p in (out_dir / "predictions").rglob("predictions.jsonl")),
         "files": len(entries),
         "notes": "local bundle; external publication requires explicit push commands",
     }
