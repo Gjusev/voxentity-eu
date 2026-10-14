@@ -82,6 +82,28 @@ An earlier extractor version (rex-2) led to a wrong "ASR bottleneck" conclusion.
 The retraction and what was fixed are documented in
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and [CHANGELOG.md](CHANGELOG.md).
 
+## Related work
+
+Closest neighbors, and how this differs:
+
+- [μ-Bench (Sierra)](https://github.com/sierra-research/mu-bench) transcribes real
+  customer-service calls multilingually and scores WER per utterance. VoxEntity-EU
+  scores exact value capture per entity type, over paired controlled conditions, with
+  corrections; it uses synthetic speech, which μ-Bench's real calls avoid.
+- [SLURP](https://aclanthology.org/2020.emnlp-main.588.pdf) and
+  [SLUE](https://github.com/asappresearch/slue-toolkit) evaluate semantic slots and
+  other SLU tasks from speech (English). Here the slot must match character for
+  character, in DE/FR, through a simulated telephone channel.
+- [PolyNorm](https://aclanthology.org/2025.emnlp-industry.6.pdf) benchmarks text
+  normalization for numbers, emails and dates. That is the textual layer of this
+  problem; VoxEntity-EU adds the acoustic channel and end-to-end capture.
+- [EOT-Bench (LiveKit)](https://github.com/livekit/eot-bench) measures end-of-turn
+  timing, a different axis of the same voice-stack problem.
+
+Full source review with licensing notes: [docs/02-research.md](docs/02-research.md).
+No worldwide-exclusivity claim is made; empty searches do not prove absence of
+competitors.
+
 ## Data and demo
 
 - Dataset with audio: [huggingface.co/datasets/Gjusev/voxentity-eu](https://huggingface.co/datasets/Gjusev/voxentity-eu)
