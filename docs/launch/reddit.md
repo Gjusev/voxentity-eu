@@ -1,64 +1,63 @@
 # Reddit draft (not posted)
 
 Owner posts manually (LAUNCH.md P3: after Show HN and the primary social post,
-one subreddit only, one platform per working session). Post it as a **text
-post**, not a link post: the body is where the caveats and method live, and
-r/MachineLearning scores the discussion, not the URL. Numbers verified against
-reports/ and README at drafting time (commit e4449b9); re-check before posting.
+one subreddit only, one platform per working session). Post as a **text post**.
+Numbers verified against reports/ and README at drafting time; re-check before
+posting.
+
+v2 (shorter, rougher register): first version was called out for reading
+AI-polished. Fixes: contractions, no labeled sections, no aphorism opener,
+~200 words instead of ~330.
 
 ## Target and title
 
-Primary: **r/MachineLearning**, tagged **[P]** (project). The sub requires one
-of [D]/[R]/[P]/[N]; a benchmark built and released by its author is [P].
-Title is plain on purpose; the number is the hook, no clickbait survives that
-audience.
+Primary: **r/MachineLearning**, tagged **[P]** (required by the sub).
 
 Title:
 
-> [P] I benchmarked whether ASR captures a dictated phone number exactly, in German and French. Whisper: 34% exact. Same text written down: 91%
+> [P] Whisper gets a dictated phone number exactly right 34% of the time (German/French benchmark, written-text ceiling 91%)
 
-Alternative for r/speechrecognition (no tag convention; pick ONE subreddit,
-do not post both):
+Alternative for r/speechrecognition (no tag convention; pick ONE subreddit):
 
-> Open benchmark: exact capture of dictated phone numbers, emails and names in German and French (Whisper 34% exact, written-text ceiling 91%)
+> Benchmark: how often does ASR get a dictated phone number or email exactly right? (German/French)
 
 ## Body (paste as text post)
 
-A transcript can read perfectly and still carry the wrong phone number. The caller says +33 6 05 36 23 71, Whisper writes +33 6 75 36 23 71 on a simulated phone line, the sentence looks fine, and every form downstream now stores a wrong number. WER barely notices, because the rest of the sentence is right.
+Whisper heard +33 6 05 36 23 71 and wrote down +33 6 75 36 23 71. The transcript reads fine, the number is wrong, and WER won't notice.
 
-I built a benchmark around that failure. VoxEntity-EU scores whether a speech system captures a dictated name, phone number, email, date, postal address or reference code exactly, in German and French. One wrong character fails the slot.
+That's what I built a benchmark for. VoxEntity-EU: does a speech system capture a dictated name, phone number, email, date or address exactly, in German and French. One wrong character fails the slot.
 
-Setup: 180 synthetic scenarios voiced with Qwen3-TTS, German and French, each in a clean 16 kHz version and through a simulated 8 kHz telephone channel. 120 independent test scenarios per system, 240 scored items each, same extractor for every system.
+180 synthetic scenarios (Qwen3-TTS), each clean and through a simulated 8 kHz phone line. 120 test scenarios per system, same extractor for everyone.
 
-Exact slot accuracy, 95% CI:
+Whisper large-v3-turbo: 34.2% exact [28.3, 40.4]
+Voxtral Mini 3B: 37.1% [30.0, 43.8]
+Correct written text, same extractor: 90.8%
 
-- Whisper large-v3-turbo: 34.2% [28.3, 40.4]
-- Voxtral Mini 3B: 37.1% [30.0, 43.8]
-- same correct text into the extractor (ceiling): 90.8% [87.5, 94.2]
+Emails land between 0 and 20%, phone numbers between 10 and 25%.
 
-The two ASR systems are statistically indistinguishable (difference −2.9 pp [−7.1, +1.3]). It is published as a null result, because that is what it is.
+Before anyone quotes this: the speech is synthetic, and a second TTS (Piper) on the same scenarios gives Whisper +10 points, so treat the numbers as Qwen3-specific. Review so far is automated QA plus me listening to a sample. Nothing systematic, hence provisional on everything.
 
-Where it falls apart: emails land at 0 to 20% depending on language and system, phone numbers at 10 to 25%. The simulated phone line alone costs Whisper 5 points [+0.8, +10.0]. On a human-speech control (FLEURS) the simulated channel nearly doubles WER too; that control is a channel check, not a generalization claim, since FLEURS was likely in the training data.
+Also, my first extractor was broken and produced a wrong headline number. I retracted it publicly; changelog has the details.
 
-Caveats I want in front, not buried:
+Predictions are frozen with checksums, every table regenerates on a CPU offline, and there's a browser where you can listen to each failure.
 
-- The speech is synthetic. When a second TTS family (Piper) voices the same scenarios, Whisper scores 10 points higher [+4.2, +15.4] and phone numbers jump from 15% to 55 to 70%. Absolute numbers are synthesizer-conditional, so results are published per TTS family.
-- Review status: automated QA plus my own listening spot check, which found no issues. No systematic per-clip human review yet, so the corpus is labelled provisional.
-- One scar, because it matters here: my first extractor version produced a wrong headline conclusion. I retracted it publicly; the changelog documents what was measured wrong.
+repo: https://github.com/Gjusev/voxentity-eu
+dataset: https://huggingface.co/datasets/Gjusev/voxentity-eu
+listen: https://huggingface.co/spaces/Gjusev/voxentity-eu-results
 
-Everything rescores on a CPU with no network: predictions are frozen with checksums, and a notebook regenerates every table from the release bundle. There is also a results browser where you can listen to each scored case and hear the failures yourself.
+Happy to go into the method.
 
-What would you test next? Another TTS family, or a language the extractor is weaker on, would stress the same pipeline. Method questions welcome, I will be in the comments.
+## Reply to the "stinks of AI" comment (if v1 was already posted)
 
-Dataset (audio included): https://huggingface.co/datasets/Gjusev/voxentity-eu
-Listen to the failures: https://huggingface.co/spaces/Gjusev/voxentity-eu-results
-Code and reports: https://github.com/Gjusev/voxentity-eu
+> You're right. I don't usually publish stuff like this, so I kept polishing it to make it look good, and somewhere in there it stopped sounding like something a person types. Rewrote it, about half the length, no gloss. If it still reads off, tell me.
+
+Shorter alt:
+
+> Fair. I don't post often and wanted it to come out pretty, which is exactly how you end up sounding like a bot. It's rewritten now, shorter and plain.
 
 ## Posting notes
 
-- Three links at the end, repo last (LAUNCH.md: every rented post ends on the
-  repo).
-- Likely first questions: why synthetic speech at all, why not Common Voice,
-  extractor ceiling on French addresses (it is in the README), and the
-  retraction. Answers live in README and reports/release_gates.md.
+- Links at the end, repo first now (body flows better that way).
+- Likely first questions: why synthetic speech, extractor ceiling on French
+  addresses, the retraction. Answers in README and reports/release_gates.md.
 - One subreddit per session (P3). No crossposting the same body the same day.
