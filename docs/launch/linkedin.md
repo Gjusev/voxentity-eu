@@ -20,7 +20,7 @@ Voxtral Mini: 37.1% [30.0, 43.8]
 Ceiling with perfect text: 90.8%
 Emails: 0 to 20% in German and French, 0% in Spanish.
 
-Two caveats belong in any summary. The audio is synthetic (Qwen3-TTS): 120 test scenarios, each clean and through a simulated phone line, checked by automated QA only. And when I re-synthesized the same scenarios with another TTS, accuracy rose 10 points, so part of what this measures is the synthesizer.
+Two caveats belong in any summary. The audio is synthetic (Qwen3-TTS): 120 test scenarios, each clean and through a simulated phone line, checked by automated QA plus my own listening spot check. And when I re-synthesized the same scenarios with another TTS, accuracy rose 10 points, so part of what this measures is the synthesizer.
 
 The retraction is documented in the repo. Everything reproduces on a CPU.
 
@@ -45,7 +45,7 @@ The phone line alone cost Whisper 5 points [0.8, 10.0].
 
 What surprised me most: re-synthesizing the same scenarios with a second TTS raised accuracy by 10 points. So this benchmark partly measures its own synthesizer, and I publish both results side by side.
 
-Status is provisional. No human has listened to the clips yet; automated QA only. Data, audio and a results browser are public.
+Status is provisional: automated QA plus my own listening spot check, no systematic review yet. Data, audio and a results browser are public.
 
 Which entity type fails most in your stack?
 

@@ -81,7 +81,7 @@ Transition: clean → Scene 3 (strong cue 8.74 used for the third row lock)
 "Exact capture, 120 test scenarios × clean + simulated phone line." Three
 horizontal bars grow: Whisper 34.2% [28.3, 40.4], Voxtral 37.1% [30.0, 43.8],
 and a grey tick for the 90.8% ceiling with correct text (lands on cue 13.11).
-Numbers count up. Footnote: "Automated QA only. Provisional."
+Numbers count up. Footnote: "Automated QA plus one listening spot check. Provisional."
 Audio: bed only; a single click as the ceiling tick lands.
 Transition: soft → Scene 4
 

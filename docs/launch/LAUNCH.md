@@ -157,8 +157,8 @@ real scoring bug, someone adding a system to `runs/`.
 > emails, dates, addresses, reference codes: the part a voice form has to get
 > right character for character. 180 synthetic scenarios
 > (Qwen3-TTS, DE+FR), each as clean audio and a simulated 8 kHz telephone
-> channel; 120 independent test scenarios per system. Automated QA only, no
-> human listening review yet, so it is provisional.
+> channel; 120 independent test scenarios per system. Automated QA plus a
+> maintainer listening spot check, no systematic review yet, so it is provisional.
 >
 > Headline results (test, n=240 scenario×condition, same extractor for all
 > systems): Whisper large-v3-turbo 34.2% [28.3, 40.4] and Voxtral Mini
@@ -300,7 +300,7 @@ First comment:
 > dates, addresses, codes). 120 independent synthetic test scenarios × clean
 > + simulated telephone. Result: Whisper 34%, Voxtral 37% exact capture vs a
 > 91% ceiling; emails ≈ 0 to 20% in all 3 languages we tested. Provisional
-> (automated QA). CPU-reproducible, data + demo: https://github.com/Gjusev/voxentity-eu
+> (automated QA plus a listening spot check). CPU-reproducible, data + demo: https://github.com/Gjusev/voxentity-eu
 
 ### Reddit (r/MachineLearning, title prefixed `[P]`): opening text
 
@@ -308,7 +308,7 @@ First comment:
 > whether the system captures exact values (phone numbers, emails, names,
 > dates, addresses, reference codes) rather than roughly the right words.
 > German + French, 180 synthetic scenarios via Qwen3-TTS with a simulated
-> telephone channel; automated QA only (provisional). Same extractor for all
+> telephone channel; automated QA plus a listening spot check (provisional). Same extractor for all
 > systems: Whisper large-v3-turbo 34.2%, Voxtral Mini 37.1% (CIs overlap) vs
 > 90.8% written ceiling; per-cell failure analysis in the report. A second
 > TTS family moves the numbers +10 pp, so we publish per-synthesizer. Happy
@@ -319,7 +319,7 @@ First comment:
 
 > Sharing a DE/FR spoken-entity benchmark (names/phones/emails/dates/
 > addresses/codes): 180 synthetic scenarios (Qwen3-TTS; provisional,
-> automated QA only), clean + simulated telephone, frozen predictions in the
+> automated QA plus a listening spot check), clean + simulated telephone, frozen predictions in the
 > release bundle, CPU notebook that reproduces every number. Two ASR families
 > land at ~34 to 37% exact capture vs a 91% written ceiling; emails fail almost
 > everywhere. Extension suites: code-switching, multi-turn corrections,
